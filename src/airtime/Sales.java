@@ -4,6 +4,13 @@ import java.awt.Font;
 import java.awt.ScrollPane;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -15,13 +22,20 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.event.InternalFrameListener;
 
+import net.proteanit.sql.DbUtils;
+
 public class Sales extends MainMDI implements InternalFrameListener {
 	private JTextField txtFldEnterUnits;
 	private JTable Salestable;
+		
+	public static void main(String[] arg){
+		new Sales();
+		
+	}
 
 	public Sales() {
 			
-		JInternalFrame internalFrameSales = new JInternalFrame("Sales",true,true,true);
+		JInternalFrame internalFrameSales = new JInternalFrame("Sales");
 		internalFrameSales.setBounds(10, 0, 414, 229);
 		internalFrameSales.setSize(1340, 700);
 		internalFrameSales.setVisible(true);
@@ -44,18 +58,39 @@ public class Sales extends MainMDI implements InternalFrameListener {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				internalFrameSales.setVisible(false);
+				//internalFrameSales.setVisible(false);
 			}
 			
 		});
 		panel.add(btnCancel);
 		
-		String[] Cname = {"None","Safaricom","Airtel","Telkom","MTN","Tigo","Vodacom"};
+		//String[] Cname = {"None","Safaricom","Airtel","Telkom","MTN","Tigo","Vodacom"};
 		
-		JComboBox<String> cbxChseCompany = new JComboBox<String>(Cname);
+		JComboBox<String> cbxChseCompany = new JComboBox<String>();
 		cbxChseCompany.setFont(new Font("Times New Roman", Font.ITALIC,18));
 		cbxChseCompany.setBounds(316, 126, 180, 27);
+		cbxChseCompany.addItem("None");
 		panel.add(cbxChseCompany);
+				
+				try
+				{
+									
+					Connection myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime","root","Mbugua21");
+					
+					//PreparedStatement mystmt = myconn.prepareStatement("select CompanyName from transactions");
+					Statement mystmt= myconn.createStatement();							
+					ResultSet myRs = mystmt.executeQuery("select CompanyName from transactions");
+					
+					  while(myRs.next())
+					  {
+						
+					  	cbxChseCompany.addItem(myRs.getString("CompanyName"));
+				}				
+					
+				}
+				catch(Exception e) {
+					e.printStackTrace();
+				}
 		
 		txtFldEnterUnits = new JTextField();
 		txtFldEnterUnits.setBounds(316, 271, 180, 28);
@@ -115,8 +150,34 @@ public class Sales extends MainMDI implements InternalFrameListener {
 		panel.add(scrollPaneSales);
 		
 		Salestable = new JTable();
-		Salestable.setBounds(1182, 431, -445, -272);
+		Salestable.setBounds(1038, 431, -350, -280);
 		panel.add(Salestable);
+		
+		try
+		{
+					
+			
+			Connection myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime","root","Mbugua21");
+			
+			PreparedStatement mystmt = myconn.prepareStatement("select *from transactions where Date = ?");
+			
+			Date curDate = new Date();
+			
+			SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd");
+
+			String DateToStr = format.format(curDate);
+			System.out.println(DateToStr);
+			mystmt.setString(1,DateToStr);
+			
+						
+			ResultSet myRs = mystmt.executeQuery();
+			
+			Salestable.setModel(DbUtils.resultSetToTableModel(myRs));
+			
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
 		
 		JButton btnPrintSales = new JButton("Print");
 		btnPrintSales.setFont(new Font("Segoe UI", Font.ITALIC, 12));

@@ -4,23 +4,39 @@ import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.swing.JButton;
-import javax.swing.JInternalFrame;
-import javax.swing.event.InternalFrameListener;
-import javax.swing.JLabel;
-import javax.swing.JTextField;
 import javax.swing.JComboBox;
+import javax.swing.JInternalFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JTextField;
+import javax.swing.event.InternalFrameListener;
 
 public class Settings extends MainMDI implements InternalFrameListener {
 	private JTextField txtFieldCompanyName;
 	private JTextField txtFldCompanyProfit;
 	private JTextField txtFldEdtProfit;
+	
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				 new Settings();
+								
+			}
+		});
+	}
 
 	public Settings() {
 		
 		JInternalFrame internalFrameCompany = new JInternalFrame("Setting Up Company Details",true,true,true);
 		internalFrameCompany.setBounds(10, 0, 414, 229);
+		internalFrameCompany.setDefaultCloseOperation(JInternalFrame.EXIT_ON_CLOSE);
 		internalFrameCompany.setSize(1340, 700);
 		internalFrameCompany.setVisible(true);
 		desktopPane.add(internalFrameCompany);
@@ -54,6 +70,7 @@ public class Settings extends MainMDI implements InternalFrameListener {
 		JComboBox<Object> comboBoxEdtCompany = new JComboBox<Object>();
 		comboBoxEdtCompany.setBounds(937, 193, 245, 25);
 		internalFrameCompany.getContentPane().add(comboBoxEdtCompany);
+		//comboBoxEdtCompany.addItem(myRs.getString("CompanyName"));
 		
 		JLabel lblEdtCompanyName = new JLabel("Company Name:");
 		lblEdtCompanyName.setFont(new Font("Times New Roman", Font.ITALIC, 20));
@@ -68,10 +85,7 @@ public class Settings extends MainMDI implements InternalFrameListener {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				/*comboBoxEdtCompany.setVisible(true);
-				lblEdtCompanyName.setVisible(true);
-				lblCompanyName.setVisible(false);
-				txtFieldCompanyName.setVisible(false);*/
+				
 			}
 			
 		});
@@ -85,12 +99,46 @@ public class Settings extends MainMDI implements InternalFrameListener {
 		btnAddCompany.setFont(new Font("Segoe UI", Font.ITALIC, 12));
 		btnAddCompany.setBounds(235, 367, 90, 33);
 		internalFrameCompany.getContentPane().add(btnAddCompany);
-		
-		JButton btnCancel = new JButton("Cancel");
-		btnCancel.setBounds(404, 367, 90, 33);
-		internalFrameCompany.getContentPane().add(btnCancel);
-		btnCancel.setFont(new Font("Segoe UI", Font.ITALIC,12));
-		
+		btnAddCompany.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+			try{
+				Connection myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime?autoReconnect=true&useSSL=false","root","Mbugua21");
+				
+				
+				String query = "insert into transactions (CompanyName,CompanyProfit,Date) values (?,?,?)";
+				
+				Date curDate = new Date();
+				
+				SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd");
+
+				String DateToStr = format.format(curDate);
+				System.out.println(DateToStr);
+			
+				PreparedStatement mystmt = myconn.prepareStatement(query);
+				mystmt.setString(1,txtFieldCompanyName.getText() );
+				mystmt.setString(2,txtFldCompanyProfit.getText() );
+				mystmt.setString(3,DateToStr.toString() );
+				
+				mystmt.execute();
+				
+				 JOptionPane.showMessageDialog(null, "Data Saved");
+				mystmt.close();
+				
+				txtFieldCompanyName.setText(null);
+				txtFldCompanyProfit.setText(null);
+			}
+			catch(Exception e){
+				 JOptionPane.showMessageDialog(null,"Company Name Mentioned Already Exists","Duplicate Entry Alert",1);
+				 txtFieldCompanyName.setText(null);
+				 txtFldCompanyProfit.setText(null);
+				e.printStackTrace();}
+			
+			}
+					
+		});
+				
 		JLabel lblEditCompanyDetails = new JLabel("Edit Company Details");
 		lblEditCompanyDetails.setFont(new Font("Times New Roman", Font.ITALIC, 20));
 		lblEditCompanyDetails.setBounds(858, 123, 202, 25);
@@ -110,22 +158,29 @@ public class Settings extends MainMDI implements InternalFrameListener {
 		txtFldEdtProfit.setColumns(10);
 		txtFldEdtProfit.setBounds(937, 252, 245, 25);
 		internalFrameCompany.getContentPane().add(txtFldEdtProfit);
+		
+		JButton btnCancel = new JButton("Cancel");
+		btnCancel.setBounds(404, 367, 90, 33);
+		btnCancel.setFont(new Font("Segoe UI", Font.ITALIC,12));
 		btnCancel.addActionListener(new ActionListener(){
-
-			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				internalFrameCompany.setVisible(false);			
+				internalFrameCompany.dispose();	
+				new Sales();
+				close();
+				
 			}
 			
 		});
+		internalFrameCompany.getContentPane().add(btnCancel);
+		
+	}
 
+	protected void close() {
+		//WindowEvent winClosingEvent = new WindowEvent(this,WindowEvent.WINDOW_CLOSING);
+		//Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(winClosingEvent);
+		
+		
 	}
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				 new Settings();
-								
-			}
-		});
-	}
+
+	
 }
