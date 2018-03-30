@@ -13,6 +13,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameListener;
 	
@@ -265,6 +266,22 @@ public class MainMDI implements InternalFrameListener {
 			SwingUtilities.invokeLater(new Runnable() {
 				public void run() {
 					//new MainMDI();
+					   try {
+				            //here you can put the selected theme class name in JTattoo
+				            UIManager.setLookAndFeel("com.jtattoo.plaf.acryl.AcrylLookAndFeel");
+				 
+				        } catch (ClassNotFoundException ex) {
+				            java.util.logging.Logger.getLogger(MainMDI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+				            
+				        } catch (InstantiationException ex) {
+				            java.util.logging.Logger.getLogger(MainMDI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+				            
+				        } catch (IllegalAccessException ex) {
+				            java.util.logging.Logger.getLogger(MainMDI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+				            
+				        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+				            java.util.logging.Logger.getLogger(MainMDI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+				        }
 					new Sales();
 				}
 			});

@@ -1,7 +1,6 @@
 package airtime;
 
 import java.awt.Font;
-import java.awt.ScrollPane;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Connection;
@@ -18,6 +17,7 @@ import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.event.InternalFrameListener;
@@ -145,7 +145,7 @@ public class Sales extends MainMDI implements InternalFrameListener {
 		lblTodaySales.setBounds(809, 42, 162, 40);
 		panel.add(lblTodaySales);
 		
-		ScrollPane scrollPaneSales = new ScrollPane();
+		JScrollPane scrollPaneSales = new JScrollPane();
 		scrollPaneSales.setBounds(613, 103, 489, 353);
 		panel.add(scrollPaneSales);
 		

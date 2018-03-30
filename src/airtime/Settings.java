@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -19,18 +20,32 @@ import javax.swing.JTextField;
 import javax.swing.event.InternalFrameListener;
 
 public class Settings extends MainMDI implements InternalFrameListener {
-	private JTextField txtFieldCompanyName;
-	private JTextField txtFldCompanyProfit;
+	private static JTextField txtFieldCompanyName;
+	private static JTextField txtFldCompanyProfit;
 	private JTextField txtFldEdtProfit;
+	private static Connection myconn;
+	static PreparedStatement mystmt;
+	private ResultSet myRs;
+	JComboBox<String> comboBoxEdtCompany;
 	
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				 new Settings();
-								
-			}
+				 try{
+						myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime?autoReconnect=true&useSSL=false","root","Mbugua21");
+						
+					
+						
+					}
+					catch(Exception e){
+						 JOptionPane.showMessageDialog(null,"Database Connection Failure","Database Exception",1);
+						e.printStackTrace();}
+					
+					}
 		});
 	}
+		
 
 	public Settings() {
 		
@@ -67,10 +82,30 @@ public class Settings extends MainMDI implements InternalFrameListener {
 		txtFldCompanyProfit.setBounds(311, 252, 245, 25);
 		internalFrameCompany.getContentPane().add(txtFldCompanyProfit);
 				
-		JComboBox<Object> comboBoxEdtCompany = new JComboBox<Object>();
+		comboBoxEdtCompany = new JComboBox<String>();
 		comboBoxEdtCompany.setBounds(937, 193, 245, 25);
+		comboBoxEdtCompany.addItem("None");
+		comboBoxEdtCompany.setFont(new Font("Times New Roman", Font.ITALIC, 20));
 		internalFrameCompany.getContentPane().add(comboBoxEdtCompany);
-		//comboBoxEdtCompany.addItem(myRs.getString("CompanyName"));
+		try
+		{
+							
+			//Connection myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime","root","Mbugua21");
+			
+			mystmt = myconn.prepareStatement("select CompanyName from transactions");
+			//Statement mystmt= myconn.createStatement();							
+			myRs = mystmt.executeQuery();
+			
+			  while(myRs.next())
+			  {
+				
+			  	comboBoxEdtCompany.addItem(myRs.getString("CompanyName"));
+		}				
+			
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
 		
 		JLabel lblEdtCompanyName = new JLabel("Company Name:");
 		lblEdtCompanyName.setFont(new Font("Times New Roman", Font.ITALIC, 20));
@@ -104,7 +139,7 @@ public class Settings extends MainMDI implements InternalFrameListener {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 			try{
-				Connection myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime?autoReconnect=true&useSSL=false","root","Mbugua21");
+				//myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime?autoReconnect=true&useSSL=false","root","Mbugua21");
 				
 				
 				String query = "insert into transactions (CompanyName,CompanyProfit,Date) values (?,?,?)";
@@ -116,7 +151,7 @@ public class Settings extends MainMDI implements InternalFrameListener {
 				String DateToStr = format.format(curDate);
 				System.out.println(DateToStr);
 			
-				PreparedStatement mystmt = myconn.prepareStatement(query);
+				mystmt = myconn.prepareStatement(query);
 				mystmt.setString(1,txtFieldCompanyName.getText() );
 				mystmt.setString(2,txtFldCompanyProfit.getText() );
 				mystmt.setString(3,DateToStr.toString() );
