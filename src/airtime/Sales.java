@@ -26,10 +26,11 @@ import net.proteanit.sql.DbUtils;
 
 public class Sales extends MainMDI implements InternalFrameListener {
 	private JTextField txtFldEnterUnits;
-	private JTable Salestable;
+	private static JTable Salestable;
 		
 	public static void main(String[] arg){
 		new Sales();
+		displayResults();
 		
 	}
 
@@ -69,7 +70,8 @@ public class Sales extends MainMDI implements InternalFrameListener {
 		JComboBox<String> cbxChseCompany = new JComboBox<String>();
 		cbxChseCompany.setFont(new Font("Times New Roman", Font.ITALIC,18));
 		cbxChseCompany.setBounds(316, 126, 180, 27);
-		cbxChseCompany.addItem("None");
+		cbxChseCompany.setSize(230, 30);
+		cbxChseCompany.addItem("-Select Company-");
 		panel.add(cbxChseCompany);
 				
 				try
@@ -79,7 +81,7 @@ public class Sales extends MainMDI implements InternalFrameListener {
 					
 					//PreparedStatement mystmt = myconn.prepareStatement("select CompanyName from transactions");
 					Statement mystmt= myconn.createStatement();							
-					ResultSet myRs = mystmt.executeQuery("select CompanyName from transactions");
+					ResultSet myRs = mystmt.executeQuery("select CompanyName from company");
 					
 					  while(myRs.next())
 					  {
@@ -107,10 +109,11 @@ public class Sales extends MainMDI implements InternalFrameListener {
 		lblAirtimeDenonimation.setBounds(109, 184, 194, 40);
 		panel.add(lblAirtimeDenonimation);
 		
-		String[] deno = {"None","10","20","50","100","250","500","1000"};
+		String[] deno = {"-Select Denomination-","10","20","50","100","250","500","1000"};
 		
-		JComboBox<Object> denomination = new JComboBox<Object>(deno);
+		JComboBox<String> denomination = new JComboBox<String>(deno);
 		denomination.setBounds(316, 191, 180, 29);
+		denomination.setSize(230, 30);
 		denomination.setFont(new Font("Times New Roman", Font.ITALIC,18));
 		panel.add(denomination);
 		
@@ -127,17 +130,61 @@ public class Sales extends MainMDI implements InternalFrameListener {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 			
-				if(cbxChseCompany.getSelectedItem() == null){
+				if(cbxChseCompany.getSelectedItem().equals("-Select Company-")){
 				JOptionPane.showMessageDialog(null, "Enter Company Name");}
 				
-				else if(denomination.getSelectedItem() == null){
+				else if(denomination.getSelectedItem().equals("-Select Denomination-")){
 					JOptionPane.showMessageDialog(null, "Enter Denomination");}
 				
-				else if(txtFldEnterUnits.getText() == null){
+				else if(txtFldEnterUnits.getText().equals("")){
 					JOptionPane.showMessageDialog(null, "Enter Number of Units");}
-			}
+				else {
+					try{
+						Connection myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime?autoReconnect=true&useSSL=false","root","Mbugua21");
+						
+						
+						String query = "insert into sales (CompanyName,Denominations,Units,Date) values (?,?,?,?)";
+						
+						Date curDate = new Date();
+						
+						SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd");
+
+						String DateToStr = format.format(curDate);
+						System.out.println(DateToStr);
+					
+						PreparedStatement mystmt = myconn.prepareStatement(query);
+						mystmt.setString(1,cbxChseCompany.getSelectedItem().toString() );
+						mystmt.setString(2,denomination.getSelectedItem().toString() );
+						mystmt.setString(3,txtFldEnterUnits.getText() );
+						mystmt.setString(4,DateToStr.toString() );
+						
+						mystmt.execute();
+						
+						 JOptionPane.showMessageDialog(null, "Data Saved");
+						mystmt.close();
+						
+						displayResults();
+						cbxChseCompany.setSelectedItem("-Select Company-");
+						denomination.setSelectedItem("-Select Denomination-");
+						txtFldEnterUnits.setText(null);
+					}
+					catch(Exception e){
+						 JOptionPane.showMessageDialog(null,e,"Duplicate Entry Alert",1);
+						 
+						cbxChseCompany.setSelectedItem(null);
+						denomination.setSelectedItem(null);
+						txtFldEnterUnits.setText(null);
+						
+						e.printStackTrace();}
+						}
+					}
 			
-		});
+			
+							
+				});
+
+				
+		
 		panel.add(btnAdd);
 		
 		JLabel lblTodaySales = new JLabel("Today's Sales");
@@ -152,32 +199,7 @@ public class Sales extends MainMDI implements InternalFrameListener {
 		Salestable = new JTable();
 		Salestable.setBounds(1038, 431, -350, -280);
 		panel.add(Salestable);
-		
-		try
-		{
-					
-			
-			Connection myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime","root","Mbugua21");
-			
-			PreparedStatement mystmt = myconn.prepareStatement("select *from transactions where Date = ?");
-			
-			Date curDate = new Date();
-			
-			SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd");
-
-			String DateToStr = format.format(curDate);
-			System.out.println(DateToStr);
-			mystmt.setString(1,DateToStr);
-			
-						
-			ResultSet myRs = mystmt.executeQuery();
-			
-			Salestable.setModel(DbUtils.resultSetToTableModel(myRs));
-			
-		}
-		catch(Exception e) {
-			e.printStackTrace();
-		}
+		scrollPaneSales.setViewportView(Salestable);
 		
 		JButton btnPrintSales = new JButton("Print");
 		btnPrintSales.setFont(new Font("Segoe UI", Font.ITALIC, 12));
@@ -208,5 +230,32 @@ public class Sales extends MainMDI implements InternalFrameListener {
 		});
 		
 		
+	}
+	public static void displayResults(){
+		try
+		{
+					
+			
+			Connection myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime","root","Mbugua21");
+			
+			PreparedStatement mystmt = myconn.prepareStatement("select *from sales where Date = ?");
+			
+			Date curDate = new Date();
+			
+			SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd");
+
+			String DateToStr = format.format(curDate);
+			System.out.println(DateToStr);
+			mystmt.setString(1,DateToStr);
+			
+						
+			ResultSet myRs = mystmt.executeQuery();
+			
+			Salestable.setModel(DbUtils.resultSetToTableModel(myRs));
+			
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
 	}
 }

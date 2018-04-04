@@ -84,15 +84,15 @@ public class Settings extends MainMDI implements InternalFrameListener {
 				
 		comboBoxEdtCompany = new JComboBox<String>();
 		comboBoxEdtCompany.setBounds(937, 193, 245, 25);
-		comboBoxEdtCompany.addItem("None");
+		comboBoxEdtCompany.addItem("-Select Company-");
 		comboBoxEdtCompany.setFont(new Font("Times New Roman", Font.ITALIC, 20));
 		internalFrameCompany.getContentPane().add(comboBoxEdtCompany);
 		try
 		{
 							
-			//Connection myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime","root","Mbugua21");
+			Connection myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime","root","Mbugua21");
 			
-			mystmt = myconn.prepareStatement("select CompanyName from transactions");
+			mystmt = myconn.prepareStatement("select CompanyName from company");
 			//Statement mystmt= myconn.createStatement();							
 			myRs = mystmt.executeQuery();
 			
@@ -129,6 +129,28 @@ public class Settings extends MainMDI implements InternalFrameListener {
 		btnDeleteCompany.setFont(new Font("Segoe UI", Font.ITALIC, 12));
 		btnDeleteCompany.setBounds(1036, 367, 90, 33);
 		internalFrameCompany.getContentPane().add(btnDeleteCompany);
+		btnDeleteCompany.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				JOptionPane.showMessageDialog(null, "Are you sure you want to delete " + comboBoxEdtCompany.getSelectedItem().toString() + " from the database"," Delete",0);
+				
+				try{
+					Connection myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime","root","Mbugua21");
+					
+					mystmt = myconn.prepareStatement("delete from company where CompanyName =?");
+					mystmt.setString(1,comboBoxEdtCompany.getSelectedItem().toString());
+										
+					mystmt.execute();
+					JOptionPane.showMessageDialog(null, "Company Name" + comboBoxEdtCompany.getSelectedItem().toString() +"has been deleted");
+					mystmt.close();
+									
+				}catch(Exception e) {
+					e.printStackTrace();
+				}
+			}
+			
+		});
 		
 		JButton btnAddCompany = new JButton("Add");
 		btnAddCompany.setFont(new Font("Segoe UI", Font.ITALIC, 12));
@@ -138,11 +160,18 @@ public class Settings extends MainMDI implements InternalFrameListener {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
+				if (txtFieldCompanyName.getText().equals("") && txtFldCompanyProfit.getText().equals("")) {
+					JOptionPane.showMessageDialog(null,"Company Name and Profit required");
+				}else if (txtFieldCompanyName.getText().equals("")){
+					JOptionPane.showMessageDialog(null,"Company Name is not declared");
+				}else if (txtFldCompanyProfit.getText().equals("")){
+					JOptionPane.showMessageDialog(null,"Company Profit is not declared");
+				}else{
 			try{
-				//myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime?autoReconnect=true&useSSL=false","root","Mbugua21");
+				myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime?autoReconnect=true&useSSL=false","root","Mbugua21");
 				
 				
-				String query = "insert into transactions (CompanyName,CompanyProfit,Date) values (?,?,?)";
+				String query = "insert into company (CompanyName,CompanyProfit,Date) values (?,?,?)";
 				
 				Date curDate = new Date();
 				
@@ -169,10 +198,13 @@ public class Settings extends MainMDI implements InternalFrameListener {
 				 txtFieldCompanyName.setText(null);
 				 txtFldCompanyProfit.setText(null);
 				e.printStackTrace();}
-			
+				}
 			}
+	
+	
 					
 		});
+
 				
 		JLabel lblEditCompanyDetails = new JLabel("Edit Company Details");
 		lblEditCompanyDetails.setFont(new Font("Times New Roman", Font.ITALIC, 20));
