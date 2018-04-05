@@ -5,7 +5,6 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -18,7 +17,6 @@ import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameListener;
 	
 public class MainMDI implements InternalFrameListener {
-
 
 		public JFrame contentPane;
 		public JMenuBar menuBar;
@@ -52,7 +50,7 @@ public class MainMDI implements InternalFrameListener {
 			contentPane.setVisible(true);
 			contentPane.setContentPane(desktopPane);
 			
-			
+			//ImageIcon icon = new ImageIcon("src/images/television-tv-dinosaur.jpg");
 			//desktopPane.setImageIcon(new ImageIcon(getClass().getResource("images//television-tv-dinosaur.jpg")));
 			desktopPane.setBackground(Color.GREEN);
 						
@@ -74,7 +72,6 @@ public class MainMDI implements InternalFrameListener {
 			mntmLock = new JMenuItem("Lock");
 			mntmLock.setFont(new Font("Times New Roman", Font.PLAIN, 14));
 			mntmLock.addActionListener(new ActionListener(){
-
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
 					mnSales.setVisible(false);
@@ -84,10 +81,8 @@ public class MainMDI implements InternalFrameListener {
 					mnHelp.setVisible(false);
 					mntmUnlock.setVisible(true);
 					mntmLock.setVisible(false);
-					desktopPane.setVisible(false);
-					
+					desktopPane.setVisible(false);	
 				}
-				
 			});
 			mnAdmin.add(mntmLock);
 			
@@ -95,7 +90,6 @@ public class MainMDI implements InternalFrameListener {
 			mntmUnlock.setVisible(false);
 			mntmUnlock.setFont(new Font("Times New Roman", Font.PLAIN, 14));
 			mntmUnlock.addActionListener(new ActionListener(){
-
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
 					mnSales.setVisible(true);
@@ -107,19 +101,16 @@ public class MainMDI implements InternalFrameListener {
 					desktopPane.setVisible(true);
 					
 				}
-				
 			});
 			mnAdmin.add(mntmUnlock);
 			
 			mntmExit = new JMenuItem("Exit");
 			mntmExit.setFont(new Font("Times New Roman", Font.PLAIN, 14));
 			mntmExit.addActionListener(new ActionListener(){
-
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
 						System.exit(0);
 				}
-				
 			});
 			mnAdmin.add(mntmExit);
 		}
@@ -133,7 +124,6 @@ public class MainMDI implements InternalFrameListener {
 		mntmSales = new JMenuItem("Open Sales");
 		mntmSales.setFont(new Font("Times New Roman", Font.PLAIN, 14));
 		mntmSales.addActionListener(new ActionListener(){
-
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				new Sales();
@@ -151,7 +141,6 @@ public class MainMDI implements InternalFrameListener {
 			mntmToday = new JMenuItem("Today");
 			mntmToday.setFont(new Font("Times New Roman", Font.PLAIN, 14));
 			mntmToday.addActionListener(new ActionListener(){
-
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
 					new Sales_Reports();
@@ -161,7 +150,6 @@ public class MainMDI implements InternalFrameListener {
 				
 			});
 			mnReports.add(mntmToday);
-			
 			
 			mntmYesterday = new JMenuItem("Yesterday");
 			mntmYesterday.setFont(new Font("Times New Roman", Font.PLAIN, 14));
@@ -204,17 +192,14 @@ public class MainMDI implements InternalFrameListener {
 		mntmCurrent = new JMenuItem("Current Stock");
 		mntmCurrent.setFont(new Font("Times New Roman", Font.PLAIN, 14));
 		mntmCurrent.addActionListener(new ActionListener(){
-
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				new Stocks();
 				contentPane.setVisible(false);
-			}
-			
+			}		
 		});
 		mnStock.add(mntmCurrent);
-	}
-			
+	}		
 	public void Settings(){
 				
 			mnSettings = new JMenu("SETTINGS");
@@ -225,21 +210,14 @@ public class MainMDI implements InternalFrameListener {
 			mntmAddCompany = new JMenuItem("Airtime Company");
 			mntmAddCompany.setFont(new Font("Times New Roman", Font.PLAIN, 14));
 			mntmAddCompany.addActionListener(new ActionListener(){
-
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
 					new Settings();
 					contentPane.setVisible(false);
-					//comboBoxEdtCompany.setVisible(false);
-					//lblEdtCompanyName.setVisible(false);
 				}
-				
 			});
-			mnSettings.add(mntmAddCompany);
-			
+			mnSettings.add(mntmAddCompany);	
 		}
-		
-
 	public void Help(){
 			
 			mnHelp = new JMenu("HELP");
@@ -249,19 +227,14 @@ public class MainMDI implements InternalFrameListener {
 			mntmAbout = new JMenuItem("About");
 			mntmAbout.setFont(new Font("Times New Roman", Font.PLAIN, 14));
 			mntmAbout.addActionListener(new ActionListener(){
-
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
 					new About();
 					contentPane.setVisible(false);
 				}
-				
 			});
-			mnHelp.add(mntmAbout);
-			
-			
-		}
-		
+			mnHelp.add(mntmAbout);	
+		}	
 		public static void main(String[] args) {
 			SwingUtilities.invokeLater(new Runnable() {
 				public void run() {
@@ -287,43 +260,17 @@ public class MainMDI implements InternalFrameListener {
 			});
 		}
 		@Override
-		public void internalFrameActivated(InternalFrameEvent e) {
-			// TODO Auto-generated method stub
-			
-		}
+		public void internalFrameActivated(InternalFrameEvent e) {}
 		@Override
-		public void internalFrameClosed(InternalFrameEvent e) {
-			// TODO Auto-generated method stub
-			
-		}
+		public void internalFrameClosed(InternalFrameEvent e) {}
 		@Override
-		public void internalFrameClosing(InternalFrameEvent e) {
-			// TODO Auto-generated method stub
-			
-		}
+		public void internalFrameClosing(InternalFrameEvent e) {}
 		@Override
-		public void internalFrameDeactivated(InternalFrameEvent e) {
-			// TODO Auto-generated method stub
-			
-		}
+		public void internalFrameDeactivated(InternalFrameEvent e) {}
 		@Override
-		public void internalFrameDeiconified(InternalFrameEvent e) {
-			// TODO Auto-generated method stub
-			
-		}
+		public void internalFrameDeiconified(InternalFrameEvent e) {}
 		@Override
-		public void internalFrameIconified(InternalFrameEvent e) {
-			// TODO Auto-generated method stub
-			
-		}
+		public void internalFrameIconified(InternalFrameEvent e) {}
 		@Override
-		public void internalFrameOpened(InternalFrameEvent e) {
-			// TODO Auto-generated method stub
-			
-		}
-		
-		
+		public void internalFrameOpened(InternalFrameEvent e) {}	
 	}
-
-
-

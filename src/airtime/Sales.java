@@ -30,8 +30,7 @@ public class Sales extends MainMDI implements InternalFrameListener {
 		
 	public static void main(String[] arg){
 		new Sales();
-		displayResults();
-		
+				
 	}
 
 	public Sales() {
@@ -65,7 +64,6 @@ public class Sales extends MainMDI implements InternalFrameListener {
 		});
 		panel.add(btnCancel);
 		
-		//String[] Cname = {"None","Safaricom","Airtel","Telkom","MTN","Tigo","Vodacom"};
 		
 		JComboBox<String> cbxChseCompany = new JComboBox<String>();
 		cbxChseCompany.setFont(new Font("Times New Roman", Font.ITALIC,18));
@@ -73,21 +71,17 @@ public class Sales extends MainMDI implements InternalFrameListener {
 		cbxChseCompany.setSize(230, 30);
 		cbxChseCompany.addItem("-Select Company-");
 		panel.add(cbxChseCompany);
-				
 				try
 				{
-									
 					Connection myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime","root","Mbugua21");
-					
-					//PreparedStatement mystmt = myconn.prepareStatement("select CompanyName from transactions");
+			
 					Statement mystmt= myconn.createStatement();							
 					ResultSet myRs = mystmt.executeQuery("select CompanyName from company");
 					
 					  while(myRs.next())
-					  {
-						
-					  	cbxChseCompany.addItem(myRs.getString("CompanyName"));
-				}				
+					  {						
+					  	cbxChseCompany.addItem(myRs.getString("CompanyName"));}
+						System.out.println("Displays Company Name on ComboBox Choose");		
 					
 				}
 				catch(Exception e) {
@@ -162,7 +156,7 @@ public class Sales extends MainMDI implements InternalFrameListener {
 						
 						 JOptionPane.showMessageDialog(null, "Data Saved");
 						mystmt.close();
-						
+						System.out.println("Sales Saved");
 						displayResults();
 						cbxChseCompany.setSelectedItem("-Select Company-");
 						denomination.setSelectedItem("-Select Denomination-");
@@ -171,20 +165,15 @@ public class Sales extends MainMDI implements InternalFrameListener {
 					catch(Exception e){
 						 JOptionPane.showMessageDialog(null,e,"Duplicate Entry Alert",1);
 						 
-						cbxChseCompany.setSelectedItem(null);
-						denomination.setSelectedItem(null);
+						cbxChseCompany.setSelectedItem("-Select Company-");
+						denomination.setSelectedItem("-Select Denomination-");
 						txtFldEnterUnits.setText(null);
 						
 						e.printStackTrace();}
 						}
-					}
-			
-			
-							
+					}		
 				});
-
 				
-		
 		panel.add(btnAdd);
 		
 		JLabel lblTodaySales = new JLabel("Today's Sales");
@@ -200,6 +189,29 @@ public class Sales extends MainMDI implements InternalFrameListener {
 		Salestable.setBounds(1038, 431, -350, -280);
 		panel.add(Salestable);
 		scrollPaneSales.setViewportView(Salestable);
+		try{
+			
+			Connection myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime","root","Mbugua21");
+			
+			PreparedStatement mystmt = myconn.prepareStatement("select *from sales where Date = ?");
+			
+			Date curDate = new Date();
+			
+			SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd");
+
+			String DateToStr = format.format(curDate);
+			System.out.println(DateToStr);
+			mystmt.setString(1,DateToStr.toString());
+			
+						
+			ResultSet myRs = mystmt.executeQuery();
+			
+			Salestable.setModel(DbUtils.resultSetToTableModel(myRs));
+			
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
 		
 		JButton btnPrintSales = new JButton("Print");
 		btnPrintSales.setFont(new Font("Segoe UI", Font.ITALIC, 12));
@@ -232,23 +244,12 @@ public class Sales extends MainMDI implements InternalFrameListener {
 		
 	}
 	public static void displayResults(){
-		try
-		{
-					
-			
+		try{
+		
 			Connection myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime","root","Mbugua21");
 			
-			PreparedStatement mystmt = myconn.prepareStatement("select *from sales where Date = ?");
-			
-			Date curDate = new Date();
-			
-			SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd");
-
-			String DateToStr = format.format(curDate);
-			System.out.println(DateToStr);
-			mystmt.setString(1,DateToStr);
-			
-						
+			PreparedStatement mystmt = myconn.prepareStatement("select *from sales");
+					
 			ResultSet myRs = mystmt.executeQuery();
 			
 			Salestable.setModel(DbUtils.resultSetToTableModel(myRs));

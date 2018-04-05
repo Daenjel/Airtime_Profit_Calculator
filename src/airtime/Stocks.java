@@ -10,11 +10,14 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -24,8 +27,10 @@ import javax.swing.event.InternalFrameListener;
 import net.proteanit.sql.DbUtils;
 
 public class Stocks extends MainMDI implements InternalFrameListener {
-	private JTable table_1;
+	private static JTable table_1;
 	private JTextField textField;
+	private JComboBox<Object> cmbCompanyName;
+	private JComboBox<Object> cmbDeno;
 
 	public Stocks() {
 		JInternalFrame internalFrameStock = new JInternalFrame("Current Stock",true,true,true);
@@ -52,6 +57,9 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
+				//new Sales();
+				//System.exit(0);
+				Sales.main(null);
 				internalFrameStock.setVisible(false);
 			}
 			
@@ -75,6 +83,7 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 			ResultSet myRs = mystmt.executeQuery();
 			
 			table_1.setModel(DbUtils.resultSetToTableModel(myRs));
+			System.out.println("Displays Stock");
 			
 		}
 		catch(Exception e) {
@@ -86,10 +95,60 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 		btnPrint.setBounds(1024, 573, 100, 40);
 		panel.add(btnPrint);
 		
-		JButton btnPrintCurrent = new JButton("Add");
-		btnPrintCurrent.setFont(new Font("Segoe UI", Font.ITALIC, 12));
-		btnPrintCurrent.setBounds(280, 371, 90, 40);
-		panel.add(btnPrintCurrent);
+		JButton btnAdd = new JButton("Add");
+		btnAdd.setFont(new Font("Segoe UI", Font.ITALIC, 12));
+		btnAdd.setBounds(280, 371, 90, 40);
+		panel.add(btnAdd);
+		btnAdd.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				if(cmbCompanyName.getSelectedItem().equals("-Select Company-")){
+					JOptionPane.showMessageDialog(null, "Enter Company Name");}
+					
+					else if(cmbDeno.getSelectedItem().equals("-Select Denomination-")){
+						JOptionPane.showMessageDialog(null, "Enter Denomination");}
+					
+					else if(textField.getText().equals("")){
+						JOptionPane.showMessageDialog(null, "Enter Number of Units");}
+					else {
+				try{
+					Connection myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime","root","Mbugua21");
+					
+					Date curDate = new Date();
+					
+					SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd");
+
+					String DateToStr = format.format(curDate);
+					System.out.println(DateToStr);
+					
+					PreparedStatement mystmt = myconn.prepareStatement("insert into stocks (Company,Denominations,Units,Date) values (?,?,?,?)");
+					mystmt.setString(1,cmbCompanyName.getSelectedItem().toString());
+					mystmt.setString(2,cmbDeno.getSelectedItem().toString());
+					mystmt.setString(3,textField.getText().toString());
+					mystmt.setString(4,DateToStr.toString());
+					
+					mystmt.execute();
+					JOptionPane.showMessageDialog(null,"Stock Saved");
+					displayStock();
+					mystmt.close();
+					System.out.println("Stocks Saved");
+				
+					cmbCompanyName.setSelectedItem("-Select Company-");
+					cmbDeno.setSelectedItem("-Select Denomination-");
+					textField.setText(null);
+				}catch (Exception e){
+					JOptionPane.showMessageDialog(null,e);
+					e.printStackTrace();
+					cmbCompanyName.setSelectedItem("-Select Company-");
+					cmbDeno.setSelectedItem("-Select Denomination-");
+					textField.setText(null);
+				}
+				
+			}
+			}
+		});
+		
 		
 		JLabel lblAddNewStock = new JLabel("Add New Stock");
 		lblAddNewStock.setFont(new Font("Times New Roman", Font.ITALIC, 22));
@@ -116,7 +175,7 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 		lblUnits.setBounds(210, 298, 69, 30);
 		panel.add(lblUnits);
 		
-		JComboBox<Object> cmbCompanyName = new JComboBox<Object>();
+		cmbCompanyName = new JComboBox<Object>();
 		cmbCompanyName.setFont(new Font("Times New Roman", Font.ITALIC, 20));
 		cmbCompanyName.addItem("-Select Company-");
 		cmbCompanyName.setBounds(337, 166, 230, 25);
@@ -128,15 +187,16 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 			
 			  while(myRs.next())
 			  {
-				
-			  	cmbCompanyName.addItem(myRs.getString("CompanyName"));
+				cmbCompanyName.addItem(myRs.getString("CompanyName"));
 			  }
+			  System.out.println("Displays Company Name on cmbCompanyName");
+			  myconn.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
 		String [] deno = {"-Select Denomination-","10","20","50","100","250","500","1000"};
-		JComboBox<Object> cmbDeno = new JComboBox<Object>(deno);
+		cmbDeno = new JComboBox<Object>(deno);
 		cmbDeno.setFont(new Font("Times New Roman", Font.ITALIC, 20));
 		cmbDeno.setBounds(337, 229, 230, 25);
 		panel.add(cmbDeno);
@@ -150,12 +210,67 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 		btnEdit.setFont(new Font("Segoe UI", Font.ITALIC, 12));
 		btnEdit.setBounds(426, 371, 83, 40);
 		panel.add(btnEdit);
+		btnEdit.addActionListener(new ActionListener(){
 
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				if (cmbCompanyName.getSelectedItem().equals("-Select Company-")){
+					JOptionPane.showMessageDialog(null,"Company Name is not declared");
+				}else if (cmbDeno.getSelectedItem().equals("-Select Denomination-")){
+					JOptionPane.showMessageDialog(null,"Company Denomination is not declared");
+				}else if (textField.getText().equals("")){
+					JOptionPane.showMessageDialog(null,"Number of Units are not declared");
+				}else{
+					try{
+						Connection myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime","root","Mbugua21");
+						
+						PreparedStatement mystmt = myconn.prepareStatement("update stocks set Denominations =?, Units =? where Company =?");
+						mystmt.setString(1,cmbDeno.getSelectedItem().toString());
+						mystmt.setString(2,textField.getText().toString());
+						mystmt.setString(3,cmbCompanyName.getSelectedItem().toString());
+											
+						mystmt.execute();
+						JOptionPane.showMessageDialog(null, cmbCompanyName.getSelectedItem().toString()+ " denomination "+cmbDeno.getSelectedItem().toString()+ " has changed to  " + textField.getText().toString());
+						mystmt.close();
+						System.out.println("Edited");
+						displayStock();
+						cmbCompanyName.setSelectedItem("-Select Company-");
+						cmbDeno.setSelectedItem("-Select Denomination-");
+						textField.setText(null);
+					}catch(Exception e) {
+						JOptionPane.showMessageDialog(null, e);
+						cmbCompanyName.setSelectedItem("-Select Company-");
+						cmbDeno.setSelectedItem("-Select Denomination-");
+						textField.setText(null);
+						e.printStackTrace();
+					}
+			}
+			}				
+			
+			
+		});
+
+	}
+	public static void displayStock(){
+		try{
+			Connection myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime","root","Mbugua21");
+		
+			PreparedStatement mystmt = myconn.prepareStatement("select * from stocks");
+			
+			ResultSet myRs = mystmt.executeQuery();
+			
+			table_1.setModel(DbUtils.resultSetToTableModel(myRs));
+		
+			System.out.println("Displays Stocks");
+		}catch (Exception e){
+			e.printStackTrace();
+		}
 	}
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				new Stocks();
+				displayStock();
 				}
 		});
 	}

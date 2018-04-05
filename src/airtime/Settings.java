@@ -32,17 +32,7 @@ public class Settings extends MainMDI implements InternalFrameListener {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				 new Settings();
-				 try{
-						myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime?autoReconnect=true&useSSL=false","root","Mbugua21");
-						
-					
-						
-					}
-					catch(Exception e){
-						 JOptionPane.showMessageDialog(null,"Database Connection Failure","Database Exception",1);
-						e.printStackTrace();}
-					
-					}
+			}
 		});
 	}
 		
@@ -100,7 +90,9 @@ public class Settings extends MainMDI implements InternalFrameListener {
 			  {
 				
 			  	comboBoxEdtCompany.addItem(myRs.getString("CompanyName"));
-		}				
+			  }		
+			  mystmt.close();
+			  System.out.println("Displays Company Name on ComboBoxEdtCompany");
 			
 		}
 		catch(Exception e) {
@@ -114,26 +106,59 @@ public class Settings extends MainMDI implements InternalFrameListener {
 		
 		JButton btnEditCompany = new JButton("Edit");
 		btnEditCompany.setFont(new Font("Segoe UI", Font.ITALIC, 12));
-		btnEditCompany.setBounds(889, 367, 90, 33);
+		btnEditCompany.setBounds(944, 367, 90, 33);
 		internalFrameCompany.getContentPane().add(btnEditCompany);
 		btnEditCompany.addActionListener(new ActionListener(){
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				
+				if (comboBoxEdtCompany.getSelectedItem().equals("-Select Company-")){
+					JOptionPane.showMessageDialog(null,"Company Name is not declared");
+				}else if (txtFldEdtProfit.getText().equals("")){
+					JOptionPane.showMessageDialog(null,"Company Profit is not declared");
+				}else{
+					try{
+						Connection myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime","root","Mbugua21");
+						
+						mystmt = myconn.prepareStatement("update company set CompanyProfit =? where CompanyName =?");
+						mystmt.setString(1,txtFldEdtProfit.getText().toString());
+						mystmt.setString(2,comboBoxEdtCompany.getSelectedItem().toString());
+											
+						mystmt.execute();
+						JOptionPane.showMessageDialog(null, comboBoxEdtCompany.getSelectedItem().toString()+ " Profit has changed to  " + txtFldEdtProfit.getText().toString());
+						mystmt.close();
+						System.out.println("Edited");
+										
+						comboBoxEdtCompany.setSelectedItem("-Select Company-");
+						txtFldEdtProfit.setText(null);
+					}catch(Exception e) {
+						JOptionPane.showMessageDialog(null, e);
+						comboBoxEdtCompany.setSelectedItem("-Select Company-");
+						txtFldEdtProfit.setText(null);
+						e.printStackTrace();
+					}
 			}
-			
+			}
 		});
 		
 		JButton btnDeleteCompany = new JButton("Delete");
 		btnDeleteCompany.setFont(new Font("Segoe UI", Font.ITALIC, 12));
-		btnDeleteCompany.setBounds(1036, 367, 90, 33);
+		btnDeleteCompany.setBounds(1092, 367, 90, 33);
 		internalFrameCompany.getContentPane().add(btnDeleteCompany);
 		btnDeleteCompany.addActionListener(new ActionListener(){
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				JOptionPane.showMessageDialog(null, "Are you sure you want to delete " + comboBoxEdtCompany.getSelectedItem().toString() + " from the database"," Delete",0);
+				if (comboBoxEdtCompany.getSelectedItem().equals("-Select Company-")){
+					JOptionPane.showMessageDialog(null,"Company Name is not declared");}
+				int response = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete  " + comboBoxEdtCompany.getSelectedItem().toString() + "  from the database"," Delete",
+						JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE);
+				 
+				if (response == JOptionPane.NO_OPTION) {
+					 System.out.println("Not Deleted");
+				      
+				    } else if (response == JOptionPane.YES_OPTION) {
+				     
 				
 				try{
 					Connection myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime","root","Mbugua21");
@@ -142,12 +167,16 @@ public class Settings extends MainMDI implements InternalFrameListener {
 					mystmt.setString(1,comboBoxEdtCompany.getSelectedItem().toString());
 										
 					mystmt.execute();
-					JOptionPane.showMessageDialog(null, "Company Name" + comboBoxEdtCompany.getSelectedItem().toString() +"has been deleted");
+					JOptionPane.showMessageDialog(null, "Company Name  " + comboBoxEdtCompany.getSelectedItem().toString() +"  has been deleted");
 					mystmt.close();
+					System.out.println("Deleted");
 									
+					comboBoxEdtCompany.setSelectedItem("-Select Company-");
 				}catch(Exception e) {
+					JOptionPane.showMessageDialog(null, e);
 					e.printStackTrace();
 				}
+			}
 			}
 			
 		});
@@ -189,7 +218,7 @@ public class Settings extends MainMDI implements InternalFrameListener {
 				
 				 JOptionPane.showMessageDialog(null, "Data Saved");
 				mystmt.close();
-				
+				System.out.println("Company Name Saved");
 				txtFieldCompanyName.setText(null);
 				txtFldCompanyProfit.setText(null);
 			}
@@ -227,7 +256,7 @@ public class Settings extends MainMDI implements InternalFrameListener {
 		internalFrameCompany.getContentPane().add(txtFldEdtProfit);
 		
 		JButton btnCancel = new JButton("Cancel");
-		btnCancel.setBounds(404, 367, 90, 33);
+		btnCancel.setBounds(376, 367, 90, 33);
 		btnCancel.setFont(new Font("Segoe UI", Font.ITALIC,12));
 		btnCancel.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
@@ -240,14 +269,25 @@ public class Settings extends MainMDI implements InternalFrameListener {
 		});
 		internalFrameCompany.getContentPane().add(btnCancel);
 		
-	}
+		JButton btnCheckStatus = new JButton("Check Status");
+		btnCheckStatus.setFont(new Font("Segoe UI", Font.ITALIC, 12));
+		btnCheckStatus.setBounds(629, 367, 111, 33);
+		internalFrameCompany.getContentPane().add(btnCheckStatus);
+		btnCheckStatus.addActionListener(new ActionListener(){
 
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				CheckStatus.main(null);				
+			}
+			
+		});
+		
+	}
 	protected void close() {
 		//WindowEvent winClosingEvent = new WindowEvent(this,WindowEvent.WINDOW_CLOSING);
 		//Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(winClosingEvent);
+	}
 		
 		
 	}
 
-	
-}
