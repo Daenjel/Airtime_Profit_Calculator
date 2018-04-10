@@ -7,8 +7,10 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 import javax.swing.JButton;
@@ -21,6 +23,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.event.InternalFrameListener;
+import javax.swing.table.DefaultTableModel;
 
 import net.proteanit.sql.DbUtils;
 
@@ -157,7 +160,7 @@ public class Sales extends MainMDI implements InternalFrameListener {
 						 JOptionPane.showMessageDialog(null, "Data Saved");
 						mystmt.close();
 						System.out.println("Sales Saved");
-						displayResults();
+						//displayResults();
 						cbxChseCompany.setSelectedItem("-Select Company-");
 						denomination.setSelectedItem("-Select Denomination-");
 						txtFldEnterUnits.setText(null);
@@ -193,9 +196,9 @@ public class Sales extends MainMDI implements InternalFrameListener {
 			
 			Connection myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime","root","Mbugua21");
 			
-			PreparedStatement mystmt = myconn.prepareStatement("select *from sales where Date = ?");
+			PreparedStatement mystmt = myconn.prepareStatement("select CompanyName,Denominations,sum(Units) AS Units,sum(Units)*Denominations AS GrandTotals FROM airtime.sales group by CompanyName,Denominations");
 			
-			Date curDate = new Date();
+			/*Date curDate = new Date();
 			
 			SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd");
 
@@ -206,7 +209,14 @@ public class Sales extends MainMDI implements InternalFrameListener {
 						
 			ResultSet myRs = mystmt.executeQuery();
 			
-			Salestable.setModel(DbUtils.resultSetToTableModel(myRs));
+			Salestable.setModel(DbUtils.resultSetToTableModel(myRs));*/
+			DefaultTableModel model;
+			model = new DefaultTableModel();
+			Salestable.setModel(model);
+			model.addRow(new Object[]{"Mark","Alex","loe"});
+
+
+			
 			
 		}
 		catch(Exception e) {
@@ -217,6 +227,87 @@ public class Sales extends MainMDI implements InternalFrameListener {
 		btnPrintSales.setFont(new Font("Segoe UI", Font.ITALIC, 12));
 		btnPrintSales.setBounds(809, 508, 100, 40);
 		panel.add(btnPrintSales);
+		btnPrintSales.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+
+				Connection myconn;
+				try {
+					myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime","root","Mbugua21");
+					PreparedStatement mystmt = myconn.prepareStatement("select distinct companyName from sales");
+					
+					ResultSet myRs = mystmt.executeQuery();
+					
+					DefaultTableModel model;
+					model = new DefaultTableModel();
+					Salestable.setModel(model);
+					Salestable.setShowVerticalLines(true);
+					Salestable.setCellSelectionEnabled(true);
+					Salestable.setColumnSelectionAllowed(true);
+					//model.setColumnIdentifiers(myRs.getString("CompanyName"));
+					ArrayList<String> companys = new ArrayList<>();
+					model.addColumn(" ");
+					while(myRs.next()){
+						companys.add(myRs.getString("CompanyName"));
+					
+					model.addColumn(myRs.getString("CompanyName"));
+				
+	               
+					//model.addRow(new Object[]{myRs.getString("CompanyName"),"Mark","Alex","loe","Resource"});
+					}
+					model.addColumn("Grand Totals");
+					
+					PreparedStatement mystmt1 = myconn.prepareStatement("select distinct Denominations from sales order by Denominations asc");
+					
+					ResultSet myRs1 = mystmt1.executeQuery();
+					ArrayList<String> deno = new ArrayList<>();
+					while(myRs1.next()){
+						deno.add(myRs1.getString("Denominations"));
+						
+						model.addRow(new Object[]{myRs1.getString("Denominations")});
+				}
+					model.addRow(new Object[]{"CompanySales"});
+						
+					String val ="";
+					
+					int i,j;
+				for(i=0; i<deno.size();i++){
+					double companyTotal =0;
+					double totalUnits = 0;
+					for(j=0; j<companys.size();j++){
+						PreparedStatement mystmt2 = myconn.prepareStatement("select sum(Units) AS Units from sales where CompanyName ='"+companys.get(j)+"' and Denominations = "+deno.get(i));
+						ResultSet myRs2 = mystmt2.executeQuery();
+						
+						
+						while(myRs2.next()){
+							val=myRs2.getString("Units");
+							if(val!= null){
+								val=myRs2.getString("Units");	
+							}else {val="0";}
+							
+							}
+						model.setValueAt(val,i, j+1);
+						totalUnits = totalUnits+ Double.parseDouble(val);
+						model.setValueAt(totalUnits *Double.parseDouble(deno.get(i)),i, companys.size()+1);
+					
+					}
+					
+					model.setValueAt(model.getValueAt(i,j),j+2,i+1);
+					System.out.println(i);
+				}
+					
+				
+				} catch (SQLException e) {
+					JOptionPane.showMessageDialog(null, e);
+					e.printStackTrace();
+				}
+				
+			
+				
+			}
+			
+		});
 		
 		String[] sal = {"Today","Yesterday","This Month","Last Month","Annual"};
 		

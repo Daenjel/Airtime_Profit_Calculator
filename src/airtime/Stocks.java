@@ -270,7 +270,6 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				new Stocks();
-				displayStock();
 				}
 		});
 	}
