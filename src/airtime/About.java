@@ -11,6 +11,7 @@ import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 import javax.swing.event.InternalFrameListener;
 import java.awt.Color;
+import javax.swing.ImageIcon;
 
 public class About extends MainMDI implements InternalFrameListener {
 
@@ -47,6 +48,7 @@ public class About extends MainMDI implements InternalFrameListener {
 				+"<br>* furnishing, performance, or use of these programs.</html>");
 		
 		JLabel lblNewLabel = new JLabel();
+		lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		lblNewLabel.setForeground(Color.BLACK);
 		lblNewLabel.setFont(new Font("Times New Roman", Font.PLAIN, 16));
 		lblNewLabel.setVerticalAlignment(SwingConstants.TOP);
@@ -55,7 +57,8 @@ public class About extends MainMDI implements InternalFrameListener {
 		internalFrameAbout.getContentPane().add(lblNewLabel);
 		
 		JButton btnCancel = new JButton("Cancel");
-		btnCancel.setBounds(644, 582, 90, 33);
+		btnCancel.setIcon(new ImageIcon(About.class.getResource("/images/ic_exit_to_app_black_24dp_1x.png")));
+		btnCancel.setBounds(644, 582, 97, 33);
 		internalFrameAbout.getContentPane().add(btnCancel);
 		btnCancel.setFont(new Font("Segoe UI", Font.ITALIC,12));
 		

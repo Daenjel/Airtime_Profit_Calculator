@@ -11,6 +11,7 @@ import java.sql.ResultSet;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JInternalFrame;
@@ -18,7 +19,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.event.InternalFrameListener;
-import javax.swing.ImageIcon;
 
 public class Settings extends MainMDI implements InternalFrameListener {
 	private static JTextField txtFieldCompanyName;
@@ -41,6 +41,7 @@ public class Settings extends MainMDI implements InternalFrameListener {
 	public Settings() {
 		
 		JInternalFrame internalFrameCompany = new JInternalFrame("Setting Up Company Details",true,true,true);
+		internalFrameCompany.setFrameIcon(new ImageIcon(Settings.class.getResource("/images/ic_settings_input_component_black_18dp_1x.png")));
 		internalFrameCompany.setBounds(10, 0, 414, 229);
 		internalFrameCompany.setDefaultCloseOperation(JInternalFrame.EXIT_ON_CLOSE);
 		internalFrameCompany.setSize(1340, 700);
@@ -78,28 +79,28 @@ public class Settings extends MainMDI implements InternalFrameListener {
 		comboBoxEdtCompany.addItem("-Select Company-");
 		comboBoxEdtCompany.setFont(new Font("Times New Roman", Font.ITALIC, 20));
 		internalFrameCompany.getContentPane().add(comboBoxEdtCompany);
-		try
-		{
-							
-			Connection myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime","root","Mbugua21");
+				try
+				{
+									
+					Connection myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime","root","Mbugua21");
+					
+					mystmt = myconn.prepareStatement("select CompanyName from company");
+					//Statement mystmt= myconn.createStatement();							
+					myRs = mystmt.executeQuery();
+					
+					  while(myRs.next())
+					  {
+						
+					  	comboBoxEdtCompany.addItem(myRs.getString("CompanyName"));
+					  }		
+					  mystmt.close();
+					  System.out.println("Displays Company Name on ComboBoxEdtCompany");
+					
+				}
+				catch(Exception e) {
+					e.printStackTrace();
+				}
 			
-			mystmt = myconn.prepareStatement("select CompanyName from company");
-			//Statement mystmt= myconn.createStatement();							
-			myRs = mystmt.executeQuery();
-			
-			  while(myRs.next())
-			  {
-				
-			  	comboBoxEdtCompany.addItem(myRs.getString("CompanyName"));
-			  }		
-			  mystmt.close();
-			  System.out.println("Displays Company Name on ComboBoxEdtCompany");
-			
-		}
-		catch(Exception e) {
-			e.printStackTrace();
-		}
-		
 		JLabel lblEdtCompanyName = new JLabel("Company Name:");
 		lblEdtCompanyName.setFont(new Font("Times New Roman", Font.ITALIC, 20));
 		lblEdtCompanyName.setBounds(747, 193, 180, 25);
@@ -171,10 +172,12 @@ public class Settings extends MainMDI implements InternalFrameListener {
 										
 					mystmt.execute();
 					JOptionPane.showMessageDialog(null, "Company Name  " + comboBoxEdtCompany.getSelectedItem().toString() +"  has been deleted");
+					
 					mystmt.close();
 					System.out.println("Deleted");
-									
-					comboBoxEdtCompany.setSelectedItem("-Select Company-");
+					comboBoxEdtCompany.removeAllItems();
+					comboBoxEdtCompany.addItem("-Select Company-");
+					addToComboEdit();
 				}catch(Exception e) {
 					JOptionPane.showMessageDialog(null, e);
 					e.printStackTrace();
@@ -219,10 +222,12 @@ public class Settings extends MainMDI implements InternalFrameListener {
 				mystmt.setString(3,DateToStr.toString() );
 				
 				mystmt.execute();
-				
 				 JOptionPane.showMessageDialog(null, "Data Saved");
 				mystmt.close();
 				System.out.println("Company Name Saved");
+				comboBoxEdtCompany.removeAllItems();
+				comboBoxEdtCompany.addItem("-Select Company-");
+				addToComboEdit();
 				txtFieldCompanyName.setText(null);
 				txtFldCompanyProfit.setText(null);
 			}
@@ -260,7 +265,8 @@ public class Settings extends MainMDI implements InternalFrameListener {
 		internalFrameCompany.getContentPane().add(txtFldEdtProfit);
 		
 		JButton btnCancel = new JButton("Cancel");
-		btnCancel.setBounds(376, 367, 90, 33);
+		btnCancel.setIcon(new ImageIcon(Settings.class.getResource("/images/ic_exit_to_app_black_24dp_1x.png")));
+		btnCancel.setBounds(376, 367, 105, 33);
 		btnCancel.setFont(new Font("Segoe UI", Font.ITALIC,12));
 		btnCancel.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
@@ -274,8 +280,9 @@ public class Settings extends MainMDI implements InternalFrameListener {
 		internalFrameCompany.getContentPane().add(btnCancel);
 		
 		JButton btnCheckStatus = new JButton("Check Status");
+		btnCheckStatus.setIcon(new ImageIcon(Settings.class.getResource("/images/ic_receipt_black_24dp_1x.png")));
 		btnCheckStatus.setFont(new Font("Segoe UI", Font.ITALIC, 12));
-		btnCheckStatus.setBounds(629, 367, 111, 33);
+		btnCheckStatus.setBounds(629, 367, 129, 33);
 		internalFrameCompany.getContentPane().add(btnCheckStatus);
 		btnCheckStatus.addActionListener(new ActionListener(){
 
@@ -291,7 +298,26 @@ public class Settings extends MainMDI implements InternalFrameListener {
 		//WindowEvent winClosingEvent = new WindowEvent(this,WindowEvent.WINDOW_CLOSING);
 		//Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(winClosingEvent);
 	}
+	protected void  addToComboEdit(){
+	try
+	{				
+		Connection myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime","root","Mbugua21");
 		
+		mystmt = myconn.prepareStatement("select CompanyName from company");							
+		myRs = mystmt.executeQuery();
+		
+		  while(myRs.next())
+		  {			
+		  	comboBoxEdtCompany.addItem(myRs.getString("CompanyName"));
+		  }		
+		  mystmt.close();
+		  System.out.println("Displays Added Company Name on ComboBoxEdtCompany");
+		
+	}
+	catch(Exception e) {
+		e.printStackTrace();
+	}
+	}	
 		
 	}
 

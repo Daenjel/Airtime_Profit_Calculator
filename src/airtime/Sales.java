@@ -40,6 +40,7 @@ public class Sales extends MainMDI implements InternalFrameListener {
 	public Sales() {
 			
 		JInternalFrame internalFrameSales = new JInternalFrame("Sales");
+		internalFrameSales.setFrameIcon(new ImageIcon(Sales.class.getResource("/images/ic_add_shopping_cart_black_18dp_1x.png")));
 		internalFrameSales.setBounds(10, 0, 414, 229);
 		internalFrameSales.setSize(1340, 700);
 		internalFrameSales.setVisible(true);
@@ -56,6 +57,7 @@ public class Sales extends MainMDI implements InternalFrameListener {
 		panel.add(lblWelcomeCompany);
 		
 		JButton btnCancel = new JButton("Cancel");
+		btnCancel.setIcon(new ImageIcon(Sales.class.getResource("/images/ic_exit_to_app_black_24dp_1x.png")));
 		btnCancel.setFont(new Font("Segoe UI", Font.ITALIC,12));
 		btnCancel.setBounds(365,374,100,40);
 		btnCancel.addActionListener(new ActionListener(){

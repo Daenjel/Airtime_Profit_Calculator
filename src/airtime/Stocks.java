@@ -38,6 +38,7 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 
 	public Stocks() {
 		JInternalFrame internalFrameStock = new JInternalFrame("Current Stock",true,true,true);
+		internalFrameStock.setFrameIcon(new ImageIcon(Stocks.class.getResource("/images/ic_storage_black_18dp_1x.png")));
 		internalFrameStock.setBounds(10, 0, 414, 229);
 		internalFrameStock.setSize(1340, 700);
 		internalFrameStock.setVisible(true);
@@ -55,14 +56,13 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 		panel.add(lblStock);
 		
 		JButton btnCancel = new JButton("Cancel");
+		btnCancel.setIcon(new ImageIcon(Stocks.class.getResource("/images/ic_exit_to_app_black_24dp_1x.png")));
 		btnCancel.setFont(new Font("Segoe UI", Font.ITALIC,12));
 		btnCancel.setBounds(611,573,100,40);
 		btnCancel.addActionListener(new ActionListener(){
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				//new Sales();
-				//System.exit(0);
 				Sales.main(null);
 				internalFrameStock.setVisible(false);
 			}
@@ -112,7 +112,7 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 		JButton btnAdd = new JButton("Add");
 		btnAdd.setIcon(new ImageIcon(Stocks.class.getResource("/images/ic_library_add_black_24dp_1x.png")));
 		btnAdd.setFont(new Font("Segoe UI", Font.ITALIC, 12));
-		btnAdd.setBounds(280, 371, 90, 40);
+		btnAdd.setBounds(240, 371, 90, 40);
 		panel.add(btnAdd);
 		btnAdd.addActionListener(new ActionListener(){
 
@@ -137,7 +137,7 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 					String DateToStr = format.format(curDate);
 					System.out.println(DateToStr);
 					
-					PreparedStatement mystmt = myconn.prepareStatement("insert into stocks (Company,Denominations,Units,Date) values (?,?,?,?)");
+					PreparedStatement mystmt = myconn.prepareStatement("insert into stocks (CompanyName,Denominations,Units,Date) values (?,?,?,?)");
 					mystmt.setString(1,cmbCompanyName.getSelectedItem().toString());
 					mystmt.setString(2,cmbDeno.getSelectedItem().toString());
 					mystmt.setString(3,textField.getText().toString());
@@ -224,7 +224,7 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 		JButton btnEdit = new JButton("Edit");
 		btnEdit.setIcon(new ImageIcon(Stocks.class.getResource("/images/ic_edit_black_24dp_1x.png")));
 		btnEdit.setFont(new Font("Segoe UI", Font.ITALIC, 12));
-		btnEdit.setBounds(426, 371, 83, 40);
+		btnEdit.setBounds(370, 371, 83, 40);
 		panel.add(btnEdit);
 		btnEdit.addActionListener(new ActionListener(){
 
@@ -240,7 +240,7 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 					try{
 						Connection myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime","root","Mbugua21");
 						
-						PreparedStatement mystmt = myconn.prepareStatement("update stocks set Denominations =?, Units =? where Company =?");
+						PreparedStatement mystmt = myconn.prepareStatement("update stocks set Denominations =?, Units =? where CompanyName =?");
 						mystmt.setString(1,cmbDeno.getSelectedItem().toString());
 						mystmt.setString(2,textField.getText().toString());
 						mystmt.setString(3,cmbCompanyName.getSelectedItem().toString());
@@ -266,6 +266,56 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 			
 		});
 
+
+		JButton btnRemove = new JButton("Remove");
+		btnRemove.setIcon(new ImageIcon(Stocks.class.getResource("/images/ic_remove_shopping_cart_black_18dp_1x.png")));
+		btnRemove.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				if (cmbCompanyName.getSelectedItem().equals("-Select Company-")){
+					JOptionPane.showMessageDialog(null,"Company Name is not declared");
+			}else if (cmbDeno.getSelectedItem().equals("-Select Denomination-")){
+				JOptionPane.showMessageDialog(null,"Company Denomination is not declared");
+			}else if(textField.getText().equals(" ")){
+				JOptionPane.showMessageDialog(null,"Number of Units are not declared");}
+				int response = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete  " + cmbCompanyName.getSelectedItem().toString() + " with Demonimation "+cmbDeno.getSelectedItem().toString()+ "  from Stock"," Delete",
+						JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE);
+				 
+				if (response == JOptionPane.NO_OPTION) {
+					 System.out.println("Not Deleted");
+				      
+				    } else if (response == JOptionPane.YES_OPTION) {
+				     
+				
+				try{
+					Connection myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime","root","Mbugua21");
+					
+					PreparedStatement mystmt = myconn.prepareStatement("delete from airtime.stocks where CompanyName = ? and Denominations=?");
+					mystmt.setString(1,cmbCompanyName.getSelectedItem().toString());
+					mystmt.setString(2,cmbDeno.getSelectedItem().toString());
+					
+										
+					mystmt.execute();
+					JOptionPane.showMessageDialog(null, "Company Name  " + cmbCompanyName.getSelectedItem().toString() +"  has been deleted");
+					
+					mystmt.close();
+					System.out.println("Deleted");
+					displayStock();
+					cmbCompanyName.setSelectedItem("-Select Company-");
+					cmbDeno.setSelectedItem("-Select Denomination-");
+					textField.setText(null);
+				
+				}catch(Exception e) {
+					JOptionPane.showMessageDialog(null, e);
+					e.printStackTrace();
+				}
+			}
+			}
+			
+		});
+		
+		btnRemove.setFont(new Font("Segoe UI", Font.ITALIC, 12));
+		btnRemove.setBounds(484, 371, 100, 40);
+		panel.add(btnRemove);
 	}
 	public static void displayStock(){
 		try{
