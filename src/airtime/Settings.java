@@ -18,6 +18,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.event.InternalFrameListener;
+import javax.swing.ImageIcon;
 
 public class Settings extends MainMDI implements InternalFrameListener {
 	private static JTextField txtFieldCompanyName;
@@ -104,9 +105,10 @@ public class Settings extends MainMDI implements InternalFrameListener {
 		lblEdtCompanyName.setBounds(747, 193, 180, 25);
 		internalFrameCompany.getContentPane().add(lblEdtCompanyName);
 		
-		JButton btnEditCompany = new JButton("Edit");
+		JButton btnEditCompany = new JButton("Update");
+		btnEditCompany.setIcon(new ImageIcon(Settings.class.getResource("/images/ic_system_update_alt_black_24dp_1x.png")));
 		btnEditCompany.setFont(new Font("Segoe UI", Font.ITALIC, 12));
-		btnEditCompany.setBounds(944, 367, 90, 33);
+		btnEditCompany.setBounds(944, 367, 105, 33);
 		internalFrameCompany.getContentPane().add(btnEditCompany);
 		btnEditCompany.addActionListener(new ActionListener(){
 
@@ -142,8 +144,9 @@ public class Settings extends MainMDI implements InternalFrameListener {
 		});
 		
 		JButton btnDeleteCompany = new JButton("Delete");
+		btnDeleteCompany.setIcon(new ImageIcon(Settings.class.getResource("/images/ic_delete_forever_black_24dp_1x.png")));
 		btnDeleteCompany.setFont(new Font("Segoe UI", Font.ITALIC, 12));
-		btnDeleteCompany.setBounds(1092, 367, 90, 33);
+		btnDeleteCompany.setBounds(1092, 367, 105, 33);
 		internalFrameCompany.getContentPane().add(btnDeleteCompany);
 		btnDeleteCompany.addActionListener(new ActionListener(){
 
@@ -182,6 +185,7 @@ public class Settings extends MainMDI implements InternalFrameListener {
 		});
 		
 		JButton btnAddCompany = new JButton("Add");
+		btnAddCompany.setIcon(new ImageIcon(Settings.class.getResource("/images/ic_create_new_folder_black_24dp_1x.png")));
 		btnAddCompany.setFont(new Font("Segoe UI", Font.ITALIC, 12));
 		btnAddCompany.setBounds(235, 367, 90, 33);
 		internalFrameCompany.getContentPane().add(btnAddCompany);

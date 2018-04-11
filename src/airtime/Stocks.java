@@ -103,12 +103,14 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 			e.printStackTrace();
 		}
 		
-		JButton btnPrint = new JButton("Print New");
+		JButton btnPrint = new JButton("Print Stock");
+		btnPrint.setIcon(new ImageIcon(Stocks.class.getResource("/images/ic_print_black_24dp_1x.png")));
 		btnPrint.setFont(new Font("Segoe UI", Font.ITALIC, 12));
-		btnPrint.setBounds(1024, 573, 100, 40);
+		btnPrint.setBounds(1024, 573, 121, 40);
 		panel.add(btnPrint);
 		
 		JButton btnAdd = new JButton("Add");
+		btnAdd.setIcon(new ImageIcon(Stocks.class.getResource("/images/ic_library_add_black_24dp_1x.png")));
 		btnAdd.setFont(new Font("Segoe UI", Font.ITALIC, 12));
 		btnAdd.setBounds(280, 371, 90, 40);
 		panel.add(btnAdd);
@@ -220,6 +222,7 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 		textField.setColumns(10);
 		
 		JButton btnEdit = new JButton("Edit");
+		btnEdit.setIcon(new ImageIcon(Stocks.class.getResource("/images/ic_edit_black_24dp_1x.png")));
 		btnEdit.setFont(new Font("Segoe UI", Font.ITALIC, 12));
 		btnEdit.setBounds(426, 371, 83, 40);
 		panel.add(btnEdit);

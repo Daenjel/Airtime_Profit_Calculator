@@ -26,6 +26,7 @@ import javax.swing.event.InternalFrameListener;
 import javax.swing.table.DefaultTableModel;
 
 import net.proteanit.sql.DbUtils;
+import javax.swing.ImageIcon;
 
 public class Sales extends MainMDI implements InternalFrameListener {
 	private JTextField txtFldEnterUnits;
@@ -68,7 +69,7 @@ public class Sales extends MainMDI implements InternalFrameListener {
 		panel.add(btnCancel);
 		
 		
-		JComboBox<String> cbxChseCompany = new JComboBox<String>();
+		JComboBox<Object> cbxChseCompany = new JComboBox<Object>();
 		cbxChseCompany.setFont(new Font("Times New Roman", Font.ITALIC,18));
 		cbxChseCompany.setBounds(316, 126, 180, 27);
 		cbxChseCompany.setSize(230, 30);
@@ -108,7 +109,7 @@ public class Sales extends MainMDI implements InternalFrameListener {
 		
 		String[] deno = {"-Select Denomination-","10","20","50","100","250","500","1000"};
 		
-		JComboBox<String> denomination = new JComboBox<String>(deno);
+		JComboBox<Object> denomination = new JComboBox<Object>(deno);
 		denomination.setBounds(316, 191, 180, 29);
 		denomination.setSize(230, 30);
 		denomination.setFont(new Font("Times New Roman", Font.ITALIC,18));
@@ -120,6 +121,7 @@ public class Sales extends MainMDI implements InternalFrameListener {
 		panel.add(lblUnitsSold);
 		
 		JButton btnAdd = new JButton("Add");
+		btnAdd.setIcon(new ImageIcon(Sales.class.getResource("/images/ic_library_add_black_24dp_1x.png")));
 		btnAdd.setFont(new Font("Segoe UI", Font.ITALIC, 12));
 		btnAdd.setBounds(181, 374, 100, 40);
 		btnAdd.addActionListener(new ActionListener(){
@@ -190,7 +192,7 @@ public class Sales extends MainMDI implements InternalFrameListener {
 		
 		Salestable = new JTable();
 		Salestable.setBounds(1038, 431, -350, -280);
-		panel.add(Salestable);
+		//panel.add(Salestable);
 		scrollPaneSales.setViewportView(Salestable);
 		try{
 			
@@ -224,6 +226,7 @@ public class Sales extends MainMDI implements InternalFrameListener {
 		}
 		
 		JButton btnPrintSales = new JButton("Print");
+		btnPrintSales.setIcon(new ImageIcon(Sales.class.getResource("/images/ic_print_black_24dp_1x.png")));
 		btnPrintSales.setFont(new Font("Segoe UI", Font.ITALIC, 12));
 		btnPrintSales.setBounds(809, 508, 100, 40);
 		panel.add(btnPrintSales);
