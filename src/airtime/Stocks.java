@@ -25,6 +25,10 @@ import javax.swing.JTextField;
 import javax.swing.event.InternalFrameListener;
 
 import net.proteanit.sql.DbUtils;
+import javax.swing.ListSelectionModel;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import javax.swing.ImageIcon;
 
 public class Stocks extends MainMDI implements InternalFrameListener {
 	private static JTable table_1;
@@ -71,9 +75,18 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 		panel.add(scrollPane_1);
 		
 		table_1 = new JTable();
+		table_1.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		table_1.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				cmbCompanyName.setSelectedItem(table_1.getValueAt(table_1.getSelectedRow(),0).toString());
+				cmbDeno.setSelectedItem(table_1.getValueAt(table_1.getSelectedRow(),1).toString());
+				textField.setText(table_1.getValueAt(table_1.getSelectedRow(),2).toString());
+			}
+		});
 		table_1.setBounds(755, 492, 495, -359);
-		panel.add(table_1);
-		scrollPane_1.setViewportView(table_1);
+		//panel.add(table_1);
+		scrollPane_1.setColumnHeaderView(table_1);
 		try
 		{
 			Connection myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime?autoReconnect=true&useSSL=false","root","Mbugua21");
@@ -207,6 +220,7 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 		textField.setColumns(10);
 		
 		JButton btnEdit = new JButton("Edit");
+		btnEdit.setIcon(new ImageIcon("D:\\Gaming\\Desktop App\\Icons\\ic_drag_handle_black_24dp\\web\\ic_drag_handle_black_24dp_1x.png"));
 		btnEdit.setFont(new Font("Segoe UI", Font.ITALIC, 12));
 		btnEdit.setBounds(426, 371, 83, 40);
 		panel.add(btnEdit);

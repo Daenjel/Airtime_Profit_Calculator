@@ -258,7 +258,7 @@ public class Sales extends MainMDI implements InternalFrameListener {
 					}
 					model.addColumn("Grand Totals");
 					
-					PreparedStatement mystmt1 = myconn.prepareStatement("select distinct Denominations from sales order by Denominations asc");
+					PreparedStatement mystmt1 = myconn.prepareStatement("select distinct Denominations from sales order by Denominations desc");
 					
 					ResultSet myRs1 = mystmt1.executeQuery();
 					ArrayList<String> deno = new ArrayList<>();
@@ -293,7 +293,7 @@ public class Sales extends MainMDI implements InternalFrameListener {
 					
 					}
 					
-					model.setValueAt(model.getValueAt(i,j),j+2,i+1);
+					model.setValueAt(model.getValueAt(2,1),deno.size(),companys.size()+1);
 					System.out.println(i);
 				}
 					
