@@ -220,7 +220,6 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 		textField.setColumns(10);
 		
 		JButton btnEdit = new JButton("Edit");
-		btnEdit.setIcon(new ImageIcon("D:\\Gaming\\Desktop App\\Icons\\ic_drag_handle_black_24dp\\web\\ic_drag_handle_black_24dp_1x.png"));
 		btnEdit.setFont(new Font("Segoe UI", Font.ITALIC, 12));
 		btnEdit.setBounds(426, 371, 83, 40);
 		panel.add(btnEdit);
