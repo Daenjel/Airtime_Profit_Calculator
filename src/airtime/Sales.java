@@ -13,6 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JInternalFrame;
@@ -26,12 +27,11 @@ import javax.swing.event.InternalFrameListener;
 import javax.swing.table.DefaultTableModel;
 
 import net.proteanit.sql.DbUtils;
-import javax.swing.ImageIcon;
 
 public class Sales extends MainMDI implements InternalFrameListener {
 	private JTextField txtFldEnterUnits;
 	private static JTable Salestable;
-		
+	private JLabel TotalCost;
 	public static void main(String[] arg){
 		new Sales();
 				
@@ -189,12 +189,12 @@ public class Sales extends MainMDI implements InternalFrameListener {
 		panel.add(lblTodaySales);
 		
 		JScrollPane scrollPaneSales = new JScrollPane();
-		scrollPaneSales.setBounds(613, 103, 489, 353);
+		scrollPaneSales.setBounds(594, 103, 508, 272);
 		panel.add(scrollPaneSales);
 		
 		Salestable = new JTable();
 		Salestable.setBounds(1038, 431, -350, -280);
-		//panel.add(Salestable);
+		panel.add(Salestable);
 		scrollPaneSales.setViewportView(Salestable);
 		try{
 			
@@ -214,14 +214,7 @@ public class Sales extends MainMDI implements InternalFrameListener {
 			ResultSet myRs = mystmt.executeQuery();
 			
 			Salestable.setModel(DbUtils.resultSetToTableModel(myRs));*/
-			DefaultTableModel model;
-			model = new DefaultTableModel();
-			Salestable.setModel(model);
-			model.addRow(new Object[]{"Mark","Alex","loe"});
-
-
-			
-			
+						
 		}
 		catch(Exception e) {
 			e.printStackTrace();
@@ -257,9 +250,6 @@ public class Sales extends MainMDI implements InternalFrameListener {
 						companys.add(myRs.getString("CompanyName"));
 					
 					model.addColumn(myRs.getString("CompanyName"));
-				
-	               
-					//model.addRow(new Object[]{myRs.getString("CompanyName"),"Mark","Alex","loe","Resource"});
 					}
 					model.addColumn("Grand Totals");
 					
@@ -295,13 +285,23 @@ public class Sales extends MainMDI implements InternalFrameListener {
 						model.setValueAt(val,i, j+1);
 						totalUnits = totalUnits+ Double.parseDouble(val);
 						model.setValueAt(totalUnits *Double.parseDouble(deno.get(i)),i, companys.size()+1);
-					
 					}
+						/*int rowcount = Salestable.getRowCount();
+						double sum = 0;
+						for( i=0;i<rowcount;i++){
+							sum = sum+Double.parseDouble(Salestable.getValueAt(i, j).toString());
+						}
+						TotalCost.setText(Double.toString(sum));*/
 					
-					model.setValueAt(model.getValueAt(2,1),deno.size(),companys.size()+1);
+					
+					
+					model.setValueAt(model.getValueAt(i,j),deno.size(),companys.size()+1);
 					System.out.println(i);
 				}
+	
 					
+					
+				
 				
 				} catch (SQLException e) {
 					JOptionPane.showMessageDialog(null, e);
@@ -320,6 +320,36 @@ public class Sales extends MainMDI implements InternalFrameListener {
 		cbxChseSales.setFont(new Font("Times New Roman", Font.ITALIC,18));
 		cbxChseSales.setBounds(1104, 55, 180, 27);
 		panel.add(cbxChseSales);		
+		
+		JLabel lblTotalSales = new JLabel("Total Sales");
+		lblTotalSales.setFont(new Font("Times New Roman", Font.ITALIC, 16));
+		lblTotalSales.setBounds(594, 386, 92, 30);
+		panel.add(lblTotalSales);
+		
+		JLabel TotalSales = new JLabel("0.0");
+		TotalSales.setFont(new Font("Times New Roman", Font.ITALIC, 22));
+		TotalSales.setBounds(682, 386, 77, 28);
+		panel.add(TotalSales);
+		
+		JLabel Profit = new JLabel("0.0");
+		Profit.setFont(new Font("Times New Roman", Font.ITALIC, 22));
+		Profit.setBounds(850, 386, 77, 28);
+		panel.add(Profit);
+		
+		JLabel lblProfit = new JLabel("Profit");
+		lblProfit.setFont(new Font("Times New Roman", Font.ITALIC, 16));
+		lblProfit.setBounds(794, 386, 60, 30);
+		panel.add(lblProfit);
+		
+		TotalCost = new JLabel("0.0");
+		TotalCost.setFont(new Font("Times New Roman", Font.ITALIC, 22));
+		TotalCost.setBounds(1025, 384, 77, 28);
+		panel.add(TotalCost);
+		
+		JLabel lblTotalCost = new JLabel("Total Cost:");
+		lblTotalCost.setFont(new Font("Times New Roman", Font.ITALIC, 16));
+		lblTotalCost.setBounds(937, 384, 84, 30);
+		panel.add(lblTotalCost);
 		cbxChseSales.addActionListener(new ActionListener(){
 
 			@Override
@@ -339,6 +369,7 @@ public class Sales extends MainMDI implements InternalFrameListener {
 		
 		
 	}
+
 	public static void displayResults(){
 		try{
 		

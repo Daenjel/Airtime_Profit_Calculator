@@ -48,7 +48,7 @@ public class MainMDI implements InternalFrameListener {
 			
 			contentPane = new JFrame();
 			contentPane.setLayout(new FlowLayout());
-			contentPane.setIconImage(Toolkit.getDefaultToolkit().getImage(MainMDI.class.getResource("/images/ic_shopping_basket_black_36dp_1x.png")));			
+			contentPane.setIconImage(Toolkit.getDefaultToolkit().getImage(MainMDI.class.getResource("/images/imageshome.png")));			
 			contentPane.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			contentPane.setVisible(true);
 			contentPane.setExtendedState(JFrame.MAXIMIZED_BOTH);

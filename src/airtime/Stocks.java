@@ -10,6 +10,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -63,8 +64,8 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				Sales.main(null);
-				internalFrameStock.setVisible(false);
+				new Sales();
+				contentPane.setVisible(false);
 			}
 			
 		});
@@ -84,9 +85,7 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 				textField.setText(table_1.getValueAt(table_1.getSelectedRow(),2).toString());
 			}
 		});
-		table_1.setBounds(755, 492, 495, -359);
-		//panel.add(table_1);
-		scrollPane_1.setColumnHeaderView(table_1);
+		scrollPane_1.setViewportView(table_1);
 		try
 		{
 			Connection myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime?autoReconnect=true&useSSL=false","root","Mbugua21");
@@ -108,6 +107,23 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 		btnPrint.setFont(new Font("Segoe UI", Font.ITALIC, 12));
 		btnPrint.setBounds(1024, 573, 121, 40);
 		panel.add(btnPrint);
+		btnPrint.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				try{
+					MessageFormat header = new MessageFormat("Page Header");
+					MessageFormat footer = new MessageFormat("Page(1,number,integer");
+					
+					table_1.print(JTable.PrintMode.FIT_WIDTH,header,footer);
+					
+				}catch(Exception e){
+					JOptionPane.showMessageDialog(null, e);
+				}
+				
+			}
+			
+		});
 		
 		JButton btnAdd = new JButton("Add");
 		btnAdd.setIcon(new ImageIcon(Stocks.class.getResource("/images/ic_library_add_black_24dp_1x.png")));
@@ -316,6 +332,21 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 		btnRemove.setFont(new Font("Segoe UI", Font.ITALIC, 12));
 		btnRemove.setBounds(484, 371, 100, 40);
 		panel.add(btnRemove);
+		
+		JLabel TotalCost = new JLabel("0.0");
+		TotalCost.setFont(new Font("Times New Roman", Font.ITALIC, 22));
+		TotalCost.setBounds(926, 539, 77, 28);
+		TotalCost.setText(Double.toString(getSum()));
+		panel.add(TotalCost);
+	}
+	public double getSum(){
+		int rowcount = table_1.getRowCount();
+		double sum = 0;
+		for(int i=0;i<rowcount;i++){
+			sum = sum+Double.parseDouble(table_1.getValueAt(i, 2).toString());
+		}
+		return sum;
+		
 	}
 	public static void displayStock(){
 		try{

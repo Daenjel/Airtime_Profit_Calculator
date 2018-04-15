@@ -1,17 +1,18 @@
 package airtime;
 
+import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 import javax.swing.event.InternalFrameListener;
-import java.awt.Color;
-import javax.swing.ImageIcon;
 
 public class About extends MainMDI implements InternalFrameListener {
 
@@ -22,6 +23,7 @@ public class About extends MainMDI implements InternalFrameListener {
 		internalFrameAbout.setBounds(10, 0, 414, 229);
 		internalFrameAbout.setSize(1340, 700);
 		internalFrameAbout.setVisible(true);
+		internalFrameAbout.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		desktopPane.add(internalFrameAbout);
 		internalFrameAbout.getContentPane().setLayout(null);
 		
@@ -58,7 +60,7 @@ public class About extends MainMDI implements InternalFrameListener {
 		
 		JButton btnCancel = new JButton("Cancel");
 		btnCancel.setIcon(new ImageIcon(About.class.getResource("/images/ic_exit_to_app_black_24dp_1x.png")));
-		btnCancel.setBounds(644, 582, 97, 33);
+		btnCancel.setBounds(644, 582, 107, 33);
 		internalFrameAbout.getContentPane().add(btnCancel);
 		btnCancel.setFont(new Font("Segoe UI", Font.ITALIC,12));
 		
@@ -71,7 +73,8 @@ public class About extends MainMDI implements InternalFrameListener {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				internalFrameAbout.setVisible(false);			
+				new Sales();
+				contentPane.setVisible(false);
 			}
 			
 		});

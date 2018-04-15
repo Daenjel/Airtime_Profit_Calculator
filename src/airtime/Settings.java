@@ -270,10 +270,8 @@ public class Settings extends MainMDI implements InternalFrameListener {
 		btnCancel.setFont(new Font("Segoe UI", Font.ITALIC,12));
 		btnCancel.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
-				internalFrameCompany.dispose();	
 				new Sales();
-				close();
-				
+				contentPane.setVisible(false);
 			}
 			
 		});
@@ -293,10 +291,6 @@ public class Settings extends MainMDI implements InternalFrameListener {
 			
 		});
 		
-	}
-	protected void close() {
-		//WindowEvent winClosingEvent = new WindowEvent(this,WindowEvent.WINDOW_CLOSING);
-		//Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(winClosingEvent);
 	}
 	protected void  addToComboEdit(){
 	try
