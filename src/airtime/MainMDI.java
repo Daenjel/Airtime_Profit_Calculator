@@ -10,6 +10,7 @@ import java.awt.event.ActionListener;
 import javax.swing.ImageIcon;
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -43,6 +44,7 @@ public class MainMDI implements InternalFrameListener {
 		public JMenu mnHelp;
 		public JMenuItem mntmAbout;
 		public JDesktopPane desktopPane = new JDesktopPane();
+		public JDesktopPane desktopPaneLock = new JDesktopPane();
 	
 	public MainMDI() {
 			
@@ -56,10 +58,32 @@ public class MainMDI implements InternalFrameListener {
 			contentPane.setTitle("Airtime Profit Calculator");
 			contentPane.setFont(new Font("Times New Roman", Font.ITALIC, 14));
 			contentPane.setContentPane(desktopPane);
+		
 			
 			//ImageIcon icon = new ImageIcon("src/images/television-tv-dinosaur.jpg");
 			//desktopPane.setImageIcon(new ImageIcon(getClass().getResource("images//television-tv-dinosaur.jpg")));
 			desktopPane.setBackground(Color.GREEN);
+			desktopPaneLock.setBackground(Color.CYAN);
+			
+			JLabel lblNewLabel = new JLabel();
+			lblNewLabel.setIcon(new ImageIcon(About.class.getResource("/images/images.png")));
+			lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
+			lblNewLabel.setForeground(Color.BLUE);
+			lblNewLabel.setFont(new Font("Harrington", Font.PLAIN, 48));
+			lblNewLabel.setVerticalAlignment(SwingConstants.CENTER);
+			lblNewLabel.setBounds(100, 10, 797, 426);
+			lblNewLabel.setText("Airtime Profit Calculator");
+			desktopPaneLock.add(lblNewLabel);
+			
+			JLabel lblLogo = new JLabel();
+			lblLogo.setHorizontalAlignment(SwingConstants.CENTER);
+			lblLogo.setForeground(Color.MAGENTA);
+			lblLogo.setBounds(441, 250, 332, 33);
+			lblLogo.setFont(new Font("Times New Roman", Font.ITALIC, 23));
+			lblLogo.setVerticalAlignment(SwingConstants.CENTER);
+			lblLogo.setText("Calculations On Your Finger Tips");
+			desktopPaneLock.add(lblLogo);
+			
 						
 			menuBar = new JMenuBar();
 			contentPane.setJMenuBar(menuBar);
@@ -90,7 +114,10 @@ public class MainMDI implements InternalFrameListener {
 					mnHelp.setVisible(false);
 					mntmUnlock.setVisible(true);
 					mntmLock.setVisible(false);
-					desktopPane.setVisible(false);
+					contentPane.setContentPane(desktopPaneLock);
+					contentPane.setSize(1000, 500);
+					contentPane.setBounds(200, 100, 1000, 500);
+					
 					
 				}
 			});
@@ -109,7 +136,8 @@ public class MainMDI implements InternalFrameListener {
 					mnHelp.setVisible(true);
 					mntmLock.setVisible(true);
 					mntmUnlock.setVisible(false);
-					desktopPane.setVisible(true);
+					contentPane.setContentPane(desktopPane);
+					contentPane.setExtendedState(JFrame.MAXIMIZED_BOTH);
 					
 				}
 			});

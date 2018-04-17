@@ -80,10 +80,68 @@ public class About extends MainMDI implements InternalFrameListener {
 		});
 
 	}
+	
+	//private static final String filename = "about.txt";
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				 new About();
+				 
+						/*BufferedReader rd = null;
+						FileReader fr = null;
+
+						try {
+
+							// Open the file for reading.
+
+							//rd = new BufferedReader(new FileReader(new File(filename)));
+
+							fr = new FileReader(filename);
+							rd = new BufferedReader(fr);
+							
+							// Read all contents of the file.
+
+							String inputLine;
+
+							while((inputLine = rd.readLine()) != null)
+
+								System.out.println(inputLine);
+
+						}
+
+						catch(IOException ex) {
+
+							System.err.println("An IOException was caught!");
+
+							ex.printStackTrace();
+
+						}
+
+						finally {
+
+							// Close the file.
+
+							try {
+
+								if (rd != null)
+									rd.close();
+
+								if (fr != null)
+									fr.close();
+								
+
+							}
+
+							catch (IOException ex) {
+
+								System.err.println("An IOException was caught!");
+
+								ex.printStackTrace();
+
+							}
+
+						}*/
+
 			}
 		});
 	}

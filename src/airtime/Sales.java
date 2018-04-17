@@ -1,5 +1,7 @@
 package airtime;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -9,6 +11,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.MessageFormat;
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -27,11 +34,14 @@ import javax.swing.event.InternalFrameListener;
 import javax.swing.table.DefaultTableModel;
 
 import net.proteanit.sql.DbUtils;
+import javax.swing.SwingConstants;
 
 public class Sales extends MainMDI implements InternalFrameListener {
 	private JTextField txtFldEnterUnits;
 	private static JTable Salestable;
-	private JLabel TotalCost;
+	JComboBox<Object> cbxChseCompany;
+	JComboBox<Object> denomination;
+	ArrayList<String> companys;
 	public static void main(String[] arg){
 		new Sales();
 				
@@ -64,14 +74,16 @@ public class Sales extends MainMDI implements InternalFrameListener {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				//internalFrameSales.setVisible(false);
+				cbxChseCompany.setSelectedItem("-Select Company-");
+				denomination.setSelectedItem("-Select Denomination-");
+				txtFldEnterUnits.setText(null);
 			}
 			
 		});
 		panel.add(btnCancel);
 		
 		
-		JComboBox<Object> cbxChseCompany = new JComboBox<Object>();
+		cbxChseCompany = new JComboBox<Object>();
 		cbxChseCompany.setFont(new Font("Times New Roman", Font.ITALIC,18));
 		cbxChseCompany.setBounds(316, 126, 180, 27);
 		cbxChseCompany.setSize(230, 30);
@@ -82,7 +94,7 @@ public class Sales extends MainMDI implements InternalFrameListener {
 					Connection myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime","root","Mbugua21");
 			
 					Statement mystmt= myconn.createStatement();							
-					ResultSet myRs = mystmt.executeQuery("select CompanyName from company");
+					ResultSet myRs = mystmt.executeQuery("select distinct CompanyName from stocks");
 					
 					  while(myRs.next())
 					  {						
@@ -109,9 +121,9 @@ public class Sales extends MainMDI implements InternalFrameListener {
 		lblAirtimeDenonimation.setBounds(109, 184, 194, 40);
 		panel.add(lblAirtimeDenonimation);
 		
-		String[] deno = {"-Select Denomination-","10","20","50","100","250","500","1000"};
+		String[] Deno = {"-Select Denomination-","10","20","50","100","250","500","1000"};
 		
-		JComboBox<Object> denomination = new JComboBox<Object>(deno);
+		denomination = new JComboBox<Object>(Deno);
 		denomination.setBounds(316, 191, 180, 29);
 		denomination.setSize(230, 30);
 		denomination.setFont(new Font("Times New Roman", Font.ITALIC,18));
@@ -139,12 +151,16 @@ public class Sales extends MainMDI implements InternalFrameListener {
 				
 				else if(txtFldEnterUnits.getText().equals("")){
 					JOptionPane.showMessageDialog(null, "Enter Number of Units");}
+				else if(txtFldEnterUnits.getText().equals("0")){
+					JOptionPane.showMessageDialog(null, "Units cannot be == to Zero");}
 				else {
 					try{
 						Connection myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime?autoReconnect=true&useSSL=false","root","Mbugua21");
 						
 						
 						String query = "insert into sales (CompanyName,Denominations,Units,Date) values (?,?,?,?)";
+						String select = "select Units from stocks where CompanyName=? and Denominations=?";
+						String update = "update stocks Set Units=? where CompanyName=? and Denominations=?";
 						
 						Date curDate = new Date();
 						
@@ -158,8 +174,32 @@ public class Sales extends MainMDI implements InternalFrameListener {
 						mystmt.setString(2,denomination.getSelectedItem().toString() );
 						mystmt.setString(3,txtFldEnterUnits.getText() );
 						mystmt.setString(4,DateToStr.toString() );
-						
 						mystmt.execute();
+						
+						double Balance;
+						PreparedStatement seta = myconn.prepareStatement(select);
+						seta.setString(1,cbxChseCompany.getSelectedItem().toString() );
+						seta.setString(2,denomination.getSelectedItem().toString() );
+						ResultSet myRs = seta.executeQuery();
+						while(myRs.next()){
+						int StockUnits = myRs.getInt("Units");
+						System.out.println(StockUnits);
+						/*if (myRs.getString(StockUnits) != null){
+							JOptionPane.showMessageDialog(null, "No Stock for "+cbxChseCompany.getSelectedItem()+ " "+denomination.getSelectedItem());
+						}else{*/
+						String convert = txtFldEnterUnits.getText();
+						int SalesUnits = Integer.parseInt(convert);
+						System.out.println(SalesUnits);
+						
+						Balance = StockUnits - SalesUnits;
+						System.out.println("Stock Balance" +Balance);
+						
+						PreparedStatement updater = myconn.prepareStatement(update);
+						updater.setDouble(1,Balance);
+						updater.setString(2,cbxChseCompany.getSelectedItem().toString() );
+						updater.setString(3,denomination.getSelectedItem().toString() );
+						updater.execute();
+					}
 						
 						 JOptionPane.showMessageDialog(null, "Data Saved");
 						mystmt.close();
@@ -194,29 +234,77 @@ public class Sales extends MainMDI implements InternalFrameListener {
 		
 		Salestable = new JTable();
 		Salestable.setBounds(1038, 431, -350, -280);
-		panel.add(Salestable);
+		//panel.add(Salestable);
 		scrollPaneSales.setViewportView(Salestable);
-		try{
-			
-			Connection myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime","root","Mbugua21");
-			
-			PreparedStatement mystmt = myconn.prepareStatement("select CompanyName,Denominations,sum(Units) AS Units,sum(Units)*Denominations AS GrandTotals FROM airtime.sales group by CompanyName,Denominations");
-			
-			/*Date curDate = new Date();
-			
-			SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd");
 
-			String DateToStr = format.format(curDate);
-			System.out.println(DateToStr);
-			mystmt.setString(1,DateToStr.toString());
+		Connection myconn;
+		try {
+			myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime","root","Mbugua21");
+			PreparedStatement mystmt = myconn.prepareStatement("select distinct companyName from sales");
 			
-						
 			ResultSet myRs = mystmt.executeQuery();
 			
-			Salestable.setModel(DbUtils.resultSetToTableModel(myRs));*/
-						
+			DefaultTableModel model;
+			model = new DefaultTableModel();
+			Salestable.setModel(model);
+			Salestable.setShowVerticalLines(true);
+			Salestable.setCellSelectionEnabled(true);
+			Salestable.setColumnSelectionAllowed(true);
+			//model.setColumnIdentifiers(myRs.getString("CompanyName"));
+			companys = new ArrayList<>();
+			model.addColumn(" ");
+			while(myRs.next()){
+				companys.add(myRs.getString("CompanyName"));
+			
+			model.addColumn(myRs.getString("CompanyName"));
+			}
+			model.addColumn("Grand Totals");
+			
+			PreparedStatement mystmt1 = myconn.prepareStatement("select distinct Denominations from sales order by Denominations desc");
+			
+			ResultSet myRs1 = mystmt1.executeQuery();
+			ArrayList<String> deno = new ArrayList<>();
+			while(myRs1.next()){
+				deno.add(myRs1.getString("Denominations"));
+				
+				model.addRow(new Object[]{myRs1.getString("Denominations")});
 		}
-		catch(Exception e) {
+			//model.addRow(new Object[]{"CompanySales"});
+				
+			String val ="";
+			
+			int i,j;
+		for(i=0; i<deno.size();i++){
+			double companyTotal =0;
+			double totalUnits = 0;
+			for(j=0; j<companys.size();j++){
+				PreparedStatement mystmt2 = myconn.prepareStatement("select sum(Units) AS Units from sales where CompanyName ='"+companys.get(j)+"' and Denominations = "+deno.get(i));
+				ResultSet myRs2 = mystmt2.executeQuery();
+				
+				
+				while(myRs2.next()){
+					val=myRs2.getString("Units");
+					if(val!= null){
+						val=myRs2.getString("Units");	
+					}else {val="0";}
+					
+					}
+				model.setValueAt(val,i, j+1);
+				totalUnits = totalUnits+ Double.parseDouble(val);
+				model.setValueAt(totalUnits *Double.parseDouble(deno.get(i)),i, companys.size()+1);
+			}
+			
+			/*double sum = 0;
+				
+				sum = sum+Double.parseDouble(Salestable.getValueAt(i, 2).toString());
+				model.setValueAt(sum,deno.size()+1,2);*/
+			//model.setValueAt(model.getValueAt(i,j),deno.size(),companys.size()+1);
+			//System.out.println(i);
+		}
+
+		
+		} catch (SQLException e) {
+			JOptionPane.showMessageDialog(null, e);
 			e.printStackTrace();
 		}
 		
@@ -229,89 +317,16 @@ public class Sales extends MainMDI implements InternalFrameListener {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-
-				Connection myconn;
-				try {
-					myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime","root","Mbugua21");
-					PreparedStatement mystmt = myconn.prepareStatement("select distinct companyName from sales");
+				try{
+					MessageFormat header = new MessageFormat("Page Header");
+					MessageFormat footer = new MessageFormat("Page(1,number,integer");
 					
-					ResultSet myRs = mystmt.executeQuery();
+					Salestable.print(JTable.PrintMode.FIT_WIDTH,header,footer);
 					
-					DefaultTableModel model;
-					model = new DefaultTableModel();
-					Salestable.setModel(model);
-					Salestable.setShowVerticalLines(true);
-					Salestable.setCellSelectionEnabled(true);
-					Salestable.setColumnSelectionAllowed(true);
-					//model.setColumnIdentifiers(myRs.getString("CompanyName"));
-					ArrayList<String> companys = new ArrayList<>();
-					model.addColumn(" ");
-					while(myRs.next()){
-						companys.add(myRs.getString("CompanyName"));
-					
-					model.addColumn(myRs.getString("CompanyName"));
-					}
-					model.addColumn("Grand Totals");
-					
-					PreparedStatement mystmt1 = myconn.prepareStatement("select distinct Denominations from sales order by Denominations desc");
-					
-					ResultSet myRs1 = mystmt1.executeQuery();
-					ArrayList<String> deno = new ArrayList<>();
-					while(myRs1.next()){
-						deno.add(myRs1.getString("Denominations"));
-						
-						model.addRow(new Object[]{myRs1.getString("Denominations")});
-				}
-					model.addRow(new Object[]{"CompanySales"});
-						
-					String val ="";
-					
-					int i,j;
-				for(i=0; i<deno.size();i++){
-					double companyTotal =0;
-					double totalUnits = 0;
-					for(j=0; j<companys.size();j++){
-						PreparedStatement mystmt2 = myconn.prepareStatement("select sum(Units) AS Units from sales where CompanyName ='"+companys.get(j)+"' and Denominations = "+deno.get(i));
-						ResultSet myRs2 = mystmt2.executeQuery();
-						
-						
-						while(myRs2.next()){
-							val=myRs2.getString("Units");
-							if(val!= null){
-								val=myRs2.getString("Units");	
-							}else {val="0";}
-							
-							}
-						model.setValueAt(val,i, j+1);
-						totalUnits = totalUnits+ Double.parseDouble(val);
-						model.setValueAt(totalUnits *Double.parseDouble(deno.get(i)),i, companys.size()+1);
-					}
-						/*int rowcount = Salestable.getRowCount();
-						double sum = 0;
-						for( i=0;i<rowcount;i++){
-							sum = sum+Double.parseDouble(Salestable.getValueAt(i, j).toString());
-						}
-						TotalCost.setText(Double.toString(sum));*/
-					
-					
-					
-					model.setValueAt(model.getValueAt(i,j),deno.size(),companys.size()+1);
-					System.out.println(i);
-				}
-	
-					
-					
-				
-				
-				} catch (SQLException e) {
+				}catch(Exception e){
 					JOptionPane.showMessageDialog(null, e);
-					e.printStackTrace();
-				}
-				
-			
-				
+				}	
 			}
-			
 		});
 		
 		String[] sal = {"Today","Yesterday","This Month","Last Month","Annual"};
@@ -321,34 +336,36 @@ public class Sales extends MainMDI implements InternalFrameListener {
 		cbxChseSales.setBounds(1104, 55, 180, 27);
 		panel.add(cbxChseSales);		
 		
-		JLabel lblTotalSales = new JLabel("Total Sales");
+		JLabel lblTotalSales = new JLabel("Total Sales:");
 		lblTotalSales.setFont(new Font("Times New Roman", Font.ITALIC, 16));
-		lblTotalSales.setBounds(594, 386, 92, 30);
+		lblTotalSales.setBounds(594, 386, 77, 28);
 		panel.add(lblTotalSales);
 		
 		JLabel TotalSales = new JLabel("0.0");
-		TotalSales.setFont(new Font("Times New Roman", Font.ITALIC, 22));
-		TotalSales.setBounds(682, 386, 77, 28);
+		TotalSales.setFont(new Font("Times New Roman", Font.BOLD, 16));
+		TotalSales.setBounds(682, 386, 90, 28);
 		panel.add(TotalSales);
 		
 		JLabel Profit = new JLabel("0.0");
-		Profit.setFont(new Font("Times New Roman", Font.ITALIC, 22));
-		Profit.setBounds(850, 386, 77, 28);
+		Profit.setFont(new Font("Times New Roman", Font.BOLD, 16));
+		Profit.setBounds(830, 386, 90, 28);
 		panel.add(Profit);
 		
-		JLabel lblProfit = new JLabel("Profit");
+		JLabel lblProfit = new JLabel("Profit:");
 		lblProfit.setFont(new Font("Times New Roman", Font.ITALIC, 16));
-		lblProfit.setBounds(794, 386, 60, 30);
+		lblProfit.setBounds(782, 386, 50, 28);
 		panel.add(lblProfit);
 		
-		TotalCost = new JLabel("0.0");
-		TotalCost.setFont(new Font("Times New Roman", Font.ITALIC, 22));
-		TotalCost.setBounds(1025, 384, 77, 28);
+		JLabel TotalCost = new JLabel("0.0");
+		TotalCost.setFont(new Font("Times New Roman", Font.BOLD, 16));
+		TotalCost.setText(Double.toString(getSum()));
+		TotalCost.setBounds(1012, 386, 90, 28);
 		panel.add(TotalCost);
 		
 		JLabel lblTotalCost = new JLabel("Total Cost:");
+		lblTotalCost.setForeground(Color.green);
 		lblTotalCost.setFont(new Font("Times New Roman", Font.ITALIC, 16));
-		lblTotalCost.setBounds(937, 384, 84, 30);
+		lblTotalCost.setBounds(925, 386, 77, 28);
 		panel.add(lblTotalCost);
 		cbxChseSales.addActionListener(new ActionListener(){
 
@@ -367,9 +384,55 @@ public class Sales extends MainMDI implements InternalFrameListener {
 			}
 		});
 		
+		boolean    bool = true;
+		  int        ndx = 0;
+       
+
+		  NumberFormat cfLocal = NumberFormat.getCurrencyInstance();
+
+		  String sCurSymbol = "";
+
+		    DecimalFormatSymbols dfs = null;
+
+		    if( cfLocal instanceof DecimalFormat )
+		    { // determine if symbol is prefix or suffix
+		      dfs = ((DecimalFormat)cfLocal).getDecimalFormatSymbols();
+		      sCurSymbol = dfs.getCurrencySymbol();      
+		    }
+
+	
+		    Number n = null;
+		    String sText = Double.toString(getSum());;
+		    
+		    ndx = sText.indexOf( sCurSymbol );
+		    if( ndx == -1 )
+		    { 
+		      if( bool ){
+		    	  sText = sCurSymbol + sText; }
+		      else{
+		    	  sText = sText + " " + sCurSymbol; }
+		    }
+		    try
+		    {
+		      n = cfLocal.parse( sText );
+		      TotalCost.setText( cfLocal.format( n ) );
+		     
+		    }
+		    catch( ParseException pe ) {
+		    	TotalCost.setText( "" ); }
+
 		
 	}
-
+	public double getSum(){
+		int rowcount = Salestable.getRowCount();
+		double sum = 0;
+		for(int i=0;i<rowcount;i++){
+			
+			sum = sum+Double.parseDouble(Salestable.getValueAt(i, companys.size()+1).toString());
+		}
+		return sum;
+		
+	}
 	public static void displayResults(){
 		try{
 		

@@ -9,9 +9,11 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 import javax.swing.JButton;
@@ -24,6 +26,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.event.InternalFrameListener;
+import javax.swing.table.DefaultTableModel;
 
 import net.proteanit.sql.DbUtils;
 import javax.swing.ListSelectionModel;
@@ -72,7 +75,7 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 		panel.add(btnCancel);
 		
 		JScrollPane scrollPane_1 = new JScrollPane();
-		scrollPane_1.setBounds(755, 135, 495, 359);
+		scrollPane_1.setBounds(666, 135, 584, 301);
 		panel.add(scrollPane_1);
 		
 		table_1 = new JTable();
@@ -86,26 +89,70 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 			}
 		});
 		scrollPane_1.setViewportView(table_1);
-		try
-		{
-			Connection myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime?autoReconnect=true&useSSL=false","root","Mbugua21");
+		
+		try {
+			Connection myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime","root","Mbugua21");
+			PreparedStatement mystmt = myconn.prepareStatement("select distinct companyName from stocks");
 			
-			PreparedStatement mystmt = myconn.prepareStatement("select *from stocks");
-						
 			ResultSet myRs = mystmt.executeQuery();
 			
-			table_1.setModel(DbUtils.resultSetToTableModel(myRs));
-			System.out.println("Displays Stock");
+			DefaultTableModel model;
+			model = new DefaultTableModel();
+			table_1.setModel(model);
+			table_1.setShowVerticalLines(true);
+			table_1.setCellSelectionEnabled(true);
+			table_1.setColumnSelectionAllowed(true);
+			ArrayList<String> companys = new ArrayList<>();
+			model.addColumn(" ");
+			while(myRs.next()){
+				companys.add(myRs.getString("CompanyName"));
 			
-		}
-		catch(Exception e) {
-			e.printStackTrace();
+			model.addColumn(myRs.getString("CompanyName"));
+			}
+			model.addColumn("Total Stocks");
+			
+			PreparedStatement mystmt1 = myconn.prepareStatement("select distinct Denominations from stocks order by Denominations desc");
+			
+			ResultSet myRs1 = mystmt1.executeQuery();
+			ArrayList<String> deno = new ArrayList<>();
+			while(myRs1.next()){
+				deno.add(myRs1.getString("Denominations"));
+				
+				model.addRow(new Object[]{myRs1.getString("Denominations")});
+		}				
+			String val ="";
+			
+			int i,j;
+		for(i=0; i<deno.size();i++){
+			double totalUnits = 0;
+			for(j=0; j<companys.size();j++){
+				PreparedStatement mystmt2 = myconn.prepareStatement("select sum(Units) AS Units from stocks where CompanyName ='"+companys.get(j)+"' and Denominations = "+deno.get(i));
+				ResultSet myRs2 = mystmt2.executeQuery();
+				
+				
+				while(myRs2.next()){
+					val=myRs2.getString("Units");
+					if(val!= null){
+						val=myRs2.getString("Units");	
+					}else {val="0";}
+					
+					}
+				model.setValueAt(val,i, j+1);
+				totalUnits = totalUnits+ Double.parseDouble(val);
+				model.setValueAt(totalUnits *Double.parseDouble(deno.get(i)),i, companys.size()+1);
+			}
+			System.out.println(i);
 		}
 		
+		} catch (SQLException e) {
+			JOptionPane.showMessageDialog(null, e);
+			e.printStackTrace();
+		}
+				
 		JButton btnPrint = new JButton("Print Stock");
 		btnPrint.setIcon(new ImageIcon(Stocks.class.getResource("/images/ic_print_black_24dp_1x.png")));
 		btnPrint.setFont(new Font("Segoe UI", Font.ITALIC, 12));
-		btnPrint.setBounds(1024, 573, 121, 40);
+		btnPrint.setBounds(897, 508, 121, 40);
 		panel.add(btnPrint);
 		btnPrint.addActionListener(new ActionListener(){
 
@@ -119,10 +166,8 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 					
 				}catch(Exception e){
 					JOptionPane.showMessageDialog(null, e);
-				}
-				
+				}	
 			}
-			
 		});
 		
 		JButton btnAdd = new JButton("Add");
@@ -142,6 +187,8 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 					
 					else if(textField.getText().equals("")){
 						JOptionPane.showMessageDialog(null, "Enter Number of Units");}
+					else if(textField.getText().equals("0")){
+						JOptionPane.showMessageDialog(null, "Units cannot be == to Zero");}
 					else {
 				try{
 					Connection myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime","root","Mbugua21");
@@ -335,7 +382,7 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 		
 		JLabel TotalCost = new JLabel("0.0");
 		TotalCost.setFont(new Font("Times New Roman", Font.ITALIC, 22));
-		TotalCost.setBounds(926, 539, 77, 28);
+		TotalCost.setBounds(1173, 453, 77, 28);
 		TotalCost.setText(Double.toString(getSum()));
 		panel.add(TotalCost);
 	}
@@ -343,7 +390,7 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 		int rowcount = table_1.getRowCount();
 		double sum = 0;
 		for(int i=0;i<rowcount;i++){
-			sum = sum+Double.parseDouble(table_1.getValueAt(i, 2).toString());
+			sum = sum+Double.parseDouble(table_1.getValueAt(i, 8).toString());
 		}
 		return sum;
 		
