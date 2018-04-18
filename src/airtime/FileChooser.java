@@ -71,10 +71,13 @@ public class FileChooser extends JFrame {
 				//int leo;
 				try{
 					FileReader reader = new FileReader(filename);
-					BufferedReader rd = new BufferedReader(reader);
+					//BufferedReader rd = new BufferedReader(reader);
 					//leo =rd.read();
 					//textArea.read(rd,null);
-					rd.close();
+					while(reader.read() != -1){
+						//textArea.read(reader,null);
+					}
+					//rd.close();
 					textArea.requestFocus();
 				}catch(Exception e){
 					JOptionPane.showMessageDialog(null,e);

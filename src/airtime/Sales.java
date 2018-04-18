@@ -1,6 +1,5 @@
 package airtime;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -34,7 +33,6 @@ import javax.swing.event.InternalFrameListener;
 import javax.swing.table.DefaultTableModel;
 
 import net.proteanit.sql.DbUtils;
-import javax.swing.SwingConstants;
 
 public class Sales extends MainMDI implements InternalFrameListener {
 	private JTextField txtFldEnterUnits;

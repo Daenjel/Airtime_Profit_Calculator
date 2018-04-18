@@ -33,12 +33,15 @@ import javax.swing.ListSelectionModel;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.ImageIcon;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
 public class Stocks extends MainMDI implements InternalFrameListener {
 	private static JTable table_1;
 	private JTextField textField;
 	private JComboBox<Object> cmbCompanyName;
 	private JComboBox<Object> cmbDeno;
+	ArrayList<String> companys;
 
 	public Stocks() {
 		JInternalFrame internalFrameStock = new JInternalFrame("Current Stock",true,true,true);
@@ -102,7 +105,7 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 			table_1.setShowVerticalLines(true);
 			table_1.setCellSelectionEnabled(true);
 			table_1.setColumnSelectionAllowed(true);
-			ArrayList<String> companys = new ArrayList<>();
+			companys = new ArrayList<>();
 			model.addColumn(" ");
 			while(myRs.next()){
 				companys.add(myRs.getString("CompanyName"));
@@ -188,7 +191,7 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 					else if(textField.getText().equals("")){
 						JOptionPane.showMessageDialog(null, "Enter Number of Units");}
 					else if(textField.getText().equals("0")){
-						JOptionPane.showMessageDialog(null, "Units cannot be == to Zero");}
+						JOptionPane.showMessageDialog(null, "Units cannot be equals to Zero");}
 					else {
 				try{
 					Connection myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime","root","Mbugua21");
@@ -199,7 +202,45 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 
 					String DateToStr = format.format(curDate);
 					System.out.println(DateToStr);
-					
+					//String StockUnits;
+					PreparedStatement check = myconn.prepareStatement("SELECT Units FROM stocks WHERE CompanyName =? and Denominations =?");
+					check.setString(1,cmbCompanyName.getSelectedItem().toString());
+					check.setString(2,cmbDeno.getSelectedItem().toString());
+					ResultSet myRs = check.executeQuery();
+					   boolean recordAdded = false;
+					    if(!myRs.first()){            
+					       /// Do your insertion of new records
+					    	PreparedStatement mystmt = myconn.prepareStatement("insert into stocks (CompanyName,Denominations,Units,Date) values (?,?,?,?)");
+							mystmt.setString(1,cmbCompanyName.getSelectedItem().toString());
+							mystmt.setString(2,cmbDeno.getSelectedItem().toString());
+							mystmt.setString(3,textField.getText().toString());
+							mystmt.setString(4,DateToStr.toString());
+							
+							mystmt.execute();
+							JOptionPane.showMessageDialog(null,"Stock Saved");
+							displayStock();
+							System.out.println("Stocks Saved");
+							mystmt.close();
+							
+					    	//JOptionPane.showMessageDialog(null, "Recorder");
+					         recordAdded = true;
+					    }
+					    else if( recordAdded ){
+					      JOptionPane.showMessageDialog(null, "Record added");
+					    }else{
+					       JOptionPane.showMessageDialog(null, "Record already exists Press EDIT to update");
+					    }
+					check.close();
+					/*myRs.first();
+					while(!myRs.next()){
+					record = true;
+					StockUnits = myRs.getString("Units");
+					System.out.println(StockUnits);
+				
+					if(StockUnits != " "){
+						JOptionPane.showMessageDialog(null,"Record already Exists Press EDIT to update");
+						
+					}else{
 					PreparedStatement mystmt = myconn.prepareStatement("insert into stocks (CompanyName,Denominations,Units,Date) values (?,?,?,?)");
 					mystmt.setString(1,cmbCompanyName.getSelectedItem().toString());
 					mystmt.setString(2,cmbDeno.getSelectedItem().toString());
@@ -209,8 +250,11 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 					mystmt.execute();
 					JOptionPane.showMessageDialog(null,"Stock Saved");
 					displayStock();
-					mystmt.close();
 					System.out.println("Stocks Saved");
+					mystmt.close();
+					}
+				
+					check.close();}*/
 				
 					cmbCompanyName.setSelectedItem("-Select Company-");
 					cmbDeno.setSelectedItem("-Select Denomination-");
@@ -280,6 +324,16 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 		panel.add(cmbDeno);
 		
 		textField = new JTextField();
+		textField.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyTyped(KeyEvent evt) {
+				char ch = evt.getKeyChar();
+				if(!Character.isDigit(ch) || (ch == KeyEvent.VK_BACK_SPACE) || (ch == KeyEvent.VK_DELETE)){
+					//getToolkit().beep();
+					evt.consume();
+				JOptionPane.showMessageDialog(null, "Units cannot be equals to Zero");}
+			}
+		});
 		textField.setBounds(336, 298, 231, 30);
 		panel.add(textField);
 		textField.setColumns(10);
@@ -390,7 +444,7 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 		int rowcount = table_1.getRowCount();
 		double sum = 0;
 		for(int i=0;i<rowcount;i++){
-			sum = sum+Double.parseDouble(table_1.getValueAt(i, 8).toString());
+			sum = sum+Double.parseDouble(table_1.getValueAt(i, companys.size()+1).toString());
 		}
 		return sum;
 		
