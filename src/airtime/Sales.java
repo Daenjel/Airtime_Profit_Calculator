@@ -17,6 +17,7 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 
 import javax.swing.ImageIcon;
@@ -37,12 +38,20 @@ import net.proteanit.sql.DbUtils;
 public class Sales extends MainMDI implements InternalFrameListener {
 	private JTextField txtFldEnterUnits;
 	private static JTable Salestable;
+	static JLabel TotalCost;
 	JComboBox<Object> cbxChseCompany;
 	JComboBox<Object> denomination;
-	ArrayList<String> companys;
+	static ArrayList<String> companys;
+	static String DateToStr;
+	static Date curDate = new Date();
+	
+	static SimpleDateFormat dateformat = new SimpleDateFormat("yyyy/MM/dd");
+	
+    static Calendar calSD = Calendar.getInstance();
+    
 	public static void main(String[] arg){
 		new Sales();
-				
+		textFormat();
 	}
 
 	public Sales() {
@@ -160,11 +169,7 @@ public class Sales extends MainMDI implements InternalFrameListener {
 						String select = "select Units from stocks where CompanyName=? and Denominations=?";
 						String update = "update stocks Set Units=? where CompanyName=? and Denominations=?";
 						
-						Date curDate = new Date();
-						
-						SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd");
-
-						String DateToStr = format.format(curDate);
+						DateToStr = dateformat.format(curDate);
 						System.out.println(DateToStr);
 					
 						PreparedStatement mystmt = myconn.prepareStatement(query);
@@ -179,15 +184,15 @@ public class Sales extends MainMDI implements InternalFrameListener {
 						seta.setString(1,cbxChseCompany.getSelectedItem().toString() );
 						seta.setString(2,denomination.getSelectedItem().toString() );
 						ResultSet myRs = seta.executeQuery();
-						while(myRs.next()){
+						if(myRs.next()){
 						int StockUnits = myRs.getInt("Units");
-						System.out.println(StockUnits);
+						System.out.println("Current Stock"+StockUnits);
 						/*if (myRs.getString(StockUnits) != null){
 							JOptionPane.showMessageDialog(null, "No Stock for "+cbxChseCompany.getSelectedItem()+ " "+denomination.getSelectedItem());
 						}else{*/
 						String convert = txtFldEnterUnits.getText();
 						int SalesUnits = Integer.parseInt(convert);
-						System.out.println(SalesUnits);
+						System.out.println("Number Units sold"+SalesUnits);
 						
 						Balance = StockUnits - SalesUnits;
 						System.out.println("Stock Balance" +Balance);
@@ -238,8 +243,9 @@ public class Sales extends MainMDI implements InternalFrameListener {
 		Connection myconn;
 		try {
 			myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime","root","Mbugua21");
-			PreparedStatement mystmt = myconn.prepareStatement("select distinct companyName from sales");
-			
+			DateToStr = dateformat.format(curDate);
+			PreparedStatement mystmt = myconn.prepareStatement("select distinct companyName from sales where date =? ");
+			mystmt.setString(1,DateToStr.toString() );
 			ResultSet myRs = mystmt.executeQuery();
 			
 			DefaultTableModel model;
@@ -258,8 +264,8 @@ public class Sales extends MainMDI implements InternalFrameListener {
 			}
 			model.addColumn("Grand Totals");
 			
-			PreparedStatement mystmt1 = myconn.prepareStatement("select distinct Denominations from sales order by Denominations desc");
-			
+			PreparedStatement mystmt1 = myconn.prepareStatement("select distinct Denominations from sales  where date = ? order by Denominations desc");
+			mystmt1.setString(1,DateToStr.toString() );
 			ResultSet myRs1 = mystmt1.executeQuery();
 			ArrayList<String> deno = new ArrayList<>();
 			while(myRs1.next()){
@@ -276,7 +282,8 @@ public class Sales extends MainMDI implements InternalFrameListener {
 			double companyTotal =0;
 			double totalUnits = 0;
 			for(j=0; j<companys.size();j++){
-				PreparedStatement mystmt2 = myconn.prepareStatement("select sum(Units) AS Units from sales where CompanyName ='"+companys.get(j)+"' and Denominations = "+deno.get(i));
+				PreparedStatement mystmt2 = myconn.prepareStatement("select sum(Units) AS Units from sales where date =? and CompanyName ='"+companys.get(j)+"' and Denominations = "+deno.get(i));
+				mystmt2.setString(1,DateToStr.toString() );
 				ResultSet myRs2 = mystmt2.executeQuery();
 				
 				
@@ -354,7 +361,7 @@ public class Sales extends MainMDI implements InternalFrameListener {
 		lblProfit.setBounds(782, 386, 50, 28);
 		panel.add(lblProfit);
 		
-		JLabel TotalCost = new JLabel("0.0");
+		TotalCost = new JLabel("0.0");
 		TotalCost.setFont(new Font("Times New Roman", Font.BOLD, 16));
 		TotalCost.setText(Double.toString(getSum()));
 		TotalCost.setBounds(1012, 386, 90, 28);
@@ -371,57 +378,52 @@ public class Sales extends MainMDI implements InternalFrameListener {
 			public void actionPerformed(ActionEvent arg0) {
 				if(cbxChseSales.getSelectedItem() == "Today") {lblTodaySales.setText("Today's Sales");}
 					
-				else if(cbxChseSales.getSelectedItem() == "Yesterday") {lblTodaySales.setText("Yesterday's Sales");}
+				else if(cbxChseSales.getSelectedItem() == "Yesterday") {lblTodaySales.setText("Yesterday's Sales"); YesterdayReport();}
 					
 				else if(cbxChseSales.getSelectedItem() == "This Month") {lblTodaySales.setText("This Month Sales");}
 				
 				else if(cbxChseSales.getSelectedItem() == "Last Month") {lblTodaySales.setText("Last Month Sales");}
 				
-				else if(cbxChseSales.getSelectedItem() == "Annual") {lblTodaySales.setText("Annual Sales");}
+				else if(cbxChseSales.getSelectedItem() == "Annual") {lblTodaySales.setText("Annual Sales"); AnnualReport();}
 				
 			}
 		});
 		
-		boolean    bool = true;
-		  int        ndx = 0;
-       
+		
+		
+	}
+	public static void textFormat(){
+		boolean bool = true;
+		int ndx = 0;
+    
+		NumberFormat cfLocal = NumberFormat.getCurrencyInstance();
 
-		  NumberFormat cfLocal = NumberFormat.getCurrencyInstance();
+		String sCurSymbol = "";
 
-		  String sCurSymbol = "";
+		DecimalFormatSymbols dfs = null;
 
-		    DecimalFormatSymbols dfs = null;
-
-		    if( cfLocal instanceof DecimalFormat )
-		    { // determine if symbol is prefix or suffix
+		if( cfLocal instanceof DecimalFormat ){ // determine if symbol is prefix or suffix
 		      dfs = ((DecimalFormat)cfLocal).getDecimalFormatSymbols();
 		      sCurSymbol = dfs.getCurrencySymbol();      
 		    }
-
-	
-		    Number n = null;
-		    String sText = Double.toString(getSum());;
+		Number n = null;
+		String sText = Double.toString(getSum());;
 		    
-		    ndx = sText.indexOf( sCurSymbol );
-		    if( ndx == -1 )
-		    { 
+		ndx = sText.indexOf( sCurSymbol );
+		if( ndx == -1 ){ 
 		      if( bool ){
 		    	  sText = sCurSymbol + sText; }
 		      else{
 		    	  sText = sText + " " + sCurSymbol; }
 		    }
-		    try
-		    {
+		    try{
 		      n = cfLocal.parse( sText );
 		      TotalCost.setText( cfLocal.format( n ) );
-		     
 		    }
 		    catch( ParseException pe ) {
 		    	TotalCost.setText( "" ); }
-
-		
-	}
-	public double getSum(){
+		}
+	public static double getSum(){
 		int rowcount = Salestable.getRowCount();
 		double sum = 0;
 		for(int i=0;i<rowcount;i++){
@@ -447,4 +449,201 @@ public class Sales extends MainMDI implements InternalFrameListener {
 			e.printStackTrace();
 		}
 	}
+	public static void YesterdayReport(){
+		
+		calSD.setTime(curDate); // convert your date to Calendar object
+	    int daysToDecrement = -2;
+	    calSD.add(Calendar.DATE, daysToDecrement);
+	    Date real_StartDate = calSD.getTime();
+	    String sD = dateformat.format(real_StartDate);
+
+		JOptionPane.showMessageDialog(null, "Yesterday's Date:  "+sD);
+
+		    try {
+		    	Connection myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime","root","Mbugua21");
+				
+				PreparedStatement mystmt = myconn.prepareStatement("select *from sales where date =?");
+				mystmt.setString(1, sD);
+				ResultSet myRs = mystmt.executeQuery();
+				if(!myRs.first()){
+					JOptionPane.showMessageDialog(null, "No Sales Recorded Yesterday");
+				}else{
+				
+					try {
+						myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime","root","Mbugua21");
+						mystmt = myconn.prepareStatement("select distinct companyName from sales where date=? ");
+						mystmt.setString(1,sD );
+						myRs = mystmt.executeQuery();
+						
+						DefaultTableModel model;
+						model = new DefaultTableModel();
+						Salestable.setModel(model);
+						Salestable.setShowVerticalLines(true);
+						Salestable.setCellSelectionEnabled(true);
+						Salestable.setColumnSelectionAllowed(true);
+						//model.setColumnIdentifiers(myRs.getString("CompanyName"));
+						companys = new ArrayList<>();
+						model.addColumn(" ");
+						while(myRs.next()){
+							companys.add(myRs.getString("CompanyName"));
+						
+						model.addColumn(myRs.getString("CompanyName"));
+						}
+						model.addColumn("Grand Totals");
+						
+						PreparedStatement mystmt1 = myconn.prepareStatement("select distinct Denominations from sales  where date=? order by Denominations desc");
+						mystmt1.setString(1,sD);
+						ResultSet myRs1 = mystmt1.executeQuery();
+						ArrayList<String> deno = new ArrayList<>();
+						while(myRs1.next()){
+							deno.add(myRs1.getString("Denominations"));
+							
+							model.addRow(new Object[]{myRs1.getString("Denominations")});
+					}
+						//model.addRow(new Object[]{"CompanySales"});
+							
+						String val ="";
+						
+						int i,j;
+					for(i=0; i<deno.size();i++){
+						double companyTotal =0;
+						double totalUnits = 0;
+						for(j=0; j<companys.size();j++){
+							PreparedStatement mystmt2 = myconn.prepareStatement("select sum(Units) AS Units from sales where date=? and CompanyName ='"+companys.get(j)+"' and Denominations = "+deno.get(i));
+							mystmt2.setString(1,sD);
+							ResultSet myRs2 = mystmt2.executeQuery();
+							
+							
+							while(myRs2.next()){
+								val=myRs2.getString("Units");
+								if(val!= null){
+									val=myRs2.getString("Units");	
+								}else {val="0";}
+								
+								}
+							model.setValueAt(val,i, j+1);
+							totalUnits = totalUnits+ Double.parseDouble(val);
+							model.setValueAt(totalUnits *Double.parseDouble(deno.get(i)),i, companys.size()+1);
+						}
+					
+					}
+					textFormat();
+					TotalCost.setText(Double.toString(getSum()));
+					
+					} catch (SQLException e) {
+						JOptionPane.showMessageDialog(null, e);
+						e.printStackTrace();
+					}
+				}
+		    } catch (Exception e) {
+		        JOptionPane.showMessageDialog(null, "Error");
+		        e.printStackTrace();
+		    }
+
+		
+	}
+	public static void AnnualReport(){
+	
+		calSD.setTime(curDate); // convert your date to Calendar object
+	    int daysToDecrement = -1;
+	    calSD.add(Calendar.DATE, daysToDecrement);
+	    Date real_StartDate = calSD.getTime();
+	    String sD = dateformat.format(real_StartDate);
+
+		JOptionPane.showMessageDialog(null, sD);
+
+		    Date endDate =  new Date();
+		    Calendar calED = Calendar.getInstance();
+		    calED.setTime(endDate); // convert your date to Calendar object
+		    int daysToIncrement = 0;
+		    calED.add(Calendar.DATE, daysToIncrement);
+		    Date real_endDate = calED.getTime();
+		    SimpleDateFormat sdF2 = new SimpleDateFormat("yyyy-MM-dd");
+		    String eD = sdF2.format(real_endDate);
+		    JOptionPane.showMessageDialog(null, eD);
+		    try {
+		    	Connection myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime","root","Mbugua21");
+				
+				PreparedStatement mystmt = myconn.prepareStatement("select *from sales where date =?");
+				mystmt.setString(1, sD);
+				ResultSet myRs = mystmt.executeQuery();
+				if(!myRs.first()){
+					JOptionPane.showMessageDialog(null, "No Sales Recorded Yesterday");
+				}else{
+					Salestable.setModel(DbUtils.resultSetToTableModel(myRs));
+				}
+		    } catch (Exception e) {
+		        JOptionPane.showMessageDialog(null, "Error");
+		        e.printStackTrace();
+		    }
+
+		
+		/*Connection myconn;
+		try {
+			myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime","root","Mbugua21");
+			DateToStr = format.format(curDate);
+			PreparedStatement mystmt = myconn.prepareStatement("select distinct companyName from sales where year(date)=year(?) ");
+			mystmt.setString(1,DateToStr.toString() );
+			ResultSet myRs = mystmt.executeQuery();
+			
+			DefaultTableModel model;
+			model = new DefaultTableModel();
+			Salestable.setModel(model);
+			Salestable.setShowVerticalLines(true);
+			Salestable.setCellSelectionEnabled(true);
+			Salestable.setColumnSelectionAllowed(true);
+			//model.setColumnIdentifiers(myRs.getString("CompanyName"));
+			companys = new ArrayList<>();
+			model.addColumn(" ");
+			while(myRs.next()){
+				companys.add(myRs.getString("CompanyName"));
+			
+			model.addColumn(myRs.getString("CompanyName"));
+			}
+			model.addColumn("Grand Totals");
+			
+			PreparedStatement mystmt1 = myconn.prepareStatement("select distinct Denominations from sales  where year(date) =year(?) order by Denominations desc");
+			mystmt1.setString(1,DateToStr.toString() );
+			ResultSet myRs1 = mystmt1.executeQuery();
+			ArrayList<String> deno = new ArrayList<>();
+			while(myRs1.next()){
+				deno.add(myRs1.getString("Denominations"));
+				
+				model.addRow(new Object[]{myRs1.getString("Denominations")});
+		}
+			//model.addRow(new Object[]{"CompanySales"});
+				
+			String val ="";
+			
+			int i,j;
+		for(i=0; i<deno.size();i++){
+			double companyTotal =0;
+			double totalUnits = 0;
+			for(j=0; j<companys.size();j++){
+				PreparedStatement mystmt2 = myconn.prepareStatement("select sum(Units) AS Units from sales where year(date) =year(?) and CompanyName ='"+companys.get(j)+"' and Denominations = "+deno.get(i));
+				mystmt2.setString(1,DateToStr.toString() );
+				ResultSet myRs2 = mystmt2.executeQuery();
+				
+				
+				while(myRs2.next()){
+					val=myRs2.getString("Units");
+					if(val!= null){
+						val=myRs2.getString("Units");	
+					}else {val="0";}
+					
+					}
+				model.setValueAt(val,i, j+1);
+				totalUnits = totalUnits+ Double.parseDouble(val);
+				model.setValueAt(totalUnits *Double.parseDouble(deno.get(i)),i, companys.size()+1);
+			}
+		
+		}
+
+		
+		} catch (SQLException e) {
+			JOptionPane.showMessageDialog(null, e);
+			e.printStackTrace();
+		}*/
+	}
 }
+

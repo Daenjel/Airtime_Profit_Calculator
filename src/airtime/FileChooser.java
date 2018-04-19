@@ -68,11 +68,14 @@ public class FileChooser extends JFrame {
 				chooser.showOpenDialog(null);
 				File f = chooser.getSelectedFile();
 				String filename = f.getAbsolutePath();
-				//int leo;
+				String leo ="";
 				try{
 					FileReader reader = new FileReader(filename);
-					//BufferedReader rd = new BufferedReader(reader);
-					//leo =rd.read();
+					BufferedReader rd = new BufferedReader(reader);
+					int SalesUnits = Integer.parseInt(filename);
+					SalesUnits =rd.read();
+					
+					//textArea.append();
 					//textArea.read(rd,null);
 					while(reader.read() != -1){
 						//textArea.read(reader,null);
@@ -81,6 +84,7 @@ public class FileChooser extends JFrame {
 					textArea.requestFocus();
 				}catch(Exception e){
 					JOptionPane.showMessageDialog(null,e);
+					e.printStackTrace();
 				}
 				
 			}

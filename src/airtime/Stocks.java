@@ -331,7 +331,7 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 				if(!Character.isDigit(ch) || (ch == KeyEvent.VK_BACK_SPACE) || (ch == KeyEvent.VK_DELETE)){
 					//getToolkit().beep();
 					evt.consume();
-				JOptionPane.showMessageDialog(null, "Units cannot be equals to Zero");}
+				JOptionPane.showMessageDialog(null, "Cannot Accept Letters");}
 			}
 		});
 		textField.setBounds(336, 298, 231, 30);
