@@ -2,8 +2,11 @@ package airtime;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -114,6 +117,16 @@ public class Sales extends MainMDI implements InternalFrameListener {
 				}
 		
 		txtFldEnterUnits = new JTextField();
+		txtFldEnterUnits.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyTyped(KeyEvent evt) {
+				char ch = evt.getKeyChar();
+				if(!Character.isDigit(ch) || (ch == KeyEvent.VK_BACK_SPACE) || (ch == KeyEvent.VK_DELETE)){
+					Toolkit.getDefaultToolkit().beep();
+				   	evt.consume();
+				JOptionPane.showMessageDialog(null, "Cannot Accept Letters");}
+			}
+		});
 		txtFldEnterUnits.setBounds(316, 271, 180, 28);
 		panel.add(txtFldEnterUnits);
 		txtFldEnterUnits.setColumns(10);

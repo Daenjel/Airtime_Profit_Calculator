@@ -2,8 +2,11 @@ package airtime;
 
 import java.awt.EventQueue;
 import java.awt.Font;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -70,6 +73,16 @@ public class Settings extends MainMDI implements InternalFrameListener {
 		txtFieldCompanyName.setColumns(10);
 		
 		txtFldCompanyProfit = new JTextField();
+		txtFldCompanyProfit.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyTyped(KeyEvent evt) {
+				char ch = evt.getKeyChar();
+				if(!Character.isDigit(ch) || (ch == KeyEvent.VK_BACK_SPACE) || (ch == KeyEvent.VK_DELETE)){
+					Toolkit.getDefaultToolkit().beep();
+					evt.consume();
+				JOptionPane.showMessageDialog(null, "Cannot Accept Letters");}
+			}
+		});
 		txtFldCompanyProfit.setColumns(10);
 		txtFldCompanyProfit.setBounds(311, 252, 245, 25);
 		internalFrameCompany.getContentPane().add(txtFldCompanyProfit);
@@ -260,6 +273,16 @@ public class Settings extends MainMDI implements InternalFrameListener {
 		internalFrameCompany.getContentPane().add(lblEdtProfit);
 		
 		txtFldEdtProfit = new JTextField();
+		txtFldEdtProfit.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyTyped(KeyEvent evt) {
+				char ch = evt.getKeyChar();
+				if(!Character.isDigit(ch) || (ch == KeyEvent.VK_BACK_SPACE) || (ch == KeyEvent.VK_DELETE)){
+					Toolkit.getDefaultToolkit().beep();
+					evt.consume();
+				JOptionPane.showMessageDialog(null, "Cannot Accept Letters");}
+			}
+		});
 		txtFldEdtProfit.setColumns(10);
 		txtFldEdtProfit.setBounds(937, 252, 245, 25);
 		internalFrameCompany.getContentPane().add(txtFldEdtProfit);

@@ -1,3 +1,21 @@
-and publisher shall not be liable in any event for incidental orand publisher shall not be liable in any event for incidental or
-and publisher shall not be liable in any event for incidental orand publisher shall not be liable in any event for incidental or
-and publisher shall not be liable in any event for incidental or
+		("<html>Airtime Profit Calculator, Airtime Profit Calculator, Airtime Profit Calculator"
+				+ "<br>Airtime Profit Calculator, Airtime Profit Calculator, Airtime Profit Calculator"
+				+ "<br>Airtime Profit Calculator, Airtime Profit Calculator, Airtime Profit Calculator"
+				+"<br>                                                                          "
+				+"<br>                                                                          "
+				+"<br>                                                                          "
+				+"<br>                                                                          "
+				+"<br>                                                                          "
+				+"<br>                                                                          "
+				+"<br>(C) Copyright 2018 by Anthony Wambua, Inc. All Rights Reserved.          *"
+				+"<br>* 										                                "
+				+"<br>*                                                                         "
+				+"<br>* DISCLAIMER: The author  and publisher of this program have used their  *"
+				+"<br>* best efforts in preparing the program. These efforts include the       *"
+				+"<br>* development, research, and testing of the theories and programs        *"
+				+"<br>* to determine their effectiveness. The author and publisher make        *"
+				+"<br>* no warranty of any kind, expressed or implied, with regard to          *"
+				+"<br>* to the documentation contained in these program. The author            *"
+				+"<br>* and publisher shall not be liable in any event for incidental or       *"
+				+"<br>* consequential damages in connection with, or arising out of, the       *"
+				+"<br>* furnishing, performance, or use of these programs.</html>");

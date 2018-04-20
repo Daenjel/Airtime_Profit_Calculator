@@ -3,6 +3,7 @@ package airtime;
 import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Font;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Connection;
@@ -332,7 +333,7 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 			public void keyTyped(KeyEvent evt) {
 				char ch = evt.getKeyChar();
 				if(!Character.isDigit(ch) || (ch == KeyEvent.VK_BACK_SPACE) || (ch == KeyEvent.VK_DELETE)){
-					//getToolkit().beep();
+					Toolkit.getDefaultToolkit().beep();
 					evt.consume();
 				JOptionPane.showMessageDialog(null, "Cannot Accept Letters");}
 			}

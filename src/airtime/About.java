@@ -3,15 +3,19 @@ package airtime;
 import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Font;
+import java.awt.TextArea;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
-import javax.swing.SwingConstants;
+import javax.swing.JOptionPane;
 import javax.swing.event.InternalFrameListener;
 
 public class About extends MainMDI implements InternalFrameListener {
@@ -27,121 +31,60 @@ public class About extends MainMDI implements InternalFrameListener {
 		desktopPane.add(internalFrameAbout);
 		internalFrameAbout.getContentPane().setLayout(null);
 		
-		String help = ("<html>Airtime Profit Calculator, Airtime Profit Calculator, Airtime Profit Calculator"
-				+ "<br>Airtime Profit Calculator, Airtime Profit Calculator, Airtime Profit Calculator"
-				+ "<br>Airtime Profit Calculator, Airtime Profit Calculator, Airtime Profit Calculator"
-				+"<br>                                                                          "
-				+"<br>                                                                          "
-				+"<br>                                                                          "
-				+"<br>                                                                          "
-				+"<br>                                                                          "
-				+"<br>                                                                          "
-				+"<br>(C) Copyright 2018 by Anthony Wambua, Inc. All Rights Reserved.          *"
-				+"<br>* 										                                "
-				+"<br>*                                                                         "
-				+"<br>* DISCLAIMER: The author  and publisher of this program have used their  *"
-				+"<br>* best efforts in preparing the program. These efforts include the       *"
-				+"<br>* development, research, and testing of the theories and programs        *"
-				+"<br>* to determine their effectiveness. The author and publisher make        *"
-				+"<br>* no warranty of any kind, expressed or implied, with regard to          *"
-				+"<br>* to the documentation contained in these program. The author            *"
-				+"<br>* and publisher shall not be liable in any event for incidental or       *"
-				+"<br>* consequential damages in connection with, or arising out of, the       *"
-				+"<br>* furnishing, performance, or use of these programs.</html>");
+		TextArea textArea = new TextArea();
+		textArea.setBackground(Color.WHITE);
+		textArea.setBounds(237, 50, 797, 426);
+		textArea.setForeground(Color.BLACK);
+		textArea.setFont(new Font("Times New Roman", Font.PLAIN, 14));
+		textArea.setSize(900,550);
+		textArea.setEditable(false);
+		internalFrameAbout.getContentPane().add(textArea);
 		
-		JLabel lblNewLabel = new JLabel();
-		lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		lblNewLabel.setForeground(Color.BLACK);
-		lblNewLabel.setFont(new Font("Times New Roman", Font.PLAIN, 16));
-		lblNewLabel.setVerticalAlignment(SwingConstants.TOP);
-		lblNewLabel.setBounds(237, 94, 797, 426);
-		lblNewLabel.setText(help);
-		internalFrameAbout.getContentPane().add(lblNewLabel);
+				try{
+				String one = null;
+				String two = null;
+				InputStream fileIs = About.class.getResourceAsStream("about.txt");
+				BufferedReader rd = null;
+				rd = new BufferedReader(new InputStreamReader(fileIs));
+				
+				while ((one = rd.readLine()) != null) {
+				two = two + one +"\n";
+				//System.out.println(two);
+				}
+				textArea.setText(two);;
+				rd.close();
+				textArea.requestFocus();
+				}catch(Exception e){
+					JOptionPane.showMessageDialog(null,e);
+					e.printStackTrace();
+				}
+				
 		
 		JButton btnCancel = new JButton("Cancel");
 		btnCancel.setIcon(new ImageIcon(About.class.getResource("/images/ic_exit_to_app_black_24dp_1x.png")));
-		btnCancel.setBounds(644, 582, 107, 33);
+		btnCancel.setBounds(650, 614, 107, 33);
 		internalFrameAbout.getContentPane().add(btnCancel);
 		btnCancel.setFont(new Font("Segoe UI", Font.ITALIC,12));
 		
 		JLabel lblNewLabel_1 = new JLabel("Airtime Profit Calculator");
+		lblNewLabel_1.setIcon(new ImageIcon(About.class.getResource("/images/images24x24gray.png")));
 		lblNewLabel_1.setForeground(Color.BLUE);
-		lblNewLabel_1.setFont(new Font("Times New Roman", Font.ITALIC, 23));
-		lblNewLabel_1.setBounds(486, 36, 248, 33);
+		lblNewLabel_1.setFont(new Font("Harrington", Font.PLAIN, 23));
+		lblNewLabel_1.setBounds(553, 11, 285, 33);
 		internalFrameAbout.getContentPane().add(lblNewLabel_1);
 		btnCancel.addActionListener(new ActionListener(){
-
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				new Sales();
 				contentPane.setVisible(false);
 			}
-			
 		});
-
-	}
-	
+	}	
 	//private static final String filename = "about.txt";
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				 new About();
-				 
-						/*BufferedReader rd = null;
-						FileReader fr = null;
-
-						try {
-
-							// Open the file for reading.
-
-							//rd = new BufferedReader(new FileReader(new File(filename)));
-
-							fr = new FileReader(filename);
-							rd = new BufferedReader(fr);
-							
-							// Read all contents of the file.
-
-							String inputLine;
-
-							while((inputLine = rd.readLine()) != null)
-
-								System.out.println(inputLine);
-
-						}
-
-						catch(IOException ex) {
-
-							System.err.println("An IOException was caught!");
-
-							ex.printStackTrace();
-
-						}
-
-						finally {
-
-							// Close the file.
-
-							try {
-
-								if (rd != null)
-									rd.close();
-
-								if (fr != null)
-									fr.close();
-								
-
-							}
-
-							catch (IOException ex) {
-
-								System.err.println("An IOException was caught!");
-
-								ex.printStackTrace();
-
-							}
-
-						}*/
-
 			}
 		});
 	}

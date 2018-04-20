@@ -50,7 +50,7 @@ public class MainMDI implements InternalFrameListener {
 			
 			contentPane = new JFrame();
 			contentPane.setLayout(new FlowLayout());
-			contentPane.setIconImage(Toolkit.getDefaultToolkit().getImage(MainMDI.class.getResource("/images/imageshome.png")));			
+			contentPane.setIconImage(Toolkit.getDefaultToolkit().getImage(MainMDI.class.getResource("/images/images24x24.png")));			
 			contentPane.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			contentPane.setVisible(true);
 			contentPane.setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -59,9 +59,6 @@ public class MainMDI implements InternalFrameListener {
 			contentPane.setFont(new Font("Times New Roman", Font.ITALIC, 14));
 			contentPane.setContentPane(desktopPane);
 		
-			
-			//ImageIcon icon = new ImageIcon("src/images/television-tv-dinosaur.jpg");
-			//desktopPane.setImageIcon(new ImageIcon(getClass().getResource("images//television-tv-dinosaur.jpg")));
 			desktopPane.setBackground(Color.GREEN);
 			desktopPaneLock.setBackground(Color.CYAN);
 			
