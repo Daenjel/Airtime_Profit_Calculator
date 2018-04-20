@@ -229,6 +229,9 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 					      JOptionPane.showMessageDialog(null, "Record added");
 					    }else{
 					       JOptionPane.showMessageDialog(null, "Record already exists Press EDIT to update");
+					   	   cmbCompanyName.getSelectedItem().toString();
+						   cmbDeno.getSelectedItem().toString();
+						   textField.getText().toString();
 					    }
 					check.close();
 					/*myRs.first();

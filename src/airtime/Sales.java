@@ -165,48 +165,60 @@ public class Sales extends MainMDI implements InternalFrameListener {
 						Connection myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime?autoReconnect=true&useSSL=false","root","Mbugua21");
 						
 						
-						String query = "insert into sales (CompanyName,Denominations,Units,Date) values (?,?,?,?)";
+						String insert = "insert into sales (CompanyName,Denominations,Units,Date) values (?,?,?,?)";
 						String select = "select Units from stocks where CompanyName=? and Denominations=?";
 						String update = "update stocks Set Units=? where CompanyName=? and Denominations=?";
 						
 						DateToStr = dateformat.format(curDate);
 						System.out.println(DateToStr);
-					
-						PreparedStatement mystmt = myconn.prepareStatement(query);
-						mystmt.setString(1,cbxChseCompany.getSelectedItem().toString() );
-						mystmt.setString(2,denomination.getSelectedItem().toString() );
-						mystmt.setString(3,txtFldEnterUnits.getText() );
-						mystmt.setString(4,DateToStr.toString() );
-						mystmt.execute();
-						
+											
 						double Balance;
 						PreparedStatement seta = myconn.prepareStatement(select);
 						seta.setString(1,cbxChseCompany.getSelectedItem().toString() );
 						seta.setString(2,denomination.getSelectedItem().toString() );
 						ResultSet myRs = seta.executeQuery();
-						if(myRs.next()){
+						if(!myRs.next()){						
+							JOptionPane.showMessageDialog(internalFrameSales, "No Stock for  "+cbxChseCompany.getSelectedItem()+ "  Denomination "+denomination.getSelectedItem());
+						}else{
+
 						int StockUnits = myRs.getInt("Units");
-						System.out.println("Current Stock"+StockUnits);
-						/*if (myRs.getString(StockUnits) != null){
-							JOptionPane.showMessageDialog(null, "No Stock for "+cbxChseCompany.getSelectedItem()+ " "+denomination.getSelectedItem());
-						}else{*/
+						System.out.println("Current Stock "+StockUnits);
+						if(StockUnits == 0){
+							PreparedStatement mystmt = myconn.prepareStatement("delete from stocks where CompanyName = ? and Denominations=?");
+							mystmt.setString(1,cbxChseCompany.getSelectedItem().toString());
+							mystmt.setString(2,denomination.getSelectedItem().toString());
+							mystmt.execute();
+							System.out.println("Record Deleted");
+						}
 						String convert = txtFldEnterUnits.getText();
 						int SalesUnits = Integer.parseInt(convert);
-						System.out.println("Number Units sold"+SalesUnits);
+						System.out.println("Number Units sold "+SalesUnits);
 						
 						Balance = StockUnits - SalesUnits;
-						System.out.println("Stock Balance" +Balance);
+						System.out.println("Stock Balance " +Balance);
+						if(Balance < 0){
+							JOptionPane.showMessageDialog(null, "Current Stock for "+cbxChseCompany.getSelectedItem()+"  Denomination "+denomination.getSelectedItem()+" is: "+StockUnits);
+						}else{
+						
+						PreparedStatement inserter = myconn.prepareStatement(insert);
+						inserter.setString(1,cbxChseCompany.getSelectedItem().toString() );
+						inserter.setString(2,denomination.getSelectedItem().toString() );
+						inserter.setString(3,txtFldEnterUnits.getText() );
+						inserter.setString(4,DateToStr.toString() );
+						inserter.execute();
+						JOptionPane.showMessageDialog(null, "Sales Saved");
+						System.out.println("Sales Saved");
+						inserter.close();
 						
 						PreparedStatement updater = myconn.prepareStatement(update);
 						updater.setDouble(1,Balance);
 						updater.setString(2,cbxChseCompany.getSelectedItem().toString() );
 						updater.setString(3,denomination.getSelectedItem().toString() );
 						updater.execute();
-					}
+						System.out.println("Record Updated");
+						}
+					} 
 						
-						 JOptionPane.showMessageDialog(null, "Data Saved");
-						mystmt.close();
-						System.out.println("Sales Saved");
 						//displayResults();
 						cbxChseCompany.setSelectedItem("-Select Company-");
 						denomination.setSelectedItem("-Select Denomination-");
@@ -452,10 +464,11 @@ public class Sales extends MainMDI implements InternalFrameListener {
 	public static void YesterdayReport(){
 		
 		calSD.setTime(curDate); // convert your date to Calendar object
-	    int daysToDecrement = -2;
+	    int daysToDecrement = -1;
 	    calSD.add(Calendar.DATE, daysToDecrement);
 	    Date real_StartDate = calSD.getTime();
-	    String sD = dateformat.format(real_StartDate);
+	    SimpleDateFormat yesterdayformat = new SimpleDateFormat("dd/MM/yyyy");
+	    String sD = yesterdayformat.format(real_StartDate);
 
 		JOptionPane.showMessageDialog(null, "Yesterday's Date:  "+sD);
 
