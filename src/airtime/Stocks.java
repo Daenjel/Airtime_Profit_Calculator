@@ -42,7 +42,8 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 	private JTextField textField;
 	private JComboBox<Object> cmbCompanyName;
 	private JComboBox<Object> cmbDeno;
-	ArrayList<String> companys;
+	static ArrayList<String> companys;
+	private JButton btnCurrentStock;
 
 	public Stocks() {
 		JInternalFrame internalFrameStock = new JInternalFrame("Current Stock",true,true,true);
@@ -93,65 +94,7 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 			}
 		});
 		scrollPane_1.setViewportView(table_1);
-		
-		try {
-			Connection myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime","root","Mbugua21");
-			PreparedStatement mystmt = myconn.prepareStatement("select distinct companyName from stocks");
-			
-			ResultSet myRs = mystmt.executeQuery();
-			
-			DefaultTableModel model;
-			model = new DefaultTableModel();
-			table_1.setModel(model);
-			table_1.setShowVerticalLines(true);
-			table_1.setCellSelectionEnabled(true);
-			table_1.setColumnSelectionAllowed(true);
-			companys = new ArrayList<>();
-			model.addColumn(" ");
-			while(myRs.next()){
-				companys.add(myRs.getString("CompanyName"));
-			
-			model.addColumn(myRs.getString("CompanyName"));
-			}
-			model.addColumn("Total Stocks");
-			
-			PreparedStatement mystmt1 = myconn.prepareStatement("select distinct Denominations from stocks order by Denominations desc");
-			
-			ResultSet myRs1 = mystmt1.executeQuery();
-			ArrayList<String> deno = new ArrayList<>();
-			while(myRs1.next()){
-				deno.add(myRs1.getString("Denominations"));
-				
-				model.addRow(new Object[]{myRs1.getString("Denominations")});
-		}				
-			String val ="";
-			
-			int i,j;
-		for(i=0; i<deno.size();i++){
-			double totalUnits = 0;
-			for(j=0; j<companys.size();j++){
-				PreparedStatement mystmt2 = myconn.prepareStatement("select sum(Units) AS Units from stocks where CompanyName ='"+companys.get(j)+"' and Denominations = "+deno.get(i));
-				ResultSet myRs2 = mystmt2.executeQuery();
-				
-				
-				while(myRs2.next()){
-					val=myRs2.getString("Units");
-					if(val!= null){
-						val=myRs2.getString("Units");	
-					}else {val="0";}
-					
-					}
-				model.setValueAt(val,i, j+1);
-				totalUnits = totalUnits+ Double.parseDouble(val);
-				model.setValueAt(totalUnits *Double.parseDouble(deno.get(i)),i, companys.size()+1);
-			}
-			System.out.println(i);
-		}
-		
-		} catch (SQLException e) {
-			JOptionPane.showMessageDialog(null, e);
-			e.printStackTrace();
-		}
+		CurrentStock();
 				
 		JButton btnPrint = new JButton("Print Stock");
 		btnPrint.setIcon(new ImageIcon(Stocks.class.getResource("/images/ic_print_black_24dp_1x.png")));
@@ -203,7 +146,6 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 
 					String DateToStr = format.format(curDate);
 					System.out.println(DateToStr);
-					//String StockUnits;
 					PreparedStatement check = myconn.prepareStatement("SELECT Units FROM stocks WHERE CompanyName =? and Denominations =?");
 					check.setString(1,cmbCompanyName.getSelectedItem().toString());
 					check.setString(2,cmbDeno.getSelectedItem().toString());
@@ -219,11 +161,9 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 							
 							mystmt.execute();
 							JOptionPane.showMessageDialog(null,"Stock Saved");
-							displayStock();
+							CurrentStock();
 							System.out.println("Stocks Saved");
 							mystmt.close();
-							
-					    	//JOptionPane.showMessageDialog(null, "Recorder");
 					         recordAdded = true;
 					    }
 					    else if( recordAdded ){
@@ -235,30 +175,6 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 						   textField.getText().toString();
 					    }
 					check.close();
-					/*myRs.first();
-					while(!myRs.next()){
-					record = true;
-					StockUnits = myRs.getString("Units");
-					System.out.println(StockUnits);
-				
-					if(StockUnits != " "){
-						JOptionPane.showMessageDialog(null,"Record already Exists Press EDIT to update");
-						
-					}else{
-					PreparedStatement mystmt = myconn.prepareStatement("insert into stocks (CompanyName,Denominations,Units,Date) values (?,?,?,?)");
-					mystmt.setString(1,cmbCompanyName.getSelectedItem().toString());
-					mystmt.setString(2,cmbDeno.getSelectedItem().toString());
-					mystmt.setString(3,textField.getText().toString());
-					mystmt.setString(4,DateToStr.toString());
-					
-					mystmt.execute();
-					JOptionPane.showMessageDialog(null,"Stock Saved");
-					displayStock();
-					System.out.println("Stocks Saved");
-					mystmt.close();
-					}
-				
-					check.close();}*/
 				
 					cmbCompanyName.setSelectedItem("-Select Company-");
 					cmbDeno.setSelectedItem("-Select Denomination-");
@@ -370,7 +286,7 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 						JOptionPane.showMessageDialog(null, cmbCompanyName.getSelectedItem().toString()+ " denomination "+cmbDeno.getSelectedItem().toString()+ " has changed to  " + textField.getText().toString());
 						mystmt.close();
 						System.out.println("Edited");
-						displayStock();
+						CurrentStock();
 						cmbCompanyName.setSelectedItem("-Select Company-");
 						cmbDeno.setSelectedItem("-Select Denomination-");
 						textField.setText(null);
@@ -420,7 +336,7 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 					
 					mystmt.close();
 					System.out.println("Deleted");
-					displayStock();
+					CurrentStock();
 					cmbCompanyName.setSelectedItem("-Select Company-");
 					cmbDeno.setSelectedItem("-Select Denomination-");
 					textField.setText(null);
@@ -443,6 +359,45 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 		TotalCost.setBounds(1173, 453, 77, 28);
 		TotalCost.setText(Double.toString(getSum()));
 		panel.add(TotalCost);
+		
+		JButton btnRecentStock = new JButton("Recent Stock");
+		btnRecentStock.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				try{
+					Connection myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime","root","Mbugua21");
+				
+					PreparedStatement mystmt = myconn.prepareStatement("select Date,CompanyName,Denominations,Units from stocks order by date desc");
+					
+					ResultSet myRs = mystmt.executeQuery();
+					
+					table_1.setModel(DbUtils.resultSetToTableModel(myRs));
+				
+					System.out.println("Displays Recent Stocks");
+				}catch (Exception e){
+					e.printStackTrace();
+				}
+				btnRecentStock.setVisible(false);
+				btnCurrentStock.setVisible(true);
+			}
+		});
+		btnRecentStock.setIcon(new ImageIcon(Stocks.class.getResource("/images/ic_storage_black_18dp_1x.png")));
+		btnRecentStock.setFont(new Font("Segoe UI", Font.ITALIC, 12));
+		btnRecentStock.setBounds(1121, 99, 129, 30);
+		panel.add(btnRecentStock);
+		
+		btnCurrentStock = new JButton("Current Stock");
+		btnCurrentStock.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				CurrentStock();
+				System.out.println("Displays Current Stocks");
+				btnCurrentStock.setVisible(false);
+				btnRecentStock.setVisible(true);
+			}
+		});
+		btnCurrentStock.setIcon(new ImageIcon(Stocks.class.getResource("/images/ic_storage_black_18dp_1x.png")));
+		btnCurrentStock.setFont(new Font("Segoe UI", Font.ITALIC, 12));
+		btnCurrentStock.setBounds(1121, 99, 129, 30);
+		panel.add(btnCurrentStock);
 	}
 	public double getSum(){
 		int rowcount = table_1.getRowCount();
@@ -453,20 +408,69 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 		return sum;
 		
 	}
-	public static void displayStock(){
-		try{
+	public static void CurrentStock(){
+		try {
 			Connection myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime","root","Mbugua21");
-		
-			PreparedStatement mystmt = myconn.prepareStatement("select * from stocks");
+			PreparedStatement mystmt = myconn.prepareStatement("select distinct companyName from stocks");
 			
 			ResultSet myRs = mystmt.executeQuery();
 			
-			table_1.setModel(DbUtils.resultSetToTableModel(myRs));
+			DefaultTableModel model;
+			model = new DefaultTableModel();
+			table_1.setModel(model);
+			table_1.setShowVerticalLines(true);
+			table_1.setCellSelectionEnabled(true);
+			table_1.setColumnSelectionAllowed(true);
+			companys = new ArrayList<>();
+			model.addColumn(" ");
+			while(myRs.next()){
+				companys.add(myRs.getString("CompanyName"));
+			
+			model.addColumn(myRs.getString("CompanyName"));
+			}
+			model.addColumn("Total Stocks");
+			
+			PreparedStatement mystmt1 = myconn.prepareStatement("select distinct Denominations from stocks order by Denominations desc");
+			
+			ResultSet myRs1 = mystmt1.executeQuery();
+			ArrayList<String> deno = new ArrayList<>();
+			while(myRs1.next()){
+				deno.add(myRs1.getString("Denominations"));
+				
+				model.addRow(new Object[]{myRs1.getString("Denominations")});
+		}				
+			String val ="";
+			
+			int i,j;
+		for(i=0; i<deno.size();i++){
+			double totalUnits = 0;
+			for(j=0; j<companys.size();j++){
+				PreparedStatement mystmt2 = myconn.prepareStatement("select sum(Units) AS Units from stocks where CompanyName ='"+companys.get(j)+"' and Denominations = "+deno.get(i));
+				ResultSet myRs2 = mystmt2.executeQuery();
+				
+				
+				while(myRs2.next()){
+					val=myRs2.getString("Units");
+					if(val!= null){
+						val=myRs2.getString("Units");	
+					}else {val="0";}
+					
+					}
+				model.setValueAt(val,i, j+1);
+				totalUnits = totalUnits+ Double.parseDouble(val);
+				model.setValueAt(totalUnits *Double.parseDouble(deno.get(i)),i, companys.size()+1);
+			}
+			System.out.println(i);
+		}
 		
-			System.out.println("Displays Stocks");
-		}catch (Exception e){
+		} catch (SQLException e) {
+			JOptionPane.showMessageDialog(null, e);
 			e.printStackTrace();
 		}
+				
+		
+			System.out.println("Displays Stocks");
+	
 	}
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
