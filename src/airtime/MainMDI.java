@@ -30,13 +30,6 @@ public class MainMDI implements InternalFrameListener {
 		public JMenuItem mntmExit;
 		public JMenu mnSales;
 		public JMenuItem mntmSales;
-		public JMenu mnReports;
-		public JMenuItem mntmToday;
-		public JMenuItem mntmYesterday;
-		public JMenu mnMonthly;
-		public JMenuItem mntmThisMth;
-		public JMenuItem mntmLastMth;
-		public JMenuItem mntmAnnual;
 		public JMenu mnStock;
 		public JMenuItem mntmCurrent;
 		public JMenu mnSettings;
@@ -87,7 +80,6 @@ public class MainMDI implements InternalFrameListener {
 			
 			Admin();
 			Sales();
-			Reports();
 			Stock();
 			Settings();
 			Help();
@@ -105,7 +97,6 @@ public class MainMDI implements InternalFrameListener {
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
 					mnSales.setVisible(false);
-					mnReports.setVisible(false);
 					mnStock.setVisible(false);
 					mnSettings.setVisible(false);
 					mnHelp.setVisible(false);
@@ -114,8 +105,6 @@ public class MainMDI implements InternalFrameListener {
 					contentPane.setContentPane(desktopPaneLock);
 					contentPane.setSize(1000, 500);
 					contentPane.setBounds(200, 100, 1000, 500);
-					
-					
 				}
 			});
 			mnAdmin.add(mntmLock);
@@ -128,14 +117,12 @@ public class MainMDI implements InternalFrameListener {
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
 					mnSales.setVisible(true);
-					mnReports.setVisible(true);
 					mnSettings.setVisible(true);
 					mnHelp.setVisible(true);
 					mntmLock.setVisible(true);
 					mntmUnlock.setVisible(false);
 					contentPane.setContentPane(desktopPane);
 					contentPane.setExtendedState(JFrame.MAXIMIZED_BOTH);
-					
 				}
 			});
 			mnAdmin.add(mntmUnlock);
@@ -171,55 +158,6 @@ public class MainMDI implements InternalFrameListener {
 		});
 		mnSales.add(mntmSales);
 	}
-	public void Reports(){
-			mnReports = new JMenu("SALES_REPORT");
-			mnReports.setFont(new Font("Segoe UI", Font.ITALIC, 12));
-			menuBar.add(mnReports);
-			
-			mntmToday = new JMenuItem("Today");
-			mntmToday.setFont(new Font("Times New Roman", Font.PLAIN, 14));
-			mntmToday.addActionListener(new ActionListener(){
-				@Override
-				public void actionPerformed(ActionEvent arg0) {
-					new Sales_Reports();
-					contentPane.setVisible(false);
-					
-				}
-				
-			});
-			mnReports.add(mntmToday);
-			
-			mntmYesterday = new JMenuItem("Yesterday");
-			mntmYesterday.setFont(new Font("Times New Roman", Font.PLAIN, 14));
-			mntmYesterday.addActionListener(new ActionListener(){
-
-				@Override
-				public void actionPerformed(ActionEvent arg0) {
-					new Sales_Report_Yesterday();
-					contentPane.setVisible(false);
-				}
-				
-			});
-			mnReports.add(mntmYesterday);
-			
-			mnMonthly = new JMenu("Monthly");
-			mnMonthly.setHorizontalTextPosition(SwingConstants.LEADING);
-			mnMonthly.setFont(new Font("Times New Roman", Font.PLAIN, 14));
-			mnReports.add(mnMonthly);
-			
-			mntmThisMth = new JMenuItem("This Month");
-			mntmThisMth.setFont(new Font("Times New Roman", Font.PLAIN, 14));
-			mnMonthly.add(mntmThisMth);
-			
-			mntmLastMth = new JMenuItem("Last Month");
-			mntmLastMth.setFont(new Font("Times New Roman", Font.PLAIN, 14));
-			mnMonthly.add(mntmLastMth);
-			
-			mntmAnnual = new JMenuItem("Annual");
-			mntmAnnual.setHorizontalTextPosition(SwingConstants.LEADING);
-			mntmAnnual.setFont(new Font("Times New Roman", Font.PLAIN, 14));
-			mnReports.add(mntmAnnual);
-		}
 	public void Stock(){
 		
 		mnStock = new JMenu("STOCK");
