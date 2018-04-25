@@ -8,7 +8,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.text.SimpleDateFormat;
@@ -27,7 +26,7 @@ public class Settings extends MainMDI implements InternalFrameListener {
 	private static JTextField txtFieldCompanyName;
 	private static JTextField txtFldCompanyProfit;
 	private JTextField txtFldEdtProfit;
-	private static Connection myconn;
+	private static Connection myconn = null;
 	static PreparedStatement mystmt;
 	private ResultSet myRs;
 	JComboBox<String> comboBoxEdtCompany;
@@ -42,7 +41,7 @@ public class Settings extends MainMDI implements InternalFrameListener {
 		
 
 	public Settings() {
-		
+		myconn = JConnection.ConnecrDb();
 		JInternalFrame internalFrameCompany = new JInternalFrame("Setting Up Company Details",true,true,true);
 		internalFrameCompany.setFrameIcon(new ImageIcon(Settings.class.getResource("/images/ic_settings_input_component_black_18dp_1x.png")));
 		internalFrameCompany.setBounds(10, 0, 414, 229);
@@ -93,10 +92,7 @@ public class Settings extends MainMDI implements InternalFrameListener {
 		comboBoxEdtCompany.setFont(new Font("Times New Roman", Font.ITALIC, 20));
 		internalFrameCompany.getContentPane().add(comboBoxEdtCompany);
 				try
-				{
-									
-					Connection myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime","root","Mbugua21");
-					
+				{				
 					mystmt = myconn.prepareStatement("select CompanyName from company");
 					//Statement mystmt= myconn.createStatement();							
 					myRs = mystmt.executeQuery();
@@ -133,9 +129,7 @@ public class Settings extends MainMDI implements InternalFrameListener {
 				}else if (txtFldEdtProfit.getText().equals("")){
 					JOptionPane.showMessageDialog(null,"Company Profit is not declared");
 				}else{
-					try{
-						Connection myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime","root","Mbugua21");
-						
+					try{						
 						mystmt = myconn.prepareStatement("update company set CompanyProfit =? where CompanyName =?");
 						mystmt.setString(1,txtFldEdtProfit.getText().toString());
 						mystmt.setString(2,comboBoxEdtCompany.getSelectedItem().toString());
@@ -177,9 +171,7 @@ public class Settings extends MainMDI implements InternalFrameListener {
 				    } else if (response == JOptionPane.YES_OPTION) {
 				     
 				
-				try{
-					Connection myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime","root","Mbugua21");
-					
+				try{					
 					mystmt = myconn.prepareStatement("delete from company where CompanyName =?");
 					mystmt.setString(1,comboBoxEdtCompany.getSelectedItem().toString());
 										
@@ -216,10 +208,7 @@ public class Settings extends MainMDI implements InternalFrameListener {
 				}else if (txtFldCompanyProfit.getText().equals("")){
 					JOptionPane.showMessageDialog(null,"Company Profit is not declared");
 				}else{
-			try{
-				myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime?autoReconnect=true&useSSL=false","root","Mbugua21");
-				
-				
+			try{				
 				String query = "insert into company (CompanyName,CompanyProfit,Date) values (?,?,?)";
 				
 				Date curDate = new Date();
@@ -317,9 +306,7 @@ public class Settings extends MainMDI implements InternalFrameListener {
 	}
 	protected void  addToComboEdit(){
 	try
-	{				
-		Connection myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime","root","Mbugua21");
-		
+	{		
 		mystmt = myconn.prepareStatement("select CompanyName from company");							
 		myRs = mystmt.executeQuery();
 		

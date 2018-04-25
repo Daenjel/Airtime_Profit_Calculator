@@ -1,7 +1,6 @@
 package airtime;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
@@ -17,17 +16,19 @@ public class CheckStatus extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private JTable table;
-
+	Connection myconn = null;
 	public static void main(String[] args) {
 		new CheckStatus();
 	}
 
 	public CheckStatus() {
+		myconn = JConnection.ConnecrDb();
 		JFrame frame = new JFrame();
 				
 		JOptionPane optionPane = new JOptionPane();
 		JScrollPane scrollPane = getscrollPane(optionPane);
 	    optionPane.setMessage(scrollPane);
+	    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		optionPane.setOptionType(JOptionPane.CLOSED_OPTION);
 		
 	    JDialog dialog = optionPane.createDialog(frame, "Company Status");
@@ -47,15 +48,15 @@ public class CheckStatus extends JFrame {
 		scrollPane.setViewportView(table);
 		try{
 			
-			Connection myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime","root","Mbugua21");
-			
 			PreparedStatement mystmt = myconn.prepareStatement("select *from company");
 					
 			ResultSet myRs = mystmt.executeQuery();
 			
 			table.setModel(DbUtils.resultSetToTableModel(myRs));
 			
+			myRs.close();
 			mystmt.close();
+			myconn.close();
 			System.out.println("Displays Company Status");
 			
 		}

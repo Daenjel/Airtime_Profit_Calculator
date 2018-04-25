@@ -8,7 +8,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -51,14 +50,14 @@ public class Sales extends MainMDI implements InternalFrameListener {
 	static SimpleDateFormat dateformat = new SimpleDateFormat("yyyy/MM/dd");
 	
     static Calendar calSD = Calendar.getInstance();
-    
+    static Connection myconn = null;
 	public static void main(String[] arg){
 		new Sales();
 		textFormat();
 	}
 
 	public Sales() {
-			
+		myconn = JConnection.ConnecrDb();	
 		JInternalFrame internalFrameSales = new JInternalFrame("Sales");
 		internalFrameSales.setFrameIcon(new ImageIcon(Sales.class.getResource("/images/ic_add_shopping_cart_black_18dp_1x.png")));
 		internalFrameSales.setBounds(10, 0, 414, 229);
@@ -100,9 +99,7 @@ public class Sales extends MainMDI implements InternalFrameListener {
 		cbxChseCompany.addItem("-Select Company-");
 		panel.add(cbxChseCompany);
 				try
-				{
-					Connection myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime","root","Mbugua21");
-			
+				{		
 					Statement mystmt= myconn.createStatement();							
 					ResultSet myRs = mystmt.executeQuery("select distinct CompanyName from stocks");
 					
@@ -175,9 +172,6 @@ public class Sales extends MainMDI implements InternalFrameListener {
 					JOptionPane.showMessageDialog(null, "Units Cannot be Equal to Zero");}
 				else {
 					try{
-						Connection myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime?autoReconnect=true&useSSL=false","root","Mbugua21");
-						
-						
 						String insert = "insert into sales (CompanyName,Denominations,Units,Date) values (?,?,?,?)";
 						String select = "select Units from stocks where CompanyName=? and Denominations=?";
 						String update = "update stocks Set Units=? where CompanyName=? and Denominations=?";
@@ -263,10 +257,7 @@ public class Sales extends MainMDI implements InternalFrameListener {
 		Salestable = new JTable();
 		Salestable.setBounds(1038, 431, -350, -280);
 		scrollPaneSales.setViewportView(Salestable);
-
-		Connection myconn;
 		try {
-			myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime","root","Mbugua21");
 			DateToStr = dateformat.format(curDate);
 			PreparedStatement mystmt = myconn.prepareStatement("select distinct companyName from sales where date =? ");
 			mystmt.setString(1,DateToStr.toString() );
@@ -463,18 +454,17 @@ public class Sales extends MainMDI implements InternalFrameListener {
 
 		//JOptionPane.showMessageDialog(null, "Today's Date:  "+sD);
 
-		    try {
-		    	Connection myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime","root","Mbugua21");
-				
+		    try {				
 				PreparedStatement mystmt = myconn.prepareStatement("select *from sales where Date = (?)");
 				mystmt.setString(1, DateToStr);
 				ResultSet myRs = mystmt.executeQuery();
 				if(!myRs.first()){
 					JOptionPane.showMessageDialog(null, "No Sales Recorded Today !!");
+					System.out.println("No Record Today");
+					Salestable.setModel(DbUtils.resultSetToTableModel(myRs));
 				}else{
 				
 					try {
-						myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime","root","Mbugua21");
 						mystmt = myconn.prepareStatement("select distinct companyName from sales where Date = (?)");
 						mystmt.setString(1,DateToStr);
 						myRs = mystmt.executeQuery();
@@ -531,6 +521,7 @@ public class Sales extends MainMDI implements InternalFrameListener {
 						}
 					
 					}
+					System.out.println("Record For Today");
 					textFormat();
 					TotalCost.setText(Double.toString(getSum()));
 					
@@ -555,18 +546,17 @@ public class Sales extends MainMDI implements InternalFrameListener {
 
 		JOptionPane.showMessageDialog(null, "Yesterday's Date:  "+sD);
 
-		    try {
-		    	Connection myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime","root","Mbugua21");
-				
+		    try {				
 				PreparedStatement mystmt = myconn.prepareStatement("select *from sales where date =?");
 				mystmt.setString(1, sD);
 				ResultSet myRs = mystmt.executeQuery();
 				if(!myRs.first()){
 					JOptionPane.showMessageDialog(null, "No Sales Recorded Yesterday!!");
+					System.out.println("No Record Yesterday");
+					Salestable.setModel(DbUtils.resultSetToTableModel(myRs));
 				}else{
 				
 					try {
-						myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime","root","Mbugua21");
 						mystmt = myconn.prepareStatement("select distinct companyName from sales where date=? ");
 						mystmt.setString(1,sD );
 						myRs = mystmt.executeQuery();
@@ -623,6 +613,7 @@ public class Sales extends MainMDI implements InternalFrameListener {
 						}
 					
 					}
+					System.out.println("Record Yesterday");
 					textFormat();
 					TotalCost.setText(Double.toString(getSum()));
 					
@@ -646,18 +637,17 @@ public static void ThisMonthReport(){
 
 		JOptionPane.showMessageDialog(null, "This Month:  "+sD);
 
-		    try {
-		    	Connection myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime","root","Mbugua21");
-				
+		    try {				
 				PreparedStatement mystmt = myconn.prepareStatement("select *from sales where MONTH(Date) = MONTH(?)");
 				mystmt.setString(1, DateToStr);
 				ResultSet myRs = mystmt.executeQuery();
 				if(!myRs.first()){
 					JOptionPane.showMessageDialog(null, "No Sales Recorded This Month!!");
+					System.out.println("Record This Month");
+					Salestable.setModel(DbUtils.resultSetToTableModel(myRs));
 				}else{
 				
 					try {
-						myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime","root","Mbugua21");
 						mystmt = myconn.prepareStatement("select distinct companyName from sales where MONTH(Date) = MONTH(?)");
 						mystmt.setString(1,DateToStr);
 						myRs = mystmt.executeQuery();
@@ -714,6 +704,7 @@ public static void ThisMonthReport(){
 						}
 					
 					}
+					System.out.println("Record This Month");
 					textFormat();
 					TotalCost.setText(Double.toString(getSum()));
 					} catch (SQLException e) {
@@ -739,18 +730,17 @@ public static void LastMonthReport(){
 
 	JOptionPane.showMessageDialog(null, "Last Month:  "+sD);
 
-	    try {
-	    	Connection myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime","root","Mbugua21");
-			
+	    try {			
 			PreparedStatement mystmt = myconn.prepareStatement("select *from sales where MONTH(Date) = MONTH(?)-1");
 			mystmt.setString(1, DateToStr);
 			ResultSet myRs = mystmt.executeQuery();
 			if(!myRs.first()){
 				JOptionPane.showMessageDialog(null, "No Sales Recorded Last Month!!");
+				System.out.println("No Record Last Month");
+				Salestable.setModel(DbUtils.resultSetToTableModel(myRs));
 			}else{
 			
 				try {
-					myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime","root","Mbugua21");
 					mystmt = myconn.prepareStatement("select distinct companyName from sales where MONTH(Date) = MONTH(?)-1");
 					mystmt.setString(1,DateToStr);
 					myRs = mystmt.executeQuery();
@@ -807,6 +797,7 @@ public static void LastMonthReport(){
 					}
 				
 				}
+				System.out.println("Record Last Month");
 				textFormat();
 				TotalCost.setText(Double.toString(getSum()));
 				
@@ -831,16 +822,16 @@ public static void LastMonthReport(){
 
 		JOptionPane.showMessageDialog(null, "This Year:  "+sD);
 		    try {
-		    	Connection myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime","root","Mbugua21");
-				
+		    					
 				PreparedStatement mystmt = myconn.prepareStatement("select * from sales where YEAR(Date) = YEAR(?)");
 				mystmt.setString(1, DateToStr);
 				ResultSet myRs = mystmt.executeQuery();
 				if(!myRs.first()){
 					JOptionPane.showMessageDialog(null, "No Sales Recorded This Year!!");
+					System.out.println("No Record Annual");
+					Salestable.setModel(DbUtils.resultSetToTableModel(myRs));
 				}else{
 					try {
-						myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime","root","Mbugua21");
 						mystmt = myconn.prepareStatement("select distinct companyName from sales where YEAR(Date) = YEAR(?)");
 						mystmt.setString(1,DateToStr);
 						myRs = mystmt.executeQuery();
@@ -897,6 +888,7 @@ public static void LastMonthReport(){
 						}
 					
 					}
+					System.out.println("Record Annual");
 					textFormat();
 					TotalCost.setText(Double.toString(getSum()));
 					

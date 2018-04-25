@@ -6,8 +6,11 @@ import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -17,6 +20,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JInternalFrame;
@@ -26,16 +30,11 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 import javax.swing.event.InternalFrameListener;
 import javax.swing.table.DefaultTableModel;
 
 import net.proteanit.sql.DbUtils;
-import javax.swing.ListSelectionModel;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import javax.swing.ImageIcon;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 
 public class Stocks extends MainMDI implements InternalFrameListener {
 	private static JTable table_1;
@@ -44,8 +43,9 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 	private JComboBox<Object> cmbDeno;
 	static ArrayList<String> companys;
 	private JButton btnCurrentStock;
-
+	static Connection myconn = null;
 	public Stocks() {
+		myconn = JConnection.ConnecrDb();
 		JInternalFrame internalFrameStock = new JInternalFrame("Current Stock",true,true,true);
 		internalFrameStock.setFrameIcon(new ImageIcon(Stocks.class.getResource("/images/ic_storage_black_18dp_1x.png")));
 		internalFrameStock.setBounds(10, 0, 414, 229);
@@ -137,9 +137,7 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 					else if(textField.getText().equals("0")){
 						JOptionPane.showMessageDialog(null, "Units cannot be equals to Zero");}
 					else {
-				try{
-					Connection myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime","root","Mbugua21");
-					
+				try{					
 					Date curDate = new Date();
 					
 					SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd");
@@ -223,7 +221,6 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 		cmbCompanyName.setBounds(337, 166, 230, 25);
 		panel.add(cmbCompanyName);
 		try {
-			Connection myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime","root","Mbugua21");
 			Statement mystmt= myconn.createStatement();							
 			ResultSet myRs = mystmt.executeQuery("select CompanyName from company");
 			
@@ -232,7 +229,7 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 				cmbCompanyName.addItem(myRs.getString("CompanyName"));
 			  }
 			  System.out.println("Displays Company Name on cmbCompanyName");
-			  myconn.close();
+			 // myconn.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -274,9 +271,7 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 				}else if (textField.getText().equals("")){
 					JOptionPane.showMessageDialog(null,"Number of Units are not declared");
 				}else{
-					try{
-						Connection myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime","root","Mbugua21");
-						
+					try{						
 						PreparedStatement mystmt = myconn.prepareStatement("update stocks set Denominations =?, Units =? where CompanyName =?");
 						mystmt.setString(1,cmbDeno.getSelectedItem().toString());
 						mystmt.setString(2,textField.getText().toString());
@@ -323,9 +318,7 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 				    } else if (response == JOptionPane.YES_OPTION) {
 				     
 				
-				try{
-					Connection myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime","root","Mbugua21");
-					
+				try{					
 					PreparedStatement mystmt = myconn.prepareStatement("delete from airtime.stocks where CompanyName = ? and Denominations=?");
 					mystmt.setString(1,cmbCompanyName.getSelectedItem().toString());
 					mystmt.setString(2,cmbDeno.getSelectedItem().toString());
@@ -363,9 +356,7 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 		JButton btnRecentStock = new JButton("Recent Stock");
 		btnRecentStock.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				try{
-					Connection myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime","root","Mbugua21");
-				
+				try{				
 					PreparedStatement mystmt = myconn.prepareStatement("select Date,CompanyName,Denominations,Units from stocks order by date desc");
 					
 					ResultSet myRs = mystmt.executeQuery();
@@ -410,7 +401,6 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 	}
 	public static void CurrentStock(){
 		try {
-			Connection myconn = DriverManager.getConnection("JDBC:mysql://localhost:3306/airtime","root","Mbugua21");
 			PreparedStatement mystmt = myconn.prepareStatement("select distinct companyName from stocks");
 			
 			ResultSet myRs = mystmt.executeQuery();
