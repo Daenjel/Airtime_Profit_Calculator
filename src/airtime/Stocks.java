@@ -15,7 +15,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.MessageFormat;
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -33,17 +37,28 @@ import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.InternalFrameListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
 
 import net.proteanit.sql.DbUtils;
+import javax.swing.SwingConstants;
 
 public class Stocks extends MainMDI implements InternalFrameListener {
 	private static JTable table_1;
 	private JTextField textField;
+	static JLabel TotalCost;
 	private JComboBox<Object> cmbCompanyName;
 	private JComboBox<Object> cmbDeno;
 	static ArrayList<String> companys;
 	private JButton btnCurrentStock;
 	static Connection myconn = null;
+	public static void main(String[] args){
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				new Stocks();
+				textFormat();
+				}
+		});
+	}
 	public Stocks() {
 		myconn = JConnection.ConnecrDb();
 		JInternalFrame internalFrameStock = new JInternalFrame("Current Stock",true,true,true);
@@ -69,13 +84,11 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 		btnCancel.setFont(new Font("Segoe UI", Font.ITALIC,12));
 		btnCancel.setBounds(611,573,100,40);
 		btnCancel.addActionListener(new ActionListener(){
-
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				new Sales();
 				contentPane.setVisible(false);
-			}
-			
+			}		
 		});
 		panel.add(btnCancel);
 		
@@ -84,6 +97,7 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 		panel.add(scrollPane_1);
 		
 		table_1 = new JTable();
+		table_1.setRowHeight(30);
 		table_1.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		table_1.addMouseListener(new MouseAdapter() {
 			@Override
@@ -197,7 +211,7 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 		
 		JLabel lblRequestNewStock = new JLabel("Current Stock");
 		lblRequestNewStock.setFont(new Font("Times New Roman", Font.ITALIC, 22));
-		lblRequestNewStock.setBounds(926, 89, 219, 40);
+		lblRequestNewStock.setBounds(856, 89, 144, 40);
 		panel.add(lblRequestNewStock);
 		
 		JLabel lblCompanyName = new JLabel("Company Name:");
@@ -347,22 +361,22 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 		btnRemove.setBounds(484, 371, 100, 40);
 		panel.add(btnRemove);
 		
-		JLabel TotalCost = new JLabel("0.0");
+		TotalCost = new JLabel("0.0");
+		TotalCost.setHorizontalAlignment(SwingConstants.RIGHT);
+		TotalCost.setForeground(Color.MAGENTA);
 		TotalCost.setFont(new Font("Times New Roman", Font.ITALIC, 22));
-		TotalCost.setBounds(1173, 453, 77, 28);
+		TotalCost.setBounds(1142, 444, 108, 34);
 		TotalCost.setText(Double.toString(getSum()));
 		panel.add(TotalCost);
 		
 		JButton btnRecentStock = new JButton("Recent Stock");
 		btnRecentStock.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				lblRequestNewStock.setText("Recent Stock");
 				try{				
 					PreparedStatement mystmt = myconn.prepareStatement("select Date,CompanyName,Denominations,Units from stocks order by date desc");
-					
 					ResultSet myRs = mystmt.executeQuery();
-					
 					table_1.setModel(DbUtils.resultSetToTableModel(myRs));
-				
 					System.out.println("Displays Recent Stocks");
 				}catch (Exception e){
 					e.printStackTrace();
@@ -379,6 +393,7 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 		btnCurrentStock = new JButton("Current Stock");
 		btnCurrentStock.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				lblRequestNewStock.setText("Current Stock");
 				CurrentStock();
 				System.out.println("Displays Current Stocks");
 				btnCurrentStock.setVisible(false);
@@ -389,8 +404,13 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 		btnCurrentStock.setFont(new Font("Segoe UI", Font.ITALIC, 12));
 		btnCurrentStock.setBounds(1121, 99, 129, 30);
 		panel.add(btnCurrentStock);
+		
+		JLabel lblTotalCost = new JLabel("Total Cost:");
+		lblTotalCost.setFont(new Font("Times New Roman", Font.ITALIC, 22));
+		lblTotalCost.setBounds(1024, 441, 108, 40);
+		panel.add(lblTotalCost);
 	}
-	public double getSum(){
+	public static double getSum(){
 		int rowcount = table_1.getRowCount();
 		double sum = 0;
 		for(int i=0;i<rowcount;i++){
@@ -405,8 +425,7 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 			
 			ResultSet myRs = mystmt.executeQuery();
 			
-			DefaultTableModel model;
-			model = new DefaultTableModel();
+			DefaultTableModel model = new DefaultTableModel();
 			table_1.setModel(model);
 			table_1.setShowVerticalLines(true);
 			table_1.setCellSelectionEnabled(true);
@@ -428,7 +447,7 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 				deno.add(myRs1.getString("Denominations"));
 				
 				model.addRow(new Object[]{myRs1.getString("Denominations")});
-		}	//model.addRow(new Object[]{("Company Totals")});			
+		}	//model.addRow(new Object[]{("Company Stock")});			
 			String val ="";
 			
 			int i,j;
@@ -437,8 +456,8 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 			for(j=0; j<companys.size();j++){
 				PreparedStatement mystmt2 = myconn.prepareStatement("select sum(Units) AS Units from stocks where CompanyName ='"+companys.get(j)+"' and Denominations = "+deno.get(i));
 				ResultSet myRs2 = mystmt2.executeQuery();
-				
-				
+				TableColumn column = table_1.getColumnModel().getColumn(0);
+		        column.setPreferredWidth(100);
 				while(myRs2.next()){
 					val=myRs2.getString("Units");
 					if(val!= null){
@@ -457,17 +476,39 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 			JOptionPane.showMessageDialog(null, e);
 			e.printStackTrace();
 		}
-				
-		
 			System.out.println("Displays Stocks");
-	
 	}
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				new Stocks();
-				}
-		});
+	public static void textFormat(){
+	boolean bool = true;
+	int ndx = 0;
+
+	NumberFormat cfLocal = NumberFormat.getCurrencyInstance();
+
+	String sCurSymbol = " ";
+
+	DecimalFormatSymbols dfs = null;
+
+	if( cfLocal instanceof DecimalFormat ){ // determine if symbol is prefix or suffix
+	      dfs = ((DecimalFormat)cfLocal).getDecimalFormatSymbols();
+	      sCurSymbol = dfs.getCurrencySymbol();      
+	    }
+	Number n = null;
+	String sText = Double.toString(getSum());;
+	//String sText ="";    
+	ndx = sText.indexOf(sCurSymbol);
+	if( ndx == -1 ){ 
+	      if( bool ){
+	    	  sText = sCurSymbol + sText; }
+	      else{
+	    	  sText = sText + " " + sCurSymbol; }
+	    }
+	    try{
+	      n = cfLocal.parse( sText );
+	      TotalCost.setText( cfLocal.format( n ) );
+	    }
+	    catch( ParseException pe ) {
+	    	TotalCost.setText( "" ); }
+	    
 	}
 }
 

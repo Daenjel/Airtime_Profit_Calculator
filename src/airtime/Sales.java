@@ -34,12 +34,15 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.event.InternalFrameListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
 
 import net.proteanit.sql.DbUtils;
+import javax.swing.SwingConstants;
 
 public class Sales extends MainMDI implements InternalFrameListener {
 	private JTextField txtFldEnterUnits;
 	private static JTable Salestable;
+	static DefaultTableModel model = new DefaultTableModel();
 	static JLabel TotalCost;
 	JComboBox<Object> cbxChseCompany;
 	JComboBox<Object> denomination;
@@ -52,6 +55,7 @@ public class Sales extends MainMDI implements InternalFrameListener {
 	
     static Calendar calSD = Calendar.getInstance();
     static Connection myconn = null;
+    static double sum =0;
 	public static void main(String[] arg){
 		new Sales();
 		textFormat();
@@ -252,10 +256,11 @@ public class Sales extends MainMDI implements InternalFrameListener {
 		panel.add(lblTodaySales);
 		
 		JScrollPane scrollPaneSales = new JScrollPane();
-		scrollPaneSales.setBounds(594, 103, 508, 272);
+		scrollPaneSales.setBounds(594, 103, 595, 311);
 		panel.add(scrollPaneSales);
 		
 		Salestable = new JTable();
+		Salestable.setRowHeight(30);
 		Salestable.setBounds(1038, 431, -350, -280);
 		scrollPaneSales.setViewportView(Salestable);
 		try {
@@ -264,13 +269,11 @@ public class Sales extends MainMDI implements InternalFrameListener {
 			mystmt.setString(1,DateToStr.toString() );
 			ResultSet myRs = mystmt.executeQuery();
 			
-			DefaultTableModel model;
-			model = new DefaultTableModel();
+			
 			Salestable.setModel(model);
 			Salestable.setShowVerticalLines(true);
 			Salestable.setCellSelectionEnabled(true);
 			Salestable.setColumnSelectionAllowed(true);
-			//model.setColumnIdentifiers(myRs.getString("CompanyName"));
 			companys = new ArrayList<>();
 			model.addColumn(" ");
 			while(myRs.next()){
@@ -289,7 +292,8 @@ public class Sales extends MainMDI implements InternalFrameListener {
 				
 				model.addRow(new Object[]{myRs1.getString("Denominations")});
 		}
-			model.addRow(new Object[]{"CompanySales"});
+			model.addRow(new Object[]{"Company Sales"});
+			model.addRow(new Object[]{" Company Profit"});
 				
 			String val ="";
 			
@@ -301,7 +305,8 @@ public class Sales extends MainMDI implements InternalFrameListener {
 				PreparedStatement mystmt2 = myconn.prepareStatement("select sum(Units) AS Units from sales where date =? and CompanyName ='"+companys.get(j)+"' and Denominations = "+deno.get(i));
 				mystmt2.setString(1,DateToStr.toString() );
 				ResultSet myRs2 = mystmt2.executeQuery();
-						
+				TableColumn column = Salestable.getColumnModel().getColumn(0);
+		        column.setPreferredWidth(110);	
 				while(myRs2.next()){
 					val=myRs2.getString("Units");
 					if(val!= null){
@@ -333,7 +338,7 @@ public class Sales extends MainMDI implements InternalFrameListener {
 		JButton btnPrintSales = new JButton("Print");
 		btnPrintSales.setIcon(new ImageIcon(Sales.class.getResource("/images/ic_print_black_24dp_1x.png")));
 		btnPrintSales.setFont(new Font("Segoe UI", Font.ITALIC, 12));
-		btnPrintSales.setBounds(809, 508, 100, 40);
+		btnPrintSales.setBounds(809, 541, 100, 40);
 		panel.add(btnPrintSales);
 		btnPrintSales.addActionListener(new ActionListener(){
 
@@ -360,34 +365,37 @@ public class Sales extends MainMDI implements InternalFrameListener {
 		
 		JLabel lblTotalSales = new JLabel("Total Sales:");
 		lblTotalSales.setFont(new Font("Times New Roman", Font.ITALIC, 16));
-		lblTotalSales.setBounds(594, 386, 77, 28);
+		lblTotalSales.setBounds(594, 425, 77, 28);
 		panel.add(lblTotalSales);
 		
 		JLabel TotalSales = new JLabel("0.0");
+		TotalSales.setHorizontalAlignment(SwingConstants.RIGHT);
 		TotalSales.setFont(new Font("Times New Roman", Font.BOLD, 16));
-		TotalSales.setBounds(682, 386, 90, 28);
+		TotalSales.setBounds(682, 425, 90, 28);
 		panel.add(TotalSales);
 		
 		JLabel Profit = new JLabel("0.0");
+		Profit.setHorizontalAlignment(SwingConstants.RIGHT);
 		Profit.setFont(new Font("Times New Roman", Font.BOLD, 16));
-		Profit.setBounds(830, 386, 90, 28);
+		Profit.setBounds(866, 425, 90, 28);
 		panel.add(Profit);
 		
 		JLabel lblProfit = new JLabel("Profit:");
 		lblProfit.setFont(new Font("Times New Roman", Font.ITALIC, 16));
-		lblProfit.setBounds(782, 386, 50, 28);
+		lblProfit.setBounds(806, 425, 50, 28);
 		panel.add(lblProfit);
 		
 		TotalCost = new JLabel("0.0");
+		TotalCost.setHorizontalAlignment(SwingConstants.RIGHT);
 		TotalCost.setFont(new Font("Times New Roman", Font.BOLD, 16));
 		//TotalCost.setText(Double.toString(getSum()));
-		TotalCost.setBounds(1012, 386, 90, 28);
+		TotalCost.setBounds(1099, 425, 90, 28);
 		panel.add(TotalCost);
 		
 		JLabel lblTotalCost = new JLabel("Total Cost:");
 		lblTotalCost.setForeground(Color.green);
 		lblTotalCost.setFont(new Font("Times New Roman", Font.ITALIC, 16));
-		lblTotalCost.setBounds(925, 386, 77, 28);
+		lblTotalCost.setBounds(1012, 425, 77, 28);
 		panel.add(lblTotalCost);
 		cbxChseSales.addActionListener(new ActionListener(){
 
@@ -448,14 +456,7 @@ public class Sales extends MainMDI implements InternalFrameListener {
 		
 	}
 	public static void TodaysReport(){
-		calSD.setTime(curDate); // convert your date to Calendar object
-	    calSD.add(Calendar.DATE,0);
-	    Date real_StartDate = calSD.getTime();
-	    SimpleDateFormat yesterdayformat = new SimpleDateFormat("dd/MM/yyyy");
-	    String sD = yesterdayformat.format(real_StartDate);
-
-		//JOptionPane.showMessageDialog(null, "Today's Date:  "+sD);
-
+		 
 		    try {				
 				PreparedStatement mystmt = myconn.prepareStatement("select *from sales where Date = (?)");
 				mystmt.setString(1, DateToStr);
@@ -471,13 +472,11 @@ public class Sales extends MainMDI implements InternalFrameListener {
 						mystmt.setString(1,DateToStr);
 						myRs = mystmt.executeQuery();
 						
-						DefaultTableModel model;
-						model = new DefaultTableModel();
+						DefaultTableModel model = new DefaultTableModel();
 						Salestable.setModel(model);
 						Salestable.setShowVerticalLines(true);
 						Salestable.setCellSelectionEnabled(true);
 						Salestable.setColumnSelectionAllowed(true);
-						//model.setColumnIdentifiers(myRs.getString("CompanyName"));
 						companys = new ArrayList<>();
 						model.addColumn(" ");
 						while(myRs.next()){
@@ -496,19 +495,20 @@ public class Sales extends MainMDI implements InternalFrameListener {
 							
 							model.addRow(new Object[]{myRs1.getString("Denominations")});
 					}
-						//model.addRow(new Object[]{"CompanySales"});
+						model.addRow(new Object[]{"Company's Sales"});
+						model.addRow(new Object[]{"Company's Profit"});
 							
 						String val ="";
 						
 						int i,j;
 					for(i=0; i<deno.size();i++){
-						double companyTotal =0;
 						double totalUnits = 0;
 						for(j=0; j<companys.size();j++){
 							PreparedStatement mystmt2 = myconn.prepareStatement("select sum(Units) AS Units from sales where Date = (?) and CompanyName ='"+companys.get(j)+"' and Denominations = "+deno.get(i));
 							mystmt2.setString(1,DateToStr);
 							ResultSet myRs2 = mystmt2.executeQuery();
-							
+							TableColumn column = Salestable.getColumnModel().getColumn(0);
+					        column.setPreferredWidth(110);
 							
 							while(myRs2.next()){
 								val=myRs2.getString("Units");
@@ -522,6 +522,14 @@ public class Sales extends MainMDI implements InternalFrameListener {
 							model.setValueAt(totalUnits *Double.parseDouble(deno.get(i)),i, companys.size()+1);
 						}
 					
+					}
+					for(j=0;j<companys.size();j++){
+						for(i=0;i<deno.size();i++){
+							sum = sum+Double.parseDouble(model.getValueAt(i, j+1).toString());
+							model.setValueAt(sum,deno.size(),j+1);
+						}
+						System.out.println("Sum of col "+j+ "-> " +sum);
+						sum=0;
 					}
 					System.out.println("Record For Today");
 					textFormat();
@@ -563,13 +571,11 @@ public class Sales extends MainMDI implements InternalFrameListener {
 						mystmt.setString(1,sD );
 						myRs = mystmt.executeQuery();
 						
-						DefaultTableModel model;
-						model = new DefaultTableModel();
+						DefaultTableModel model = new DefaultTableModel();
 						Salestable.setModel(model);
 						Salestable.setShowVerticalLines(true);
 						Salestable.setCellSelectionEnabled(true);
 						Salestable.setColumnSelectionAllowed(true);
-						//model.setColumnIdentifiers(myRs.getString("CompanyName"));
 						companys = new ArrayList<>();
 						model.addColumn(" ");
 						while(myRs.next()){
@@ -588,19 +594,20 @@ public class Sales extends MainMDI implements InternalFrameListener {
 							
 							model.addRow(new Object[]{myRs1.getString("Denominations")});
 					}
-						//model.addRow(new Object[]{"CompanySales"});
+						model.addRow(new Object[]{"Company's Sales"});
+						model.addRow(new Object[]{"Company's Profit"});
 							
 						String val ="";
 						
 						int i,j;
 					for(i=0; i<deno.size();i++){
-						double companyTotal =0;
 						double totalUnits = 0;
 						for(j=0; j<companys.size();j++){
 							PreparedStatement mystmt2 = myconn.prepareStatement("select sum(Units) AS Units from sales where date=? and CompanyName ='"+companys.get(j)+"' and Denominations = "+deno.get(i));
 							mystmt2.setString(1,sD);
 							ResultSet myRs2 = mystmt2.executeQuery();
-							
+							TableColumn column = Salestable.getColumnModel().getColumn(0);
+					        column.setPreferredWidth(110);
 							
 							while(myRs2.next()){
 								val=myRs2.getString("Units");
@@ -615,9 +622,17 @@ public class Sales extends MainMDI implements InternalFrameListener {
 						}
 					
 					}
+					for(j=0;j<companys.size();j++){
+						for(i=0;i<deno.size();i++){
+							sum = sum+Double.parseDouble(model.getValueAt(i, j+1).toString());
+							model.setValueAt(sum,deno.size(),j+1);
+						}
+						System.out.println("Sum of col "+j+ "-> " +sum);
+						sum=0;
+					}
 					System.out.println("Record Yesterday");
 					textFormat();
-					TotalCost.setText(Double.toString(getSum()));
+					//TotalCost.setText(Double.toString(getSum()));
 					
 					} catch (SQLException e) {
 						JOptionPane.showMessageDialog(null, e);
@@ -625,7 +640,7 @@ public class Sales extends MainMDI implements InternalFrameListener {
 					}
 				}
 		    } catch (Exception e) {
-		        JOptionPane.showMessageDialog(null, "Error");
+		        JOptionPane.showMessageDialog(null, e,"Error", 0);
 		        e.printStackTrace();
 		    }	
 	}
@@ -654,13 +669,11 @@ public static void ThisMonthReport(){
 						mystmt.setString(1,DateToStr);
 						myRs = mystmt.executeQuery();
 						
-						DefaultTableModel model;
-						model = new DefaultTableModel();
+						DefaultTableModel model = new DefaultTableModel();
 						Salestable.setModel(model);
 						Salestable.setShowVerticalLines(true);
 						Salestable.setCellSelectionEnabled(true);
 						Salestable.setColumnSelectionAllowed(true);
-						//model.setColumnIdentifiers(myRs.getString("CompanyName"));
 						companys = new ArrayList<>();
 						model.addColumn(" ");
 						while(myRs.next()){
@@ -679,19 +692,20 @@ public static void ThisMonthReport(){
 							
 							model.addRow(new Object[]{myRs1.getString("Denominations")});
 					}
-						//model.addRow(new Object[]{"CompanySales"});
+						model.addRow(new Object[]{"Company's Sales"});
+						model.addRow(new Object[]{"Company's Profit"});
 							
 						String val ="";
 						
 						int i,j;
 					for(i=0; i<deno.size();i++){
-						double companyTotal =0;
 						double totalUnits = 0;
 						for(j=0; j<companys.size();j++){
 							PreparedStatement mystmt2 = myconn.prepareStatement("select sum(Units) AS Units from sales where MONTH(Date) = MONTH(?) and CompanyName ='"+companys.get(j)+"' and Denominations = "+deno.get(i));
 							mystmt2.setString(1,DateToStr);
 							ResultSet myRs2 = mystmt2.executeQuery();
-							
+							TableColumn column = Salestable.getColumnModel().getColumn(0);
+					        column.setPreferredWidth(110);
 							
 							while(myRs2.next()){
 								val=myRs2.getString("Units");
@@ -706,16 +720,24 @@ public static void ThisMonthReport(){
 						}
 					
 					}
+					for(j=0;j<companys.size();j++){
+						for(i=0;i<deno.size();i++){
+							sum = sum+Double.parseDouble(model.getValueAt(i, j+1).toString());
+							model.setValueAt(sum,deno.size(),j+1);
+						}
+						System.out.println("Sum of col "+j+ "-> " +sum);
+						sum=0;
+					}
 					System.out.println("Record This Month");
 					textFormat();
-					TotalCost.setText(Double.toString(getSum()));
+					//TotalCost.setText(Double.toString(getSum()));
 					} catch (SQLException e) {
 						JOptionPane.showMessageDialog(null, e);
 						e.printStackTrace();
 					}
 				}
 		    } catch (Exception e) {
-		        JOptionPane.showMessageDialog(null, "Error");
+		        JOptionPane.showMessageDialog(null,e, "Error",0);
 		        e.printStackTrace();
 		    }
 
@@ -747,13 +769,11 @@ public static void LastMonthReport(){
 					mystmt.setString(1,DateToStr);
 					myRs = mystmt.executeQuery();
 					
-					DefaultTableModel model;
-					model = new DefaultTableModel();
+					DefaultTableModel model = new DefaultTableModel();
 					Salestable.setModel(model);
 					Salestable.setShowVerticalLines(true);
 					Salestable.setCellSelectionEnabled(true);
 					Salestable.setColumnSelectionAllowed(true);
-					//model.setColumnIdentifiers(myRs.getString("CompanyName"));
 					companys = new ArrayList<>();
 					model.addColumn(" ");
 					while(myRs.next()){
@@ -772,19 +792,20 @@ public static void LastMonthReport(){
 						
 						model.addRow(new Object[]{myRs1.getString("Denominations")});
 				}
-					//model.addRow(new Object[]{"CompanySales"});
+					model.addRow(new Object[]{"Company's Sales"});
+					model.addRow(new Object[]{"Company's Profit"});
 						
 					String val ="";
 					
 					int i,j;
 				for(i=0; i<deno.size();i++){
-					double companyTotal =0;
 					double totalUnits = 0;
 					for(j=0; j<companys.size();j++){
 						PreparedStatement mystmt2 = myconn.prepareStatement("select sum(Units) AS Units from sales where MONTH(Date) = MONTH(?)-1 and CompanyName ='"+companys.get(j)+"' and Denominations = "+deno.get(i));
 						mystmt2.setString(1,DateToStr);
 						ResultSet myRs2 = mystmt2.executeQuery();
-						
+						TableColumn column = Salestable.getColumnModel().getColumn(0);
+				        column.setPreferredWidth(110);
 						
 						while(myRs2.next()){
 							val=myRs2.getString("Units");
@@ -799,9 +820,17 @@ public static void LastMonthReport(){
 					}
 				
 				}
+				for(j=0;j<companys.size();j++){
+					for(i=0;i<deno.size();i++){
+						sum = sum+Double.parseDouble(model.getValueAt(i, j+1).toString());
+						model.setValueAt(sum,deno.size(),j+1);
+					}
+					System.out.println("Sum of col "+j+ "-> " +sum);
+					sum=0;
+				}
 				System.out.println("Record Last Month");
 				textFormat();
-				TotalCost.setText(Double.toString(getSum()));
+				//TotalCost.setText(Double.toString(getSum()));
 				
 				} catch (SQLException e) {
 					JOptionPane.showMessageDialog(null, e);
@@ -809,7 +838,7 @@ public static void LastMonthReport(){
 				}
 			}
 	    } catch (Exception e) {
-	        JOptionPane.showMessageDialog(null, "Error");
+	        JOptionPane.showMessageDialog(null,e, "Error",0);
 	        e.printStackTrace();
 	    }	
 }
@@ -838,13 +867,11 @@ public static void LastMonthReport(){
 						mystmt.setString(1,DateToStr);
 						myRs = mystmt.executeQuery();
 						
-						DefaultTableModel model;
-						model = new DefaultTableModel();
+						DefaultTableModel model = new DefaultTableModel();
 						Salestable.setModel(model);
 						Salestable.setShowVerticalLines(true);
 						Salestable.setCellSelectionEnabled(true);
 						Salestable.setColumnSelectionAllowed(true);
-						//model.setColumnIdentifiers(myRs.getString("CompanyName"));
 						companys = new ArrayList<>();
 						model.addColumn(" ");
 						while(myRs.next()){
@@ -863,19 +890,20 @@ public static void LastMonthReport(){
 							
 							model.addRow(new Object[]{myRs1.getString("Denominations")});
 					}
-						//model.addRow(new Object[]{"CompanySales"});
+						model.addRow(new Object[]{"Company's Sales"});
+						model.addRow(new Object[]{"Company's Profit"});
 							
 						String val ="";
 						
 						int i,j;
 					for(i=0; i<deno.size();i++){
-						double companyTotal =0;
 						double totalUnits = 0;
 						for(j=0; j<companys.size();j++){
 							PreparedStatement mystmt2 = myconn.prepareStatement("select sum(Units) AS Units from sales where YEAR(Date) = YEAR(?) and CompanyName ='"+companys.get(j)+"' and Denominations = "+deno.get(i));
 							mystmt2.setString(1,DateToStr);
 							ResultSet myRs2 = mystmt2.executeQuery();
-							
+							TableColumn column = Salestable.getColumnModel().getColumn(0);
+					        column.setPreferredWidth(110);
 							
 							while(myRs2.next()){
 								val=myRs2.getString("Units");
@@ -890,23 +918,27 @@ public static void LastMonthReport(){
 						}
 					
 					}
+					for(j=0;j<companys.size();j++){
+						for(i=0;i<deno.size();i++){
+							sum = sum+Double.parseDouble(model.getValueAt(i, j+1).toString());
+							model.setValueAt(sum,deno.size(),j+1);
+						}
+						System.out.println("Sum of col "+j+ "-> " +sum);
+						sum=0;
+					}
 					System.out.println("Record Annual");
 					textFormat();
-					TotalCost.setText(Double.toString(getSum()));
-					
+					TotalCost.setText(Double.toString(sum));
+										
 					} catch (SQLException e) {
 						JOptionPane.showMessageDialog(null, e);
 						e.printStackTrace();
-					}
-					
+					}	
 				}
 		    } catch (Exception e) {
-		        JOptionPane.showMessageDialog(null, "Error");
+		        JOptionPane.showMessageDialog(null, e,"Error",0);
 		        e.printStackTrace();
-		    }
-
-		
-		
+		    }		
 	}
 }
 
