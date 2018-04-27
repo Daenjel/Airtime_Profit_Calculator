@@ -1,3 +1,10 @@
+ It is important for any type of business to keep track of stock and profit. Airtime profits are among the difficult aspects to keep track of.
+ By developing airtime profit calculator app, it will be easier for business people to have accurate data of their airtime sales. The app herein
+ seeks to compute value of daily and periodic airtime purchase so as to help determine period sales, thus computing profits from airtime sales
+ both on a daily basis as well as annually. This app will be a great asset as it will help the business people to calculate daily or periodic 
+ refills needed from wholesalers. Furthermore it will help to keep track of the fluctuating wholesale prices of the different airtimes.
+ Therefore profits of close of business daily will be effectively isolated. 
+ 
 		("<html>Airtime Profit Calculator, Airtime Profit Calculator, Airtime Profit Calculator"
 				+ "<br>Airtime Profit Calculator, Airtime Profit Calculator, Airtime Profit Calculator"
 				+ "<br>Airtime Profit Calculator, Airtime Profit Calculator, Airtime Profit Calculator"
@@ -19,6 +26,7 @@
 				+"<br>* and publisher shall not be liable in any event for incidental or       *"
 				+"<br>* consequential damages in connection with, or arising out of, the       *"
 				+"<br>* furnishing, performance, or use of these programs.</html>");
+ 			
 				
 				("<html>Airtime Profit Calculator, Airtime Profit Calculator, Airtime Profit Calculator"
 				+ "<br>Airtime Profit Calculator, Airtime Profit Calculator, Airtime Profit Calculator"
