@@ -428,7 +428,7 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 				deno.add(myRs1.getString("Denominations"));
 				
 				model.addRow(new Object[]{myRs1.getString("Denominations")});
-		}				
+		}	//model.addRow(new Object[]{("Company Totals")});			
 			String val ="";
 			
 			int i,j;

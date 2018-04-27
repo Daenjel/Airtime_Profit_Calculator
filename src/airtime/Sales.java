@@ -44,6 +44,7 @@ public class Sales extends MainMDI implements InternalFrameListener {
 	JComboBox<Object> cbxChseCompany;
 	JComboBox<Object> denomination;
 	static ArrayList<String> companys;
+	static ArrayList<String> deno;
 	static String DateToStr;
 	static Date curDate = new Date();
 	
@@ -282,46 +283,47 @@ public class Sales extends MainMDI implements InternalFrameListener {
 			PreparedStatement mystmt1 = myconn.prepareStatement("select distinct Denominations from sales  where date = ? order by Denominations desc");
 			mystmt1.setString(1,DateToStr.toString() );
 			ResultSet myRs1 = mystmt1.executeQuery();
-			ArrayList<String> deno = new ArrayList<>();
+			deno = new ArrayList<>();
 			while(myRs1.next()){
 				deno.add(myRs1.getString("Denominations"));
 				
 				model.addRow(new Object[]{myRs1.getString("Denominations")});
 		}
-			//model.addRow(new Object[]{"CompanySales"});
+			model.addRow(new Object[]{"CompanySales"});
 				
 			String val ="";
 			
-			int i,j;
+			double sum =0;
+			int i,j = 0;
 		for(i=0; i<deno.size();i++){
-			double companyTotal =0;
 			double totalUnits = 0;
 			for(j=0; j<companys.size();j++){
 				PreparedStatement mystmt2 = myconn.prepareStatement("select sum(Units) AS Units from sales where date =? and CompanyName ='"+companys.get(j)+"' and Denominations = "+deno.get(i));
 				mystmt2.setString(1,DateToStr.toString() );
 				ResultSet myRs2 = mystmt2.executeQuery();
-				
-				
+						
 				while(myRs2.next()){
 					val=myRs2.getString("Units");
 					if(val!= null){
 						val=myRs2.getString("Units");	
-					}else {val="0";}
-					
+					}else {val="0";}					
 					}
 				model.setValueAt(val,i, j+1);
 				totalUnits = totalUnits+ Double.parseDouble(val);
 				model.setValueAt(totalUnits *Double.parseDouble(deno.get(i)),i, companys.size()+1);
 			}
-			
-			/*double sum = 0;
-				
-				sum = sum+Double.parseDouble(Salestable.getValueAt(i, 2).toString());
-				model.setValueAt(sum,deno.size()+1,2);*/
-			//model.setValueAt(model.getValueAt(i,j),deno.size(),companys.size()+1);
-			//System.out.println(i);
+			//sum = sum+Double.parseDouble(model.getValueAt(i, j).toString());
+			//model.setValueAt(sum,deno.size(),j);
+			//System.out.println(i);			
 		}
-
+		for(j=0;j<companys.size();j++){
+			for(i=0;i<deno.size();i++){
+				sum = sum+Double.parseDouble(model.getValueAt(i, j+1).toString());
+				model.setValueAt(sum,deno.size(),j+1);
+			}
+			System.out.println("Sum of col "+j+ "-> " +sum);
+			sum=0;
+		}
 		
 		} catch (SQLException e) {
 			JOptionPane.showMessageDialog(null, e);
@@ -378,7 +380,7 @@ public class Sales extends MainMDI implements InternalFrameListener {
 		
 		TotalCost = new JLabel("0.0");
 		TotalCost.setFont(new Font("Times New Roman", Font.BOLD, 16));
-		TotalCost.setText(Double.toString(getSum()));
+		//TotalCost.setText(Double.toString(getSum()));
 		TotalCost.setBounds(1012, 386, 90, 28);
 		panel.add(TotalCost);
 		
@@ -419,8 +421,8 @@ public class Sales extends MainMDI implements InternalFrameListener {
 		      sCurSymbol = dfs.getCurrencySymbol();      
 		    }
 		Number n = null;
-		String sText = Double.toString(getSum());;
-		    
+		//String sText = Double.toString(getSum());;
+		String sText ="";    
 		ndx = sText.indexOf(sCurSymbol);
 		if( ndx == -1 ){ 
 		      if( bool ){
@@ -436,9 +438,9 @@ public class Sales extends MainMDI implements InternalFrameListener {
 		    	TotalCost.setText( "" ); }
 		}
 	public static double getSum(){
-		int rowcount = Salestable.getRowCount();
+		int rowCount = Salestable.getRowCount();
 		double sum = 0;
-		for(int i=0;i<rowcount;i++){
+		for(int i=0;i<rowCount;i++){
 			
 			sum = sum+Double.parseDouble(Salestable.getValueAt(i, companys.size()+1).toString());
 		}
@@ -541,7 +543,7 @@ public class Sales extends MainMDI implements InternalFrameListener {
 	    int daysToDecrement = -1;
 	    calSD.add(Calendar.DATE, daysToDecrement);
 	    Date real_StartDate = calSD.getTime();
-	    SimpleDateFormat yesterdayformat = new SimpleDateFormat("dd/MM/yyyy");
+	    SimpleDateFormat yesterdayformat = new SimpleDateFormat("yyyy/MM/dd");
 	    String sD = yesterdayformat.format(real_StartDate);
 
 		JOptionPane.showMessageDialog(null, "Yesterday's Date:  "+sD);
