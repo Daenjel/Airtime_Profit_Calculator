@@ -32,17 +32,17 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.event.InternalFrameListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
 import net.proteanit.sql.DbUtils;
-import javax.swing.SwingConstants;
 
 public class Sales extends MainMDI implements InternalFrameListener {
 	private JTextField txtFldEnterUnits;
 	private static JTable Salestable;
-	static DefaultTableModel model = new DefaultTableModel();
+	//static DefaultTableModel model = new DefaultTableModel();
 	static JLabel TotalCost;
 	JComboBox<Object> cbxChseCompany;
 	JComboBox<Object> denomination;
@@ -50,7 +50,7 @@ public class Sales extends MainMDI implements InternalFrameListener {
 	static ArrayList<String> deno;
 	static String DateToStr;
 	static Date curDate = new Date();
-	
+	DecimalFormat df2 = new DecimalFormat(".##");
 	static SimpleDateFormat dateformat = new SimpleDateFormat("yyyy/MM/dd");
 	
     static Calendar calSD = Calendar.getInstance();
@@ -256,7 +256,7 @@ public class Sales extends MainMDI implements InternalFrameListener {
 		panel.add(lblTodaySales);
 		
 		JScrollPane scrollPaneSales = new JScrollPane();
-		scrollPaneSales.setBounds(594, 103, 595, 311);
+		scrollPaneSales.setBounds(594, 103, 632, 334);
 		panel.add(scrollPaneSales);
 		
 		Salestable = new JTable();
@@ -269,11 +269,14 @@ public class Sales extends MainMDI implements InternalFrameListener {
 			mystmt.setString(1,DateToStr.toString() );
 			ResultSet myRs = mystmt.executeQuery();
 			
-			
+			DefaultTableModel model = new DefaultTableModel();
 			Salestable.setModel(model);
 			Salestable.setShowVerticalLines(true);
 			Salestable.setCellSelectionEnabled(true);
 			Salestable.setColumnSelectionAllowed(true);
+			Salestable.setBackground(Color.WHITE);
+			Salestable.setForeground(Color.BLACK);
+			Salestable.setFont(new Font("Times New Roman", Font.BOLD, 16));
 			companys = new ArrayList<>();
 			model.addColumn(" ");
 			while(myRs.next()){
@@ -292,15 +295,17 @@ public class Sales extends MainMDI implements InternalFrameListener {
 				
 				model.addRow(new Object[]{myRs1.getString("Denominations")});
 		}
-			model.addRow(new Object[]{"Company Sales"});
-			model.addRow(new Object[]{" Company Profit"});
+			model.addRow(new Object[]{"Total Sales"});
+			model.addRow(new Object[]{"Profit"});
+			model.addRow(new Object[]{"Cost Price"});
 				
 			String val ="";
 			
 			double sum =0;
-			int i,j = 0;
+			int i,j;
 		for(i=0; i<deno.size();i++){
 			double totalUnits = 0;
+			//double Tsales =0;
 			for(j=0; j<companys.size();j++){
 				PreparedStatement mystmt2 = myconn.prepareStatement("select sum(Units) AS Units from sales where date =? and CompanyName ='"+companys.get(j)+"' and Denominations = "+deno.get(i));
 				mystmt2.setString(1,DateToStr.toString() );
@@ -316,20 +321,31 @@ public class Sales extends MainMDI implements InternalFrameListener {
 				model.setValueAt(val,i, j+1);
 				totalUnits = totalUnits+ Double.parseDouble(val);
 				model.setValueAt(totalUnits *Double.parseDouble(deno.get(i)),i, companys.size()+1);
-			}
-			//sum = sum+Double.parseDouble(model.getValueAt(i, j).toString());
-			//model.setValueAt(sum,deno.size(),j);
-			//System.out.println(i);			
+				
+				//Tsales = Tsales+Double.parseDouble(model.getValueAt(i, j+1).toString());
+				//model.setValueAt(Tsales,deno.size() ,companys.size()+1);
+			}			
 		}
 		for(j=0;j<companys.size();j++){
 			for(i=0;i<deno.size();i++){
-				sum = sum+Double.parseDouble(model.getValueAt(i, j+1).toString());
+				
+				sum = sum+(Double.parseDouble(model.getValueAt(i, j+1).toString())*Double.parseDouble(deno.get(i)));
 				model.setValueAt(sum,deno.size(),j+1);
+				
+				double cost =94;
+				cost = cost*(Double.parseDouble(model.getValueAt(deno.size(),j+1).toString())/100);
+				model.setValueAt(Double.valueOf(df2.format(cost)),deno.size()+2,j+1);
+				cost = Double.valueOf(df2.format(cost));
+				System.out.println("Sum of cost "+j+ "-> " +cost);
+				
+				double profit = sum-cost;
+				model.setValueAt(Double.valueOf(df2.format(profit)),deno.size()+1,j+1);
+				profit = Double.valueOf(df2.format(profit));
+				System.out.println("Sum of Profit "+j+ "-> " +profit);
 			}
-			System.out.println("Sum of col "+j+ "-> " +sum);
+			System.out.println("Sum of Sales "+j+ "-> " +sum);
 			sum=0;
 		}
-		
 		} catch (SQLException e) {
 			JOptionPane.showMessageDialog(null, e);
 			e.printStackTrace();
@@ -365,37 +381,37 @@ public class Sales extends MainMDI implements InternalFrameListener {
 		
 		JLabel lblTotalSales = new JLabel("Total Sales:");
 		lblTotalSales.setFont(new Font("Times New Roman", Font.ITALIC, 16));
-		lblTotalSales.setBounds(594, 425, 77, 28);
+		lblTotalSales.setBounds(594, 441, 77, 28);
 		panel.add(lblTotalSales);
 		
 		JLabel TotalSales = new JLabel("0.0");
 		TotalSales.setHorizontalAlignment(SwingConstants.RIGHT);
 		TotalSales.setFont(new Font("Times New Roman", Font.BOLD, 16));
-		TotalSales.setBounds(682, 425, 90, 28);
+		TotalSales.setBounds(682, 441, 90, 28);
 		panel.add(TotalSales);
 		
 		JLabel Profit = new JLabel("0.0");
 		Profit.setHorizontalAlignment(SwingConstants.RIGHT);
 		Profit.setFont(new Font("Times New Roman", Font.BOLD, 16));
-		Profit.setBounds(866, 425, 90, 28);
+		Profit.setBounds(866, 441, 90, 28);
 		panel.add(Profit);
 		
 		JLabel lblProfit = new JLabel("Profit:");
 		lblProfit.setFont(new Font("Times New Roman", Font.ITALIC, 16));
-		lblProfit.setBounds(806, 425, 50, 28);
+		lblProfit.setBounds(806, 441, 50, 28);
 		panel.add(lblProfit);
 		
 		TotalCost = new JLabel("0.0");
 		TotalCost.setHorizontalAlignment(SwingConstants.RIGHT);
 		TotalCost.setFont(new Font("Times New Roman", Font.BOLD, 16));
 		//TotalCost.setText(Double.toString(getSum()));
-		TotalCost.setBounds(1099, 425, 90, 28);
+		TotalCost.setBounds(1099, 441, 90, 28);
 		panel.add(TotalCost);
 		
 		JLabel lblTotalCost = new JLabel("Total Cost:");
 		lblTotalCost.setForeground(Color.green);
 		lblTotalCost.setFont(new Font("Times New Roman", Font.ITALIC, 16));
-		lblTotalCost.setBounds(1012, 425, 77, 28);
+		lblTotalCost.setBounds(1012, 441, 77, 28);
 		panel.add(lblTotalCost);
 		cbxChseSales.addActionListener(new ActionListener(){
 
@@ -532,8 +548,8 @@ public class Sales extends MainMDI implements InternalFrameListener {
 						sum=0;
 					}
 					System.out.println("Record For Today");
-					textFormat();
-					TotalCost.setText(Double.toString(getSum()));
+					//textFormat();
+					//TotalCost.setText(Double.toString(getSum()));
 					
 					} catch (SQLException e) {
 						JOptionPane.showMessageDialog(null, e);
@@ -541,7 +557,7 @@ public class Sales extends MainMDI implements InternalFrameListener {
 					}
 				}
 		    } catch (Exception e) {
-		        JOptionPane.showMessageDialog(null, "Error");
+		        JOptionPane.showMessageDialog(null,e, "Error",0);
 		        e.printStackTrace();
 		    }
 	}
@@ -872,6 +888,7 @@ public static void LastMonthReport(){
 						Salestable.setShowVerticalLines(true);
 						Salestable.setCellSelectionEnabled(true);
 						Salestable.setColumnSelectionAllowed(true);
+				       
 						companys = new ArrayList<>();
 						model.addColumn(" ");
 						while(myRs.next()){
@@ -890,8 +907,9 @@ public static void LastMonthReport(){
 							
 							model.addRow(new Object[]{myRs1.getString("Denominations")});
 					}
-						model.addRow(new Object[]{"Company's Sales"});
-						model.addRow(new Object[]{"Company's Profit"});
+						model.addRow(new Object[]{"Total Sales"});
+						model.addRow(new Object[]{"Profit"});
+						model.addRow(new Object[]{"Cost Price"});
 							
 						String val ="";
 						
@@ -904,7 +922,7 @@ public static void LastMonthReport(){
 							ResultSet myRs2 = mystmt2.executeQuery();
 							TableColumn column = Salestable.getColumnModel().getColumn(0);
 					        column.setPreferredWidth(110);
-							
+					       
 							while(myRs2.next()){
 								val=myRs2.getString("Units");
 								if(val!= null){
