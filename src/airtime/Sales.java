@@ -50,7 +50,7 @@ public class Sales extends MainMDI implements InternalFrameListener {
 	static ArrayList<String> deno;
 	static String DateToStr;
 	static Date curDate = new Date();
-	DecimalFormat df2 = new DecimalFormat(".##");
+	static DecimalFormat df2 = new DecimalFormat(".##");
 	static SimpleDateFormat dateformat = new SimpleDateFormat("yyyy/MM/dd");
 	
     static Calendar calSD = Calendar.getInstance();
@@ -59,6 +59,7 @@ public class Sales extends MainMDI implements InternalFrameListener {
 	public static void main(String[] arg){
 		new Sales();
 		textFormat();
+		getSum();
 	}
 
 	public Sales() {
@@ -268,7 +269,6 @@ public class Sales extends MainMDI implements InternalFrameListener {
 			PreparedStatement mystmt = myconn.prepareStatement("select distinct companyName from sales where date =? ");
 			mystmt.setString(1,DateToStr.toString() );
 			ResultSet myRs = mystmt.executeQuery();
-			
 			DefaultTableModel model = new DefaultTableModel();
 			Salestable.setModel(model);
 			Salestable.setShowVerticalLines(true);
@@ -301,7 +301,7 @@ public class Sales extends MainMDI implements InternalFrameListener {
 				
 			String val ="";
 			
-			double sum =0;
+			//double sum =0;
 			int i,j;
 		for(i=0; i<deno.size();i++){
 			double totalUnits = 0;
@@ -330,9 +330,16 @@ public class Sales extends MainMDI implements InternalFrameListener {
 			for(i=0;i<deno.size();i++){
 				
 				sum = sum+(Double.parseDouble(model.getValueAt(i, j+1).toString())*Double.parseDouble(deno.get(i)));
+				//sCurSymbol = dfs.getCurrencySymbol();
 				model.setValueAt(sum,deno.size(),j+1);
 				
-				double cost =94;
+				PreparedStatement pro = myconn.prepareStatement("select distinct sales.CompanyName,company.CompanyProfit from sales,company where sales.CompanyName=? and company.CompanyName=sales.CompanyName");
+				pro.setString(1,companys.get(j));
+				ResultSet myPro = pro.executeQuery();
+				if(!myPro.next()){
+					System.out.println("No column sales");
+				}else{
+				double cost =myPro.getInt("CompanyProfit");
 				cost = cost*(Double.parseDouble(model.getValueAt(deno.size(),j+1).toString())/100);
 				model.setValueAt(Double.valueOf(df2.format(cost)),deno.size()+2,j+1);
 				cost = Double.valueOf(df2.format(cost));
@@ -341,9 +348,10 @@ public class Sales extends MainMDI implements InternalFrameListener {
 				double profit = sum-cost;
 				model.setValueAt(Double.valueOf(df2.format(profit)),deno.size()+1,j+1);
 				profit = Double.valueOf(df2.format(profit));
-				System.out.println("Sum of Profit "+j+ "-> " +profit);
+				System.out.println("Sum of Profit "+j+ "-> " +profit);}
 			}
 			System.out.println("Sum of Sales "+j+ "-> " +sum);
+			System.out.println(companys.get(j));
 			sum=0;
 		}
 		} catch (SQLException e) {
@@ -442,7 +450,7 @@ public class Sales extends MainMDI implements InternalFrameListener {
 
 		if( cfLocal instanceof DecimalFormat ){ // determine if symbol is prefix or suffix
 		      dfs = ((DecimalFormat)cfLocal).getDecimalFormatSymbols();
-		      sCurSymbol = dfs.getCurrencySymbol();      
+		      sCurSymbol = dfs.getCurrencySymbol();     
 		    }
 		Number n = null;
 		//String sText = Double.toString(getSum());;
@@ -461,14 +469,16 @@ public class Sales extends MainMDI implements InternalFrameListener {
 		    catch( ParseException pe ) {
 		    	TotalCost.setText( "" ); }
 		}
-	public static double getSum(){
+	public static void getSum(){
 		int rowCount = Salestable.getRowCount();
 		double sum = 0;
 		for(int i=0;i<rowCount;i++){
 			
 			sum = sum+Double.parseDouble(Salestable.getValueAt(i, companys.size()+1).toString());
+			System.out.println("Saame is" +sum);
+			TotalCost.setText(""+sum);
 		}
-		return sum;
+		//zzreturn sum;z
 		
 	}
 	public static void TodaysReport(){
@@ -511,9 +521,9 @@ public class Sales extends MainMDI implements InternalFrameListener {
 							
 							model.addRow(new Object[]{myRs1.getString("Denominations")});
 					}
-						model.addRow(new Object[]{"Company's Sales"});
-						model.addRow(new Object[]{"Company's Profit"});
-							
+						model.addRow(new Object[]{"Total Sales"});
+						model.addRow(new Object[]{"Profit"});
+						model.addRow(new Object[]{"Cost Price"});
 						String val ="";
 						
 						int i,j;
@@ -541,8 +551,25 @@ public class Sales extends MainMDI implements InternalFrameListener {
 					}
 					for(j=0;j<companys.size();j++){
 						for(i=0;i<deno.size();i++){
-							sum = sum+Double.parseDouble(model.getValueAt(i, j+1).toString());
+							sum = sum+(Double.parseDouble(model.getValueAt(i, j+1).toString())*Double.parseDouble(deno.get(i)));
 							model.setValueAt(sum,deno.size(),j+1);
+							
+							PreparedStatement pro = myconn.prepareStatement("select distinct sales.CompanyName,company.CompanyProfit from sales,company where sales.CompanyName=? and company.CompanyName=sales.CompanyName");
+							pro.setString(1,companys.get(j));
+							ResultSet myPro = pro.executeQuery();
+							if(!myPro.next()){
+								System.out.println("No column sales");
+							}else{
+							double cost =myPro.getInt("CompanyProfit");
+							cost = cost*(Double.parseDouble(model.getValueAt(deno.size(),j+1).toString())/100);
+							model.setValueAt(Double.valueOf(df2.format(cost)),deno.size()+2,j+1);
+							cost = Double.valueOf(df2.format(cost));
+							System.out.println("Sum of cost "+j+ "-> " +cost);
+							
+							double profit = sum-cost;
+							model.setValueAt(Double.valueOf(df2.format(profit)),deno.size()+1,j+1);
+							profit = Double.valueOf(df2.format(profit));
+							System.out.println("Sum of Profit "+j+ "-> " +profit);}
 						}
 						System.out.println("Sum of col "+j+ "-> " +sum);
 						sum=0;
@@ -610,9 +637,9 @@ public class Sales extends MainMDI implements InternalFrameListener {
 							
 							model.addRow(new Object[]{myRs1.getString("Denominations")});
 					}
-						model.addRow(new Object[]{"Company's Sales"});
-						model.addRow(new Object[]{"Company's Profit"});
-							
+						model.addRow(new Object[]{"Total Sales"});
+						model.addRow(new Object[]{"Profit"});
+						model.addRow(new Object[]{"Cost Price"});	
 						String val ="";
 						
 						int i,j;
@@ -640,8 +667,25 @@ public class Sales extends MainMDI implements InternalFrameListener {
 					}
 					for(j=0;j<companys.size();j++){
 						for(i=0;i<deno.size();i++){
-							sum = sum+Double.parseDouble(model.getValueAt(i, j+1).toString());
+							sum = sum+(Double.parseDouble(model.getValueAt(i, j+1).toString())*Double.parseDouble(deno.get(i)));
 							model.setValueAt(sum,deno.size(),j+1);
+							
+							PreparedStatement pro = myconn.prepareStatement("select distinct sales.CompanyName,company.CompanyProfit from sales,company where sales.CompanyName=? and company.CompanyName=sales.CompanyName");
+							pro.setString(1,companys.get(j));
+							ResultSet myPro = pro.executeQuery();
+							if(!myPro.next()){
+								System.out.println("No column sales");
+							}else{
+							double cost =myPro.getInt("CompanyProfit");
+							cost = cost*(Double.parseDouble(model.getValueAt(deno.size(),j+1).toString())/100);
+							model.setValueAt(Double.valueOf(df2.format(cost)),deno.size()+2,j+1);
+							cost = Double.valueOf(df2.format(cost));
+							System.out.println("Sum of cost "+j+ "-> " +cost);
+							
+							double profit = sum-cost;
+							model.setValueAt(Double.valueOf(df2.format(profit)),deno.size()+1,j+1);
+							profit = Double.valueOf(df2.format(profit));
+							System.out.println("Sum of Profit "+j+ "-> " +profit);}
 						}
 						System.out.println("Sum of col "+j+ "-> " +sum);
 						sum=0;
@@ -708,9 +752,9 @@ public static void ThisMonthReport(){
 							
 							model.addRow(new Object[]{myRs1.getString("Denominations")});
 					}
-						model.addRow(new Object[]{"Company's Sales"});
-						model.addRow(new Object[]{"Company's Profit"});
-							
+						model.addRow(new Object[]{"Total Sales"});
+						model.addRow(new Object[]{"Profit"});
+						model.addRow(new Object[]{"Cost Price"});
 						String val ="";
 						
 						int i,j;
@@ -738,8 +782,25 @@ public static void ThisMonthReport(){
 					}
 					for(j=0;j<companys.size();j++){
 						for(i=0;i<deno.size();i++){
-							sum = sum+Double.parseDouble(model.getValueAt(i, j+1).toString());
+							sum = sum+(Double.parseDouble(model.getValueAt(i, j+1).toString())*Double.parseDouble(deno.get(i)));
 							model.setValueAt(sum,deno.size(),j+1);
+							
+							PreparedStatement pro = myconn.prepareStatement("select distinct sales.CompanyName,company.CompanyProfit from sales,company where sales.CompanyName=? and company.CompanyName=sales.CompanyName");
+							pro.setString(1,companys.get(j));
+							ResultSet myPro = pro.executeQuery();
+							if(!myPro.next()){
+								System.out.println("No column sales");
+							}else{
+							double cost =myPro.getInt("CompanyProfit");
+							cost = cost*(Double.parseDouble(model.getValueAt(deno.size(),j+1).toString())/100);
+							model.setValueAt(Double.valueOf(df2.format(cost)),deno.size()+2,j+1);
+							cost = Double.valueOf(df2.format(cost));
+							System.out.println("Sum of cost "+j+ "-> " +cost);
+							
+							double profit = sum-cost;
+							model.setValueAt(Double.valueOf(df2.format(profit)),deno.size()+1,j+1);
+							profit = Double.valueOf(df2.format(profit));
+							System.out.println("Sum of Profit "+j+ "-> " +profit);}
 						}
 						System.out.println("Sum of col "+j+ "-> " +sum);
 						sum=0;
@@ -808,9 +869,9 @@ public static void LastMonthReport(){
 						
 						model.addRow(new Object[]{myRs1.getString("Denominations")});
 				}
-					model.addRow(new Object[]{"Company's Sales"});
-					model.addRow(new Object[]{"Company's Profit"});
-						
+					model.addRow(new Object[]{"Total Sales"});
+					model.addRow(new Object[]{"Profit"});
+					model.addRow(new Object[]{"Cost Price"});
 					String val ="";
 					
 					int i,j;
@@ -838,8 +899,25 @@ public static void LastMonthReport(){
 				}
 				for(j=0;j<companys.size();j++){
 					for(i=0;i<deno.size();i++){
-						sum = sum+Double.parseDouble(model.getValueAt(i, j+1).toString());
+						sum = sum+(Double.parseDouble(model.getValueAt(i, j+1).toString())*Double.parseDouble(deno.get(i)));
 						model.setValueAt(sum,deno.size(),j+1);
+						
+						PreparedStatement pro = myconn.prepareStatement("select distinct sales.CompanyName,company.CompanyProfit from sales,company where sales.CompanyName=? and company.CompanyName=sales.CompanyName");
+						pro.setString(1,companys.get(j));
+						ResultSet myPro = pro.executeQuery();
+						if(!myPro.next()){
+							System.out.println("No column sales");
+						}else{
+						double cost =myPro.getInt("CompanyProfit");
+						cost = cost*(Double.parseDouble(model.getValueAt(deno.size(),j+1).toString())/100);
+						model.setValueAt(Double.valueOf(df2.format(cost)),deno.size()+2,j+1);
+						cost = Double.valueOf(df2.format(cost));
+						System.out.println("Sum of cost "+j+ "-> " +cost);
+						
+						double profit = sum-cost;
+						model.setValueAt(Double.valueOf(df2.format(profit)),deno.size()+1,j+1);
+						profit = Double.valueOf(df2.format(profit));
+						System.out.println("Sum of Profit "+j+ "-> " +profit);}
 					}
 					System.out.println("Sum of col "+j+ "-> " +sum);
 					sum=0;
@@ -938,8 +1016,25 @@ public static void LastMonthReport(){
 					}
 					for(j=0;j<companys.size();j++){
 						for(i=0;i<deno.size();i++){
-							sum = sum+Double.parseDouble(model.getValueAt(i, j+1).toString());
+							sum = sum+(Double.parseDouble(model.getValueAt(i, j+1).toString())*Double.parseDouble(deno.get(i)));
 							model.setValueAt(sum,deno.size(),j+1);
+							
+							PreparedStatement pro = myconn.prepareStatement("select distinct sales.CompanyName,company.CompanyProfit from sales,company where sales.CompanyName=? and company.CompanyName=sales.CompanyName");
+							pro.setString(1,companys.get(j));
+							ResultSet myPro = pro.executeQuery();
+							if(!myPro.next()){
+								System.out.println("No column sales");
+							}else{
+							double cost =myPro.getInt("CompanyProfit");
+							cost = cost*(Double.parseDouble(model.getValueAt(deno.size(),j+1).toString())/100);
+							model.setValueAt(Double.valueOf(df2.format(cost)),deno.size()+2,j+1);
+							cost = Double.valueOf(df2.format(cost));
+							System.out.println("Sum of cost "+j+ "-> " +cost);
+							
+							double profit = sum-cost;
+							model.setValueAt(Double.valueOf(df2.format(profit)),deno.size()+1,j+1);
+							profit = Double.valueOf(df2.format(profit));
+							System.out.println("Sum of Profit "+j+ "-> " +profit);}
 						}
 						System.out.println("Sum of col "+j+ "-> " +sum);
 						sum=0;

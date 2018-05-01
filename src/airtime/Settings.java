@@ -124,10 +124,14 @@ public class Settings extends MainMDI implements InternalFrameListener {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
+				if (txtFldEdtProfit.getText().equals("")){
+					JOptionPane.showMessageDialog(null,"Company Profit is not declared");
+				}else{
+				int getnumber = Integer.parseInt(txtFldEdtProfit.getText());
 				if (comboBoxEdtCompany.getSelectedItem().equals("-Select Company-")){
 					JOptionPane.showMessageDialog(null,"Company Name is not declared");
-				}else if (txtFldEdtProfit.getText().equals("")){
-					JOptionPane.showMessageDialog(null,"Company Profit is not declared");
+				}else  if (getnumber >=101){
+					JOptionPane.showMessageDialog(null,"Company Profit cannot  be more than 100");
 				}else{
 					try{						
 						mystmt = myconn.prepareStatement("update company set CompanyProfit =? where CompanyName =?");
@@ -147,7 +151,8 @@ public class Settings extends MainMDI implements InternalFrameListener {
 						txtFldEdtProfit.setText(null);
 						e.printStackTrace();
 					}
-			}
+				}
+			   }
 			}
 		});
 		
