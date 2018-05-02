@@ -43,7 +43,7 @@ public class Sales extends MainMDI implements InternalFrameListener {
 	private JTextField txtFldEnterUnits;
 	private static JTable Salestable;
 	//static DefaultTableModel model = new DefaultTableModel();
-	static JLabel TotalCost;
+	static JLabel TotalCost,TotalSales,Profit;
 	JComboBox<Object> cbxChseCompany;
 	JComboBox<Object> denomination;
 	static ArrayList<String> companys;
@@ -392,13 +392,13 @@ public class Sales extends MainMDI implements InternalFrameListener {
 		lblTotalSales.setBounds(594, 441, 77, 28);
 		panel.add(lblTotalSales);
 		
-		JLabel TotalSales = new JLabel("0.0");
+		TotalSales = new JLabel("0.0");
 		TotalSales.setHorizontalAlignment(SwingConstants.RIGHT);
 		TotalSales.setFont(new Font("Times New Roman", Font.BOLD, 16));
 		TotalSales.setBounds(682, 441, 90, 28);
 		panel.add(TotalSales);
 		
-		JLabel Profit = new JLabel("0.0");
+		Profit = new JLabel("0.0");
 		Profit.setHorizontalAlignment(SwingConstants.RIGHT);
 		Profit.setFont(new Font("Times New Roman", Font.BOLD, 16));
 		Profit.setBounds(866, 441, 90, 28);
@@ -412,12 +412,10 @@ public class Sales extends MainMDI implements InternalFrameListener {
 		TotalCost = new JLabel("0.0");
 		TotalCost.setHorizontalAlignment(SwingConstants.RIGHT);
 		TotalCost.setFont(new Font("Times New Roman", Font.BOLD, 16));
-		//TotalCost.setText(Double.toString(getSum()));
 		TotalCost.setBounds(1099, 441, 90, 28);
 		panel.add(TotalCost);
 		
 		JLabel lblTotalCost = new JLabel("Total Cost:");
-		lblTotalCost.setForeground(Color.green);
 		lblTotalCost.setFont(new Font("Times New Roman", Font.ITALIC, 16));
 		lblTotalCost.setBounds(1012, 441, 77, 28);
 		panel.add(lblTotalCost);
@@ -470,17 +468,28 @@ public class Sales extends MainMDI implements InternalFrameListener {
 		    	TotalCost.setText( "" ); }
 		}
 	public static void getSum(){
-		int rowCount = Salestable.getRowCount();
 		double sum = 0;
-		for(int i=0;i<rowCount;i++){
-			
-			sum = sum+Double.parseDouble(Salestable.getValueAt(i, companys.size()+1).toString());
-			System.out.println("Saame is" +sum);
-			TotalCost.setText(""+sum);
+		double cost =0;
+		double profit=0;
+			for(int j=0;j<deno.size();j++){
+				
+				sum = sum+Double.parseDouble(Salestable.getValueAt(j, companys.size()+1).toString());
+				TotalSales.setText(""+sum);
+				System.out.println("Sum inner is" +sum);
+				
+				cost =cost+(Double.parseDouble(Salestable.getValueAt(deno.size()+2,j+1).toString()));
+				System.out.println("Cost is" +cost);
+				TotalCost.setText(""+cost);
+				
+				profit = sum-cost;
+				Profit.setText(""+profit);
+				System.out.println("Profit inner is" +profit);
+				
+			}
+			sum=0;
+			cost=0;
+			profit =0;
 		}
-		//zzreturn sum;z
-		
-	}
 	public static void TodaysReport(){
 		 
 		    try {				
@@ -692,7 +701,8 @@ public class Sales extends MainMDI implements InternalFrameListener {
 					}
 					System.out.println("Record Yesterday");
 					textFormat();
-					//TotalCost.setText(Double.toString(getSum()));
+					getSum();
+					//TotalCost.setText();
 					
 					} catch (SQLException e) {
 						JOptionPane.showMessageDialog(null, e);
