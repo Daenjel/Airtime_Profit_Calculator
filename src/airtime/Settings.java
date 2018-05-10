@@ -130,8 +130,8 @@ public class Settings extends MainMDI implements InternalFrameListener {
 				int getnumber = Integer.parseInt(txtFldEdtProfit.getText());
 				if (comboBoxEdtCompany.getSelectedItem().equals("-Select Company-")){
 					JOptionPane.showMessageDialog(null,"Company Name is not declared");
-				}else  if (getnumber >=101){
-					JOptionPane.showMessageDialog(null,"Company Profit cannot  be more than 100");
+				}else  if (getnumber >100 ){
+					JOptionPane.showMessageDialog(null,"Company Profit cannot be more than 100%");
 				}else{
 					try{						
 						mystmt = myconn.prepareStatement("update company set CompanyProfit =? where CompanyName =?");
@@ -206,9 +206,11 @@ public class Settings extends MainMDI implements InternalFrameListener {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				if (txtFieldCompanyName.getText().equals("") && txtFldCompanyProfit.getText().equals("")) {
-					JOptionPane.showMessageDialog(null,"Company Name and Profit required");
-				}else if (txtFieldCompanyName.getText().equals("")){
+				int a = Integer.parseInt(txtFldCompanyProfit.getText());
+				if ( a >100) {
+					JOptionPane.showMessageDialog(null,"Company Profit cannot be more than 100%");
+				}else{
+				if (txtFieldCompanyName.getText().equals("")){
 					JOptionPane.showMessageDialog(null,"Company Name is not declared");
 				}else if (txtFldCompanyProfit.getText().equals("")){
 					JOptionPane.showMessageDialog(null,"Company Profit is not declared");
@@ -229,7 +231,7 @@ public class Settings extends MainMDI implements InternalFrameListener {
 				mystmt.setString(3,DateToStr.toString() );
 				
 				mystmt.execute();
-				 JOptionPane.showMessageDialog(null, "Data Saved");
+				 JOptionPane.showMessageDialog(null, "Company Name "+txtFieldCompanyName.getText()+" and Profit "+txtFldCompanyProfit.getText()+" Saved");
 				mystmt.close();
 				System.out.println("Company Name Saved");
 				comboBoxEdtCompany.removeAllItems();
@@ -245,10 +247,8 @@ public class Settings extends MainMDI implements InternalFrameListener {
 				e.printStackTrace();}
 				}
 			}
-	
-	
-					
-		});
+		}		
+	});
 
 				
 		JLabel lblEditCompanyDetails = new JLabel("Edit Company Details");

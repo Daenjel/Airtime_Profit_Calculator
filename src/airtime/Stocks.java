@@ -46,9 +46,12 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 	private static JTable table_1;
 	private JTextField textField;
 	static JLabel TotalCost;
+	static double sum = 0;
+	static DecimalFormat df2 = new DecimalFormat(".##");
 	private JComboBox<Object> cmbCompanyName;
 	private JComboBox<Object> cmbDeno;
 	static ArrayList<String> companys;
+	static ArrayList<String> deno;
 	private JButton btnCurrentStock;
 	static Connection myconn = null;
 	public static void main(String[] args){
@@ -109,7 +112,8 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 		});
 		scrollPane_1.setViewportView(table_1);
 		CurrentStock();
-				
+		getStock();
+		
 		JButton btnPrint = new JButton("Print Stock");
 		btnPrint.setIcon(new ImageIcon(Stocks.class.getResource("/images/ic_print_black_24dp_1x.png")));
 		btnPrint.setFont(new Font("Segoe UI", Font.ITALIC, 12));
@@ -366,7 +370,6 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 		TotalCost.setForeground(Color.MAGENTA);
 		TotalCost.setFont(new Font("Times New Roman", Font.ITALIC, 22));
 		TotalCost.setBounds(1142, 444, 108, 34);
-		TotalCost.setText(Double.toString(getSum()));
 		panel.add(TotalCost);
 		
 		JButton btnRecentStock = new JButton("Recent Stock");
@@ -410,15 +413,7 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 		lblTotalCost.setBounds(1024, 441, 108, 40);
 		panel.add(lblTotalCost);
 	}
-	public static double getSum(){
-		int rowcount = table_1.getRowCount();
-		double sum = 0;
-		for(int i=0;i<rowcount;i++){
-			sum = sum+Double.parseDouble(table_1.getValueAt(i, companys.size()+1).toString());
-		}
-		return sum;
-		
-	}
+
 	public static void CurrentStock(){
 		try {
 			PreparedStatement mystmt = myconn.prepareStatement("select distinct companyName from stocks");
@@ -442,12 +437,12 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 			PreparedStatement mystmt1 = myconn.prepareStatement("select distinct Denominations from stocks order by Denominations desc");
 			
 			ResultSet myRs1 = mystmt1.executeQuery();
-			ArrayList<String> deno = new ArrayList<>();
+			deno = new ArrayList<>();
 			while(myRs1.next()){
 				deno.add(myRs1.getString("Denominations"));
 				
 				model.addRow(new Object[]{myRs1.getString("Denominations")});
-		}	//model.addRow(new Object[]{("Company Stock")});			
+		}	model.addRow(new Object[]{("Company Stock")});			
 			String val ="";
 			
 			int i,j;
@@ -471,12 +466,31 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 			}
 			System.out.println(i);
 		}
-		
+		for(j=0;j<companys.size();j++){
+			for(i=0;i<deno.size();i++){
+				sum = sum+(Double.parseDouble(model.getValueAt(i, j+1).toString())*Double.parseDouble(deno.get(i)));
+				model.setValueAt(sum,deno.size(),j+1);
+				}
+			System.out.println("Sum of col "+j+ "-> " +sum);
+			sum=0;
+		}
 		} catch (SQLException e) {
 			JOptionPane.showMessageDialog(null, e);
 			e.printStackTrace();
 		}
-			System.out.println("Displays Stocks");
+		System.out.println("Displays Stocks");
+	}
+	public static void getStock(){
+		
+		for(int j=0;j<deno.size();j++){
+			
+			sum = sum+Double.parseDouble(table_1.getValueAt(j, companys.size()+1).toString());
+			//TotalCost.setText(""+sum);
+			System.out.println("Sum inner is" +sum);
+			
+			
+		}
+		sum=0;
 	}
 	public static void textFormat(){
 	boolean bool = true;
@@ -493,8 +507,8 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 	      sCurSymbol = dfs.getCurrencySymbol();      
 	    }
 	Number n = null;
-	String sText = Double.toString(getSum());;
-	//String sText ="";    
+	//String sText = Double.toString(getSum());;
+	String sText ="";    
 	ndx = sText.indexOf(sCurSymbol);
 	if( ndx == -1 ){ 
 	      if( bool ){

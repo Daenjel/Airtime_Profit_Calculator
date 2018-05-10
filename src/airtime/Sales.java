@@ -37,13 +37,16 @@ import javax.swing.event.InternalFrameListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
+import com.toedter.calendar.JDateChooser;
+
 import net.proteanit.sql.DbUtils;
 
 public class Sales extends MainMDI implements InternalFrameListener {
 	private JTextField txtFldEnterUnits;
 	private static JTable Salestable;
+	JDateChooser dateChooser;
 	//static DefaultTableModel model = new DefaultTableModel();
-	static JLabel TotalCost,TotalSales,Profit;
+	static JLabel TotalSales,TotalCost,Profit;
 	JComboBox<Object> cbxChseCompany;
 	JComboBox<Object> denomination;
 	static ArrayList<String> companys;
@@ -56,6 +59,8 @@ public class Sales extends MainMDI implements InternalFrameListener {
     static Calendar calSD = Calendar.getInstance();
     static Connection myconn = null;
     static double sum =0;
+    static double cost =0;
+    static double profit =0;
 	public static void main(String[] arg){
 		new Sales();
 		textFormat();
@@ -231,8 +236,8 @@ public class Sales extends MainMDI implements InternalFrameListener {
 						System.out.println("Record Updated");
 						}
 					} 
-						
 						TodaysReport();
+						getSum();
 						cbxChseCompany.setSelectedItem("-Select Company-");
 						denomination.setSelectedItem("-Select Denomination-");
 						txtFldEnterUnits.setText(null);
@@ -253,7 +258,7 @@ public class Sales extends MainMDI implements InternalFrameListener {
 		
 		JLabel lblTodaySales = new JLabel("Today's Sales");
 		lblTodaySales.setFont(new Font("Times New Roman", Font.ITALIC, 22));
-		lblTodaySales.setBounds(809, 42, 162, 40);
+		lblTodaySales.setBounds(777, 42, 194, 40);
 		panel.add(lblTodaySales);
 		
 		JScrollPane scrollPaneSales = new JScrollPane();
@@ -330,7 +335,7 @@ public class Sales extends MainMDI implements InternalFrameListener {
 			for(i=0;i<deno.size();i++){
 				
 				sum = sum+(Double.parseDouble(model.getValueAt(i, j+1).toString())*Double.parseDouble(deno.get(i)));
-				//sCurSymbol = dfs.getCurrencySymbol();
+				//TotalSales.setText(""+sum);
 				model.setValueAt(sum,deno.size(),j+1);
 				
 				PreparedStatement pro = myconn.prepareStatement("select distinct sales.CompanyName,company.CompanyProfit from sales,company where sales.CompanyName=? and company.CompanyName=sales.CompanyName");
@@ -371,7 +376,8 @@ public class Sales extends MainMDI implements InternalFrameListener {
 				try{
 					MessageFormat header = new MessageFormat("Page Header");
 					MessageFormat footer = new MessageFormat("Page(1,number,integer");
-					
+					SimpleDateFormat yesterdayformat = new SimpleDateFormat("E, dd MMM yyyy");
+					System.out.println(yesterdayformat.format(dateChooser.getDate()));
 					Salestable.print(JTable.PrintMode.FIT_WIDTH,header,footer);
 					
 				}catch(Exception e){
@@ -387,16 +393,16 @@ public class Sales extends MainMDI implements InternalFrameListener {
 		cbxChseSales.setBounds(1104, 55, 180, 27);
 		panel.add(cbxChseSales);		
 		
-		JLabel lblTotalSales = new JLabel("Total Sales:");
+		JLabel lblTotalSales = new JLabel("Total Cost:");
 		lblTotalSales.setFont(new Font("Times New Roman", Font.ITALIC, 16));
 		lblTotalSales.setBounds(594, 441, 77, 28);
 		panel.add(lblTotalSales);
 		
-		TotalSales = new JLabel("0.0");
-		TotalSales.setHorizontalAlignment(SwingConstants.RIGHT);
-		TotalSales.setFont(new Font("Times New Roman", Font.BOLD, 16));
-		TotalSales.setBounds(682, 441, 90, 28);
-		panel.add(TotalSales);
+		TotalCost = new JLabel("0.0");
+		TotalCost.setHorizontalAlignment(SwingConstants.RIGHT);
+		TotalCost.setFont(new Font("Times New Roman", Font.BOLD, 16));
+		TotalCost.setBounds(682, 441, 90, 28);
+		panel.add(TotalCost);
 		
 		Profit = new JLabel("0.0");
 		Profit.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -409,16 +415,167 @@ public class Sales extends MainMDI implements InternalFrameListener {
 		lblProfit.setBounds(806, 441, 50, 28);
 		panel.add(lblProfit);
 		
-		TotalCost = new JLabel("0.0");
-		TotalCost.setHorizontalAlignment(SwingConstants.RIGHT);
-		TotalCost.setFont(new Font("Times New Roman", Font.BOLD, 16));
-		TotalCost.setBounds(1099, 441, 90, 28);
-		panel.add(TotalCost);
+		TotalSales = new JLabel("0.0");
+		TotalSales.setHorizontalAlignment(SwingConstants.RIGHT);
+		TotalSales.setFont(new Font("Times New Roman", Font.BOLD, 16));
+		TotalSales.setBounds(1099, 441, 90, 28);
+		panel.add(TotalSales);
 		
-		JLabel lblTotalCost = new JLabel("Total Cost:");
+		JLabel lblTotalCost = new JLabel("Total Sales:");
 		lblTotalCost.setFont(new Font("Times New Roman", Font.ITALIC, 16));
 		lblTotalCost.setBounds(1012, 441, 77, 28);
 		panel.add(lblTotalCost);
+		
+		dateChooser = new JDateChooser();
+		dateChooser.setBounds(1174, 11, 110, 20);
+		dateChooser.setFont(new Font("Times New Roman", Font.PLAIN, 12));
+		dateChooser.setDateFormatString(dateformat.toString());
+		System.out.println(dateChooser.getDate());
+		panel.add(dateChooser);
+		
+		JButton btnGet = new JButton("Get");
+		btnGet.setFont(new Font("Times New Roman", Font.PLAIN, 12));
+		btnGet.setBounds(1107, 11, 57, 20);
+		panel.add(btnGet);
+		btnGet.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				if(dateChooser.getDate()==null){
+					JOptionPane.showMessageDialog(null, "No Selected Date!!");
+				}else{
+				String choseDate = dateformat.format(dateChooser.getDate());
+				
+				SimpleDateFormat dayformat = new SimpleDateFormat("E, dd MMM yyyy");
+			    String chooser = dayformat.format(dateChooser.getDate());
+			    lblTodaySales.setText(chooser);
+
+				    try {				
+						PreparedStatement mystmt = myconn.prepareStatement("select *from sales where date =?");
+						mystmt.setString(1,choseDate);
+						ResultSet myRs = mystmt.executeQuery();
+						if(!myRs.first()){
+							JOptionPane.showMessageDialog(null, "No Sales Recorded for "+chooser+" !!");
+							System.out.println("No Record DateChooser");
+							Salestable.setModel(DbUtils.resultSetToTableModel(myRs));
+						}else{
+						
+							try {
+								mystmt = myconn.prepareStatement("select distinct companyName from sales where date=? ");
+								mystmt.setString(1,choseDate );
+								myRs = mystmt.executeQuery();
+								
+								DefaultTableModel model = new DefaultTableModel();
+								Salestable.setModel(model);
+								Salestable.setShowVerticalLines(true);
+								Salestable.setCellSelectionEnabled(true);
+								Salestable.setColumnSelectionAllowed(true);
+								companys = new ArrayList<>();
+								model.addColumn(" ");
+								while(myRs.next()){
+									companys.add(myRs.getString("CompanyName"));
+								
+								model.addColumn(myRs.getString("CompanyName"));
+								}
+								model.addColumn("Grand Totals");
+								
+								PreparedStatement mystmt1 = myconn.prepareStatement("select distinct Denominations from sales  where date=? order by Denominations desc");
+								mystmt1.setString(1,choseDate);
+								ResultSet myRs1 = mystmt1.executeQuery();
+								deno = new ArrayList<>();
+								while(myRs1.next()){
+									deno.add(myRs1.getString("Denominations"));
+									
+									model.addRow(new Object[]{myRs1.getString("Denominations")});
+							}
+								model.addRow(new Object[]{"Total Sales"});
+								model.addRow(new Object[]{"Profit"});
+								model.addRow(new Object[]{"Cost Price"});	
+								String val ="";
+								
+								int i,j;
+							for(i=0; i<deno.size();i++){
+								double totalUnits = 0;
+								for(j=0; j<companys.size();j++){
+									PreparedStatement mystmt2 = myconn.prepareStatement("select sum(Units) AS Units from sales where date=? and CompanyName ='"+companys.get(j)+"' and Denominations = "+deno.get(i));
+									mystmt2.setString(1,choseDate);
+									ResultSet myRs2 = mystmt2.executeQuery();
+									TableColumn column = Salestable.getColumnModel().getColumn(0);
+							        column.setPreferredWidth(110);
+									
+									while(myRs2.next()){
+										val=myRs2.getString("Units");
+										if(val!= null){
+											val=myRs2.getString("Units");	
+										}else {val="0";}
+										
+										}
+									model.setValueAt(val,i, j+1);
+									totalUnits = totalUnits+ Double.parseDouble(val);
+									model.setValueAt(totalUnits *Double.parseDouble(deno.get(i)),i, companys.size()+1);
+								}
+							
+							}
+							for(j=0;j<companys.size();j++){
+								for(i=0;i<deno.size();i++){
+									sum = sum+(Double.parseDouble(model.getValueAt(i, j+1).toString())*Double.parseDouble(deno.get(i)));
+									model.setValueAt(sum,deno.size(),j+1);
+									
+									PreparedStatement pro = myconn.prepareStatement("select distinct sales.CompanyName,company.CompanyProfit from sales,company where sales.CompanyName=? and company.CompanyName=sales.CompanyName");
+									pro.setString(1,companys.get(j));
+									ResultSet myPro = pro.executeQuery();
+									if(!myPro.next()){
+										System.out.println("No column sales");
+									}else{
+									double cost =myPro.getInt("CompanyProfit");
+									cost = cost*(Double.parseDouble(model.getValueAt(deno.size(),j+1).toString())/100);
+									model.setValueAt(Double.valueOf(df2.format(cost)),deno.size()+2,j+1);
+									cost = Double.valueOf(df2.format(cost));
+									System.out.println("Sum of get cost "+j+ "-> " +cost);
+									
+									double profit = sum-cost;
+									model.setValueAt(Double.valueOf(df2.format(profit)),deno.size()+1,j+1);
+									profit = Double.valueOf(df2.format(profit));
+									System.out.println("Sum of get Profit "+j+ "-> " +profit);}
+								}
+								System.out.println("Sum of col "+j+ "-> " +sum);
+								sum=0;
+							}
+							System.out.println("Record DateChooser");
+							for(int z=0;z<companys.size();z++){
+								
+								sum = sum+Double.parseDouble(Salestable.getValueAt(deno.size(),z+1).toString());
+								TotalSales.setText(""+sum);
+								System.out.println("Sum get is" +sum);
+								
+								cost =cost+(Double.parseDouble(Salestable.getValueAt(deno.size()+2,z+1).toString()));
+								cost = Double.valueOf(df2.format(cost));
+								System.out.println("Cost get is" +cost);
+								TotalCost.setText(""+cost);
+								
+								profit = sum-cost;
+								profit = Double.valueOf(df2.format(profit));
+								Profit.setText(""+profit);
+								System.out.println("Profit get is" +profit);
+								
+							}
+							sum=0;
+							cost=0;
+							profit =0;
+							} catch (SQLException e) {
+								JOptionPane.showMessageDialog(null, e);
+								e.printStackTrace();
+							}
+							
+						}
+				    } catch (Exception e) {
+				        JOptionPane.showMessageDialog(null, e,"Error", 0);
+				        e.printStackTrace();
+				    }	
+				}
+			}
+			
+		});
 		cbxChseSales.addActionListener(new ActionListener(){
 
 			@Override
@@ -462,26 +619,26 @@ public class Sales extends MainMDI implements InternalFrameListener {
 		    }
 		    try{
 		      n = cfLocal.parse( sText );
-		      TotalCost.setText( cfLocal.format( n ) );
+		      TotalSales.setText( cfLocal.format( n ) );
 		    }
 		    catch( ParseException pe ) {
-		    	TotalCost.setText( "" ); }
+		    	TotalSales.setText( "" ); }
 		}
 	public static void getSum(){
-		double sum = 0;
-		double cost =0;
-		double profit=0;
-			for(int j=0;j<deno.size();j++){
+		
+			for(int j=0;j<companys.size();j++){
 				
-				sum = sum+Double.parseDouble(Salestable.getValueAt(j, companys.size()+1).toString());
+				sum = sum+Double.parseDouble(Salestable.getValueAt(deno.size(),j+1).toString());
 				TotalSales.setText(""+sum);
 				System.out.println("Sum inner is" +sum);
 				
 				cost =cost+(Double.parseDouble(Salestable.getValueAt(deno.size()+2,j+1).toString()));
+				cost = Double.valueOf(df2.format(cost));
 				System.out.println("Cost is" +cost);
 				TotalCost.setText(""+cost);
 				
 				profit = sum-cost;
+				profit = Double.valueOf(df2.format(profit));
 				Profit.setText(""+profit);
 				System.out.println("Profit inner is" +profit);
 				
@@ -584,8 +741,6 @@ public class Sales extends MainMDI implements InternalFrameListener {
 						sum=0;
 					}
 					System.out.println("Record For Today");
-					//textFormat();
-					//TotalCost.setText(Double.toString(getSum()));
 					
 					} catch (SQLException e) {
 						JOptionPane.showMessageDialog(null, e);
@@ -596,6 +751,27 @@ public class Sales extends MainMDI implements InternalFrameListener {
 		        JOptionPane.showMessageDialog(null,e, "Error",0);
 		        e.printStackTrace();
 		    }
+		    /*getSum();
+		    for(int j=0;j<deno.size();j++){
+				
+				sum = sum+Double.parseDouble(Salestable.getValueAt(j, companys.size()+1).toString());
+				TotalSales.setText(""+sum);
+				System.out.println("Sum today is" +sum);
+				
+				cost =cost+(Double.parseDouble(Salestable.getValueAt(deno.size()+2,j+1).toString()));
+				cost = Double.valueOf(df2.format(cost));
+				System.out.println("Cost today is" +cost);
+				TotalCost.setText(""+cost);
+				
+				profit = sum-cost;
+				profit = Double.valueOf(df2.format(profit));
+				Profit.setText(""+profit);
+				System.out.println("Profit today is" +profit);
+				
+			}
+			sum=0;
+			cost=0;
+			profit =0;*/
 	}
 	public static void YesterdayReport(){
 		
@@ -603,10 +779,11 @@ public class Sales extends MainMDI implements InternalFrameListener {
 	    int daysToDecrement = -1;
 	    calSD.add(Calendar.DATE, daysToDecrement);
 	    Date real_StartDate = calSD.getTime();
-	    SimpleDateFormat yesterdayformat = new SimpleDateFormat("yyyy/MM/dd");
-	    String sD = yesterdayformat.format(real_StartDate);
+	    SimpleDateFormat yesterdayformat = new SimpleDateFormat("E, dd MMM yyyy");
+	    String sD = dateformat.format(real_StartDate);
+	    String style = yesterdayformat.format(real_StartDate);
 
-		JOptionPane.showMessageDialog(null, "Yesterday's Date:  "+sD);
+		JOptionPane.showMessageDialog(null, "Yesterday's Date:  "+style);
 
 		    try {				
 				PreparedStatement mystmt = myconn.prepareStatement("select *from sales where date =?");
@@ -700,29 +877,46 @@ public class Sales extends MainMDI implements InternalFrameListener {
 						sum=0;
 					}
 					System.out.println("Record Yesterday");
-					textFormat();
-					getSum();
-					//TotalCost.setText();
 					
 					} catch (SQLException e) {
 						JOptionPane.showMessageDialog(null, e);
 						e.printStackTrace();
 					}
+					for(int j=0;j<deno.size();j++){
+						
+						sum = sum+Double.parseDouble(Salestable.getValueAt(j, companys.size()+1).toString());
+						TotalSales.setText(""+sum);
+						System.out.println("Sum today is" +sum);
+						
+						cost =cost+(Double.parseDouble(Salestable.getValueAt(deno.size()+2,j+1).toString()));
+						cost = Double.valueOf(df2.format(cost));
+						System.out.println("Cost today is" +cost);
+						TotalCost.setText(""+cost);
+						
+						profit = sum-cost;
+						profit = Double.valueOf(df2.format(profit));
+						Profit.setText(""+profit);
+						System.out.println("Profit today is" +profit);
+						
+					}
+					sum=0;
+					cost=0;
+					profit =0;
 				}
 		    } catch (Exception e) {
 		        JOptionPane.showMessageDialog(null, e,"Error", 0);
 		        e.printStackTrace();
 		    }	
+		 
 	}
 public static void ThisMonthReport(){
 		
 		calSD.setTime(curDate); // convert your date to Calendar object
 	    calSD.add(Calendar.MONTH,0);
 	    Date real_StartDate = calSD.getTime();
-	    SimpleDateFormat yesterdayformat = new SimpleDateFormat("MM");
-	    String sD = yesterdayformat.format(real_StartDate);
-
-		JOptionPane.showMessageDialog(null, "This Month:  "+sD);
+	    SimpleDateFormat yesterdayformat = new SimpleDateFormat(" MMM yyyy");
+	    String style = yesterdayformat.format(real_StartDate);
+		JOptionPane.showMessageDialog(null, "This Month:  "+style);
 
 		    try {				
 				PreparedStatement mystmt = myconn.prepareStatement("select *from sales where MONTH(Date) = MONTH(?)");
@@ -816,19 +1010,41 @@ public static void ThisMonthReport(){
 						sum=0;
 					}
 					System.out.println("Record This Month");
-					textFormat();
-					//TotalCost.setText(Double.toString(getSum()));
 					} catch (SQLException e) {
 						JOptionPane.showMessageDialog(null, e);
 						e.printStackTrace();
 					}
+					//getSum();
+					/*double profit=0;
+					double cost=0;
+					double sum=0;
+					for(int j=0;j<deno.size();j++){
+						
+						sum = sum+Double.parseDouble(Salestable.getValueAt(j, companys.size()+1).toString());
+						TotalSales.setText(""+sum);
+						System.out.println("Sum month is" +sum);
+						
+						cost =cost+(Double.parseDouble(Salestable.getValueAt(deno.size()+2,j+1).toString()));
+						cost = Double.valueOf(df2.format(cost));
+						System.out.println("Cost month is" +cost);
+						TotalCost.setText(""+cost);
+						
+						profit = sum-cost;
+						profit = Double.valueOf(df2.format(profit));
+						Profit.setText(""+profit);
+						System.out.println("Profit month is" +profit);
+						
+					}
+					sum=0;
+					cost=0;
+					profit =0;*/
 				}
 		    } catch (Exception e) {
 		        JOptionPane.showMessageDialog(null,e, "Error",0);
 		        e.printStackTrace();
 		    }
-
-		
+		    //getSum();
+				
 	}
 public static void LastMonthReport(){
 	
@@ -836,10 +1052,10 @@ public static void LastMonthReport(){
 	int decrement =-1;
     calSD.add(Calendar.MONTH,decrement);
     Date real_StartDate = calSD.getTime();
-    SimpleDateFormat yesterdayformat = new SimpleDateFormat("MM");
-    String sD = yesterdayformat.format(real_StartDate);
+    SimpleDateFormat yesterdayformat = new SimpleDateFormat(" MMM yyyy");
+    String style = yesterdayformat.format(real_StartDate);
 
-	JOptionPane.showMessageDialog(null, "Last Month:  "+sD);
+	JOptionPane.showMessageDialog(null, "Last Month:  "+style);
 
 	    try {			
 			PreparedStatement mystmt = myconn.prepareStatement("select *from sales where MONTH(Date) = MONTH(?)-1");
@@ -933,8 +1149,6 @@ public static void LastMonthReport(){
 					sum=0;
 				}
 				System.out.println("Record Last Month");
-				textFormat();
-				//TotalCost.setText(Double.toString(getSum()));
 				
 				} catch (SQLException e) {
 					JOptionPane.showMessageDialog(null, e);
@@ -945,6 +1159,26 @@ public static void LastMonthReport(){
 	        JOptionPane.showMessageDialog(null,e, "Error",0);
 	        e.printStackTrace();
 	    }	
+	    for(int j=0;j<deno.size();j++){
+			
+			sum = sum+Double.parseDouble(Salestable.getValueAt(j, companys.size()+1).toString());
+			TotalSales.setText(""+sum);
+			System.out.println("Sum today is" +sum);
+			
+			cost =cost+(Double.parseDouble(Salestable.getValueAt(deno.size()+2,j+1).toString()));
+			cost = Double.valueOf(df2.format(cost));
+			System.out.println("Cost today is" +cost);
+			TotalCost.setText(""+cost);
+			
+			profit = sum-cost;
+			profit = Double.valueOf(df2.format(profit));
+			Profit.setText(""+profit);
+			System.out.println("Profit today is" +profit);
+			
+		}
+		sum=0;
+		cost=0;
+		profit =0;
 }
 	public static void AnnualReport(){
 	
@@ -952,7 +1186,7 @@ public static void LastMonthReport(){
 	    int daysToDecrement = 0;
 	    calSD.add(Calendar.YEAR, daysToDecrement);
 	    Date real_StartDate = calSD.getTime();
-	    SimpleDateFormat sdF2 = new SimpleDateFormat("yyyy");
+	    SimpleDateFormat sdF2 = new SimpleDateFormat(" yyyy ");
 	    String sD = sdF2.format(real_StartDate);
 
 		JOptionPane.showMessageDialog(null, "This Year:  "+sD);
@@ -1051,7 +1285,7 @@ public static void LastMonthReport(){
 					}
 					System.out.println("Record Annual");
 					textFormat();
-					TotalCost.setText(Double.toString(sum));
+					TotalSales.setText(Double.toString(sum));
 										
 					} catch (SQLException e) {
 						JOptionPane.showMessageDialog(null, e);
@@ -1061,7 +1295,27 @@ public static void LastMonthReport(){
 		    } catch (Exception e) {
 		        JOptionPane.showMessageDialog(null, e,"Error",0);
 		        e.printStackTrace();
-		    }		
+		    }
+		    for(int j=0;j<deno.size();j++){
+				
+				sum = sum+Double.parseDouble(Salestable.getValueAt(j, companys.size()+1).toString());
+				TotalSales.setText(""+sum);
+				System.out.println("Sum today is" +sum);
+				
+				cost =cost+(Double.parseDouble(Salestable.getValueAt(deno.size()+2,j+1).toString()));
+				cost = Double.valueOf(df2.format(cost));
+				System.out.println("Cost today is" +cost);
+				TotalCost.setText(""+cost);
+				
+				profit = sum-cost;
+				profit = Double.valueOf(df2.format(profit));
+				Profit.setText(""+profit);
+				System.out.println("Profit today is" +profit);
+				
+			}
+			sum=0;
+			cost=0;
+			profit =0;
 	}
 }
 
