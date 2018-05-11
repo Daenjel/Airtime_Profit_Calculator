@@ -237,7 +237,6 @@ public class Sales extends MainMDI implements InternalFrameListener {
 						}
 					} 
 						TodaysReport();
-						getSum();
 						cbxChseCompany.setSelectedItem("-Select Company-");
 						denomination.setSelectedItem("-Select Denomination-");
 						txtFldEnterUnits.setText(null);
@@ -741,7 +740,26 @@ public class Sales extends MainMDI implements InternalFrameListener {
 						sum=0;
 					}
 					System.out.println("Record For Today");
-					
+					for(int s=0;s<companys.size();s++){
+						
+						sum = sum+Double.parseDouble(Salestable.getValueAt(deno.size(),s+1).toString());
+						TotalSales.setText(""+sum);
+						System.out.println("Sum today is" +sum);
+						
+						cost =cost+(Double.parseDouble(Salestable.getValueAt(deno.size()+2,s+1).toString()));
+						cost = Double.valueOf(df2.format(cost));
+						System.out.println("Cost today is" +cost);
+						TotalCost.setText(""+cost);
+						
+						profit = sum-cost;
+						profit = Double.valueOf(df2.format(profit));
+						Profit.setText(""+profit);
+						System.out.println("Profit today is" +profit);
+						
+					}
+					sum=0;
+					cost=0;
+					profit =0;
 					} catch (SQLException e) {
 						JOptionPane.showMessageDialog(null, e);
 						e.printStackTrace();
@@ -750,28 +768,7 @@ public class Sales extends MainMDI implements InternalFrameListener {
 		    } catch (Exception e) {
 		        JOptionPane.showMessageDialog(null,e, "Error",0);
 		        e.printStackTrace();
-		    }
-		    /*getSum();
-		    for(int j=0;j<deno.size();j++){
-				
-				sum = sum+Double.parseDouble(Salestable.getValueAt(j, companys.size()+1).toString());
-				TotalSales.setText(""+sum);
-				System.out.println("Sum today is" +sum);
-				
-				cost =cost+(Double.parseDouble(Salestable.getValueAt(deno.size()+2,j+1).toString()));
-				cost = Double.valueOf(df2.format(cost));
-				System.out.println("Cost today is" +cost);
-				TotalCost.setText(""+cost);
-				
-				profit = sum-cost;
-				profit = Double.valueOf(df2.format(profit));
-				Profit.setText(""+profit);
-				System.out.println("Profit today is" +profit);
-				
-			}
-			sum=0;
-			cost=0;
-			profit =0;*/
+		    }	    
 	}
 	public static void YesterdayReport(){
 		
@@ -877,31 +874,30 @@ public class Sales extends MainMDI implements InternalFrameListener {
 						sum=0;
 					}
 					System.out.println("Record Yesterday");
-					
-					} catch (SQLException e) {
-						JOptionPane.showMessageDialog(null, e);
-						e.printStackTrace();
-					}
-					for(int j=0;j<deno.size();j++){
+					for(int z=0;z<companys.size();z++){
 						
-						sum = sum+Double.parseDouble(Salestable.getValueAt(j, companys.size()+1).toString());
+						sum = sum+Double.parseDouble(Salestable.getValueAt(deno.size(),z+1).toString());
 						TotalSales.setText(""+sum);
-						System.out.println("Sum today is" +sum);
+						System.out.println("Sum get is" +sum);
 						
-						cost =cost+(Double.parseDouble(Salestable.getValueAt(deno.size()+2,j+1).toString()));
+						cost =cost+(Double.parseDouble(Salestable.getValueAt(deno.size()+2,z+1).toString()));
 						cost = Double.valueOf(df2.format(cost));
-						System.out.println("Cost today is" +cost);
+						System.out.println("Cost get is" +cost);
 						TotalCost.setText(""+cost);
 						
 						profit = sum-cost;
 						profit = Double.valueOf(df2.format(profit));
 						Profit.setText(""+profit);
-						System.out.println("Profit today is" +profit);
+						System.out.println("Profit get is" +profit);
 						
 					}
 					sum=0;
 					cost=0;
 					profit =0;
+					} catch (SQLException e) {
+						JOptionPane.showMessageDialog(null, e);
+						e.printStackTrace();
+					}
 				}
 		    } catch (Exception e) {
 		        JOptionPane.showMessageDialog(null, e,"Error", 0);
@@ -1010,40 +1006,35 @@ public static void ThisMonthReport(){
 						sum=0;
 					}
 					System.out.println("Record This Month");
-					} catch (SQLException e) {
-						JOptionPane.showMessageDialog(null, e);
-						e.printStackTrace();
-					}
-					//getSum();
-					/*double profit=0;
-					double cost=0;
-					double sum=0;
-					for(int j=0;j<deno.size();j++){
+					for(int z=0;z<companys.size();z++){
 						
-						sum = sum+Double.parseDouble(Salestable.getValueAt(j, companys.size()+1).toString());
+						sum = sum+Double.parseDouble(Salestable.getValueAt(deno.size(),z+1).toString());
 						TotalSales.setText(""+sum);
-						System.out.println("Sum month is" +sum);
+						System.out.println("Sum get is" +sum);
 						
-						cost =cost+(Double.parseDouble(Salestable.getValueAt(deno.size()+2,j+1).toString()));
+						cost =cost+(Double.parseDouble(Salestable.getValueAt(deno.size()+2,z+1).toString()));
 						cost = Double.valueOf(df2.format(cost));
-						System.out.println("Cost month is" +cost);
+						System.out.println("Cost get is" +cost);
 						TotalCost.setText(""+cost);
 						
 						profit = sum-cost;
 						profit = Double.valueOf(df2.format(profit));
 						Profit.setText(""+profit);
-						System.out.println("Profit month is" +profit);
+						System.out.println("Profit get is" +profit);
 						
 					}
 					sum=0;
 					cost=0;
-					profit =0;*/
+					profit =0;
+					} catch (SQLException e) {
+						JOptionPane.showMessageDialog(null, e);
+						e.printStackTrace();
+					}
 				}
 		    } catch (Exception e) {
 		        JOptionPane.showMessageDialog(null,e, "Error",0);
 		        e.printStackTrace();
 		    }
-		    //getSum();
 				
 	}
 public static void LastMonthReport(){
@@ -1149,7 +1140,26 @@ public static void LastMonthReport(){
 					sum=0;
 				}
 				System.out.println("Record Last Month");
-				
+				for(int z=0;z<companys.size();z++){
+					
+					sum = sum+Double.parseDouble(Salestable.getValueAt(deno.size(),z+1).toString());
+					TotalSales.setText(""+sum);
+					System.out.println("Sum get is" +sum);
+					
+					cost =cost+(Double.parseDouble(Salestable.getValueAt(deno.size()+2,z+1).toString()));
+					cost = Double.valueOf(df2.format(cost));
+					System.out.println("Cost get is" +cost);
+					TotalCost.setText(""+cost);
+					
+					profit = sum-cost;
+					profit = Double.valueOf(df2.format(profit));
+					Profit.setText(""+profit);
+					System.out.println("Profit get is" +profit);
+					
+				}
+				sum=0;
+				cost=0;
+				profit =0;
 				} catch (SQLException e) {
 					JOptionPane.showMessageDialog(null, e);
 					e.printStackTrace();
@@ -1159,26 +1169,6 @@ public static void LastMonthReport(){
 	        JOptionPane.showMessageDialog(null,e, "Error",0);
 	        e.printStackTrace();
 	    }	
-	    for(int j=0;j<deno.size();j++){
-			
-			sum = sum+Double.parseDouble(Salestable.getValueAt(j, companys.size()+1).toString());
-			TotalSales.setText(""+sum);
-			System.out.println("Sum today is" +sum);
-			
-			cost =cost+(Double.parseDouble(Salestable.getValueAt(deno.size()+2,j+1).toString()));
-			cost = Double.valueOf(df2.format(cost));
-			System.out.println("Cost today is" +cost);
-			TotalCost.setText(""+cost);
-			
-			profit = sum-cost;
-			profit = Double.valueOf(df2.format(profit));
-			Profit.setText(""+profit);
-			System.out.println("Profit today is" +profit);
-			
-		}
-		sum=0;
-		cost=0;
-		profit =0;
 }
 	public static void AnnualReport(){
 	
@@ -1284,8 +1274,26 @@ public static void LastMonthReport(){
 						sum=0;
 					}
 					System.out.println("Record Annual");
-					textFormat();
-					TotalSales.setText(Double.toString(sum));
+					for(int z=0;z<companys.size();z++){
+						
+						sum = sum+Double.parseDouble(Salestable.getValueAt(deno.size(),z+1).toString());
+						TotalSales.setText(""+sum);
+						System.out.println("Sum get is" +sum);
+						
+						cost =cost+(Double.parseDouble(Salestable.getValueAt(deno.size()+2,z+1).toString()));
+						cost = Double.valueOf(df2.format(cost));
+						System.out.println("Cost get is" +cost);
+						TotalCost.setText(""+cost);
+						
+						profit = sum-cost;
+						profit = Double.valueOf(df2.format(profit));
+						Profit.setText(""+profit);
+						System.out.println("Profit get is" +profit);
+						
+					}
+					sum=0;
+					cost=0;
+					profit =0;
 										
 					} catch (SQLException e) {
 						JOptionPane.showMessageDialog(null, e);
@@ -1296,26 +1304,6 @@ public static void LastMonthReport(){
 		        JOptionPane.showMessageDialog(null, e,"Error",0);
 		        e.printStackTrace();
 		    }
-		    for(int j=0;j<deno.size();j++){
-				
-				sum = sum+Double.parseDouble(Salestable.getValueAt(j, companys.size()+1).toString());
-				TotalSales.setText(""+sum);
-				System.out.println("Sum today is" +sum);
-				
-				cost =cost+(Double.parseDouble(Salestable.getValueAt(deno.size()+2,j+1).toString()));
-				cost = Double.valueOf(df2.format(cost));
-				System.out.println("Cost today is" +cost);
-				TotalCost.setText(""+cost);
-				
-				profit = sum-cost;
-				profit = Double.valueOf(df2.format(profit));
-				Profit.setText(""+profit);
-				System.out.println("Profit today is" +profit);
-				
-			}
-			sum=0;
-			cost=0;
-			profit =0;
+	
 	}
 }
-

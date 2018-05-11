@@ -117,6 +117,7 @@ public class MainMDI implements InternalFrameListener {
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
 					mnSales.setVisible(true);
+					mnStock.setVisible(true);
 					mnSettings.setVisible(true);
 					mnHelp.setVisible(true);
 					mntmLock.setVisible(true);
@@ -152,6 +153,7 @@ public class MainMDI implements InternalFrameListener {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				new Sales();
+				Sales.getSum();
 				contentPane.setVisible(false);
 			}
 			
@@ -236,6 +238,7 @@ public class MainMDI implements InternalFrameListener {
 				            java.util.logging.Logger.getLogger(MainMDI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
 				        }
 					new Sales();
+					Sales.getSum();
 				}
 			});
 		}
