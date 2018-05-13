@@ -1,5 +1,6 @@
 package airtime;
 
+import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.Toolkit;
@@ -20,6 +21,7 @@ import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.event.InternalFrameListener;
 
 public class Settings extends MainMDI implements InternalFrameListener {
@@ -307,6 +309,15 @@ public class Settings extends MainMDI implements InternalFrameListener {
 			}
 			
 		});
+		
+		JLabel lblcCopyright = new JLabel();
+		lblcCopyright.setVerticalAlignment(SwingConstants.CENTER);
+		lblcCopyright.setText("(C) Copyright 2018 by Anthony Wambua, Daniel Mbugua Inc.");
+		lblcCopyright.setHorizontalAlignment(SwingConstants.CENTER);
+		lblcCopyright.setForeground(Color.DARK_GRAY);
+		lblcCopyright.setFont(new Font("Times New Roman", Font.ITALIC, 16));
+		lblcCopyright.setBounds(436, 626, 420, 33);
+		internalFrameCompany.add(lblcCopyright);
 		
 	}
 	protected void  addToComboEdit(){

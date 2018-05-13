@@ -409,6 +409,15 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 		lblTotalCost.setFont(new Font("Times New Roman", Font.ITALIC, 22));
 		lblTotalCost.setBounds(1024, 441, 108, 40);
 		panel.add(lblTotalCost);
+		
+		JLabel lblcCopyright = new JLabel();
+		lblcCopyright.setVerticalAlignment(SwingConstants.CENTER);
+		lblcCopyright.setText("(C) Copyright 2018 by Anthony Wambua, Daniel Mbugua Inc.");
+		lblcCopyright.setHorizontalAlignment(SwingConstants.CENTER);
+		lblcCopyright.setForeground(Color.DARK_GRAY);
+		lblcCopyright.setFont(new Font("Times New Roman", Font.ITALIC, 16));
+		lblcCopyright.setBounds(436, 626, 420, 33);
+		panel.add(lblcCopyright);
 	}
 
 	public static void CurrentStock(){

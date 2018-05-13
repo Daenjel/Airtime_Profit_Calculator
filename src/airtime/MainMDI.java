@@ -56,12 +56,12 @@ public class MainMDI implements InternalFrameListener {
 			desktopPaneLock.setBackground(Color.CYAN);
 			
 			JLabel lblNewLabel = new JLabel();
-			lblNewLabel.setIcon(new ImageIcon(About.class.getResource("/images/images.png")));
+			lblNewLabel.setIcon(new ImageIcon(MainMDI.class.getResource("/images/images.png")));
 			lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
 			lblNewLabel.setForeground(Color.BLUE);
 			lblNewLabel.setFont(new Font("Harrington", Font.PLAIN, 48));
 			lblNewLabel.setVerticalAlignment(SwingConstants.CENTER);
-			lblNewLabel.setBounds(100, 10, 797, 426);
+			lblNewLabel.setBounds(100, 10, 797, 385);
 			lblNewLabel.setText("Airtime Profit Calculator");
 			desktopPaneLock.add(lblNewLabel);
 			
@@ -74,7 +74,15 @@ public class MainMDI implements InternalFrameListener {
 			lblLogo.setText("Calculations On Your Finger Tips");
 			desktopPaneLock.add(lblLogo);
 			
-						
+			JLabel lblcCopyright = new JLabel();
+			lblcCopyright.setVerticalAlignment(SwingConstants.CENTER);
+			lblcCopyright.setText("(C) Copyright 2018 by Anthony Wambua, Daniel Mbugua Inc.");
+			lblcCopyright.setHorizontalAlignment(SwingConstants.CENTER);
+			lblcCopyright.setForeground(Color.DARK_GRAY);
+			lblcCopyright.setFont(new Font("Times New Roman", Font.ITALIC, 16));
+			lblcCopyright.setBounds(315, 395, 420, 33);
+			desktopPaneLock.add(lblcCopyright);
+			
 			menuBar = new JMenuBar();
 			contentPane.setJMenuBar(menuBar);
 			

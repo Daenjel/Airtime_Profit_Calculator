@@ -41,8 +41,8 @@ public class About extends MainMDI implements InternalFrameListener {
 		internalFrameAbout.getContentPane().add(textArea);
 		
 				try{
-				String one = null;
-				String two = null;
+				String one = "";
+				String two = "";
 				InputStream fileIs = About.class.getResourceAsStream("about.txt");
 				BufferedReader rd = null;
 				rd = new BufferedReader(new InputStreamReader(fileIs));

@@ -387,7 +387,16 @@ public class Sales extends MainMDI implements InternalFrameListener {
 		JComboBox<Object> cbxChseSales = new JComboBox<Object>(sal);
 		cbxChseSales.setFont(new Font("Times New Roman", Font.ITALIC,18));
 		cbxChseSales.setBounds(1104, 55, 180, 27);
-		panel.add(cbxChseSales);		
+		panel.add(cbxChseSales);	
+		
+		JLabel lblcCopyright = new JLabel();
+		lblcCopyright.setVerticalAlignment(SwingConstants.CENTER);
+		lblcCopyright.setText("(C) Copyright 2018 by Anthony Wambua, Daniel Mbugua Inc.");
+		lblcCopyright.setHorizontalAlignment(SwingConstants.CENTER);
+		lblcCopyright.setForeground(Color.DARK_GRAY);
+		lblcCopyright.setFont(new Font("Times New Roman", Font.ITALIC, 16));
+		lblcCopyright.setBounds(436, 626, 420, 33);
+		panel.add(lblcCopyright);
 		
 		JLabel lblTotalSales = new JLabel("Total Cost:");
 		lblTotalSales.setFont(new Font("Times New Roman", Font.ITALIC, 16));

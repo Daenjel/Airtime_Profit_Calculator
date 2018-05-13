@@ -1,3 +1,7 @@
+
+
+
+
  It is important for any type of business to keep track of stock and profit. Airtime profits are among the difficult aspects to keep track of.
  By developing airtime profit calculator app, it will be easier for business people to have accurate data of their airtime sales. The app herein
  seeks to compute value of daily and periodic airtime purchase so as to help determine period sales, thus computing profits from airtime sales
