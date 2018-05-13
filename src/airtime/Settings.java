@@ -287,8 +287,8 @@ public class Settings extends MainMDI implements InternalFrameListener {
 		btnCancel.setFont(new Font("Segoe UI", Font.ITALIC,12));
 		btnCancel.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
-				new Sales();
-				contentPane.setVisible(false);
+				txtFieldCompanyName.setText(null);
+				txtFldCompanyProfit.setText(null);
 			}
 			
 		});
@@ -320,13 +320,11 @@ public class Settings extends MainMDI implements InternalFrameListener {
 		  	comboBoxEdtCompany.addItem(myRs.getString("CompanyName"));
 		  }		
 		  mystmt.close();
-		  System.out.println("Displays Added Company Name on ComboBoxEdtCompany");
-		
+		  System.out.println("Displays Added Company Name on ComboBoxEdtCompany");	
 	}
 	catch(Exception e) {
 		e.printStackTrace();
 	}
-	}	
-		
-	}
+  }		
+}
 

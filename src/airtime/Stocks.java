@@ -58,7 +58,7 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				new Stocks();
-				textFormat();
+				getStock();
 				}
 		});
 	}
@@ -89,8 +89,9 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 		btnCancel.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				new Sales();
-				contentPane.setVisible(false);
+				cmbCompanyName.setSelectedItem("-Select Company-");
+				cmbDeno.setSelectedItem("-Select Denomination-");
+				textField.setText(null);
 			}		
 		});
 		panel.add(btnCancel);
@@ -112,7 +113,6 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 		});
 		scrollPane_1.setViewportView(table_1);
 		CurrentStock();
-		getStock();
 		
 		JButton btnPrint = new JButton("Print Stock");
 		btnPrint.setIcon(new ImageIcon(Stocks.class.getResource("/images/ic_print_black_24dp_1x.png")));
@@ -311,11 +311,8 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 						e.printStackTrace();
 					}
 			}
-			}				
-			
-			
+			}						
 		});
-
 
 		JButton btnRemove = new JButton("Remove");
 		btnRemove.setIcon(new ImageIcon(Stocks.class.getResource("/images/ic_remove_shopping_cart_black_18dp_1x.png")));
@@ -367,8 +364,8 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 		
 		TotalCost = new JLabel("0.0");
 		TotalCost.setHorizontalAlignment(SwingConstants.RIGHT);
-		TotalCost.setForeground(Color.MAGENTA);
-		TotalCost.setFont(new Font("Times New Roman", Font.ITALIC, 22));
+		TotalCost.setForeground(Color.BLACK);
+		TotalCost.setFont(new Font("Times New Roman", Font.CENTER_BASELINE, 20));
 		TotalCost.setBounds(1142, 444, 108, 34);
 		panel.add(TotalCost);
 		
@@ -422,6 +419,7 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 			
 			DefaultTableModel model = new DefaultTableModel();
 			table_1.setModel(model);
+			table_1.setFont(new Font("Times New Roman", Font.BOLD, 16));
 			table_1.setShowVerticalLines(true);
 			table_1.setCellSelectionEnabled(true);
 			table_1.setColumnSelectionAllowed(true);
@@ -442,7 +440,7 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 				deno.add(myRs1.getString("Denominations"));
 				
 				model.addRow(new Object[]{myRs1.getString("Denominations")});
-		}	model.addRow(new Object[]{("Company Stock")});			
+		}	model.addRow(new Object[]{("Total Stk:")});			
 			String val ="";
 			
 			int i,j;
@@ -480,49 +478,45 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 		}
 		System.out.println("Displays Stocks");
 	}
-	public static void getStock(){
+	public static double getStock(){
 		
 		for(int j=0;j<deno.size();j++){
 			
 			sum = sum+Double.parseDouble(table_1.getValueAt(j, companys.size()+1).toString());
-			//TotalCost.setText(""+sum);
+			TotalCost.setText(""+sum);
 			System.out.println("Sum inner is" +sum);
 			
-			
-		}
-		sum=0;
-	}
-	public static void textFormat(){
-	boolean bool = true;
-	int ndx = 0;
+			boolean bool = true;
+			int ndx = 0;
 
-	NumberFormat cfLocal = NumberFormat.getCurrencyInstance();
+			NumberFormat cfLocal = NumberFormat.getCurrencyInstance();
 
-	String sCurSymbol = " ";
+			String sCurSymbol = " ";
 
-	DecimalFormatSymbols dfs = null;
+			DecimalFormatSymbols dfs = null;
 
-	if( cfLocal instanceof DecimalFormat ){ // determine if symbol is prefix or suffix
-	      dfs = ((DecimalFormat)cfLocal).getDecimalFormatSymbols();
-	      sCurSymbol = dfs.getCurrencySymbol();      
-	    }
-	Number n = null;
-	//String sText = Double.toString(getSum());;
-	String sText ="";    
-	ndx = sText.indexOf(sCurSymbol);
-	if( ndx == -1 ){ 
-	      if( bool ){
-	    	  sText = sCurSymbol + sText; }
-	      else{
-	    	  sText = sText + " " + sCurSymbol; }
-	    }
-	    try{
-	      n = cfLocal.parse( sText );
-	      TotalCost.setText( cfLocal.format( n ) );
-	    }
-	    catch( ParseException pe ) {
-	    	TotalCost.setText( "" ); }
-	    
+			if( cfLocal instanceof DecimalFormat ){ // determine if symbol is prefix or suffix
+			      dfs = ((DecimalFormat)cfLocal).getDecimalFormatSymbols();
+			      sCurSymbol = dfs.getCurrencySymbol();      
+			    }
+			Number n = null;
+			String sText = TotalCost.getText();    
+			ndx = sText.indexOf(sCurSymbol);
+			if( ndx == -1 ){ 
+			      if( bool ){
+			    	  sText = sCurSymbol + sText; }
+			      else{
+			    	  sText = sText + " " + sCurSymbol; }
+			    }
+			    try{
+			      n = cfLocal.parse( sText );
+			      TotalCost.setText( cfLocal.format( n ) );
+			    }
+			    catch( ParseException pe ) {
+			    	TotalCost.setText( "" ); }
+			    
+			}
+		
+		return sum=0;
 	}
 }
-

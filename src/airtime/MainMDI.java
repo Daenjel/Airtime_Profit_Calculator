@@ -174,6 +174,7 @@ public class MainMDI implements InternalFrameListener {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				new Stocks();
+				Stocks.getStock();
 				contentPane.setVisible(false);
 			}		
 		});

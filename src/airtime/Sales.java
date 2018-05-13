@@ -45,7 +45,6 @@ public class Sales extends MainMDI implements InternalFrameListener {
 	private JTextField txtFldEnterUnits;
 	private static JTable Salestable;
 	JDateChooser dateChooser;
-	//static DefaultTableModel model = new DefaultTableModel();
 	static JLabel TotalSales,TotalCost,Profit;
 	JComboBox<Object> cbxChseCompany;
 	JComboBox<Object> denomination;
@@ -63,8 +62,8 @@ public class Sales extends MainMDI implements InternalFrameListener {
     static double profit =0;
 	public static void main(String[] arg){
 		new Sales();
-		textFormat();
 		getSum();
+		textFormat();
 	}
 
 	public Sales() {
@@ -375,8 +374,6 @@ public class Sales extends MainMDI implements InternalFrameListener {
 				try{
 					MessageFormat header = new MessageFormat("Page Header");
 					MessageFormat footer = new MessageFormat("Page(1,number,integer");
-					SimpleDateFormat yesterdayformat = new SimpleDateFormat("E, dd MMM yyyy");
-					System.out.println(yesterdayformat.format(dateChooser.getDate()));
 					Salestable.print(JTable.PrintMode.FIT_WIDTH,header,footer);
 					
 				}catch(Exception e){
@@ -457,6 +454,9 @@ public class Sales extends MainMDI implements InternalFrameListener {
 							JOptionPane.showMessageDialog(null, "No Sales Recorded for "+chooser+" !!");
 							System.out.println("No Record DateChooser");
 							Salestable.setModel(DbUtils.resultSetToTableModel(myRs));
+							TotalSales.setText("Ksh0.0");
+							Profit.setText("Ksh0.0");
+							TotalCost.setText("Ksh0.0");
 						}else{
 						
 							try {
@@ -556,7 +556,7 @@ public class Sales extends MainMDI implements InternalFrameListener {
 								profit = Double.valueOf(df2.format(profit));
 								Profit.setText(""+profit);
 								System.out.println("Profit get is" +profit);
-								
+								textFormat();
 							}
 							sum=0;
 							cost=0;
@@ -607,8 +607,7 @@ public class Sales extends MainMDI implements InternalFrameListener {
 		      sCurSymbol = dfs.getCurrencySymbol();     
 		    }
 		Number n = null;
-		//String sText = Double.toString(getSum());;
-		String sText ="";    
+		String sText = TotalSales.getText();  
 		ndx = sText.indexOf(sCurSymbol);
 		if( ndx == -1 ){ 
 		      if( bool ){
@@ -619,9 +618,44 @@ public class Sales extends MainMDI implements InternalFrameListener {
 		    try{
 		      n = cfLocal.parse( sText );
 		      TotalSales.setText( cfLocal.format( n ) );
+				System.out.println("Text Format");
 		    }
 		    catch( ParseException pe ) {
-		    	TotalSales.setText( "" ); }
+		    	TotalSales.setText( "" );
+		    	}
+			String s1Text = Profit.getText();  
+			ndx = s1Text.indexOf(sCurSymbol);
+			if( ndx == -1 ){ 
+			      if( bool ){
+			    	  s1Text = sCurSymbol + s1Text; }
+			      else{
+			    	  s1Text = s1Text + " " + sCurSymbol; }
+			    }
+			    try{
+			      n = cfLocal.parse( s1Text );
+			      Profit.setText( cfLocal.format( n ) );
+					System.out.println("Text Format");
+			    }
+			    catch( ParseException pe ) {
+			    	Profit.setText( "" );
+			    	}
+				String s2Text = TotalCost.getText();  
+				ndx = s2Text.indexOf(sCurSymbol);
+				if( ndx == -1 ){ 
+				      if( bool ){
+				    	  s2Text = sCurSymbol + s2Text; }
+				      else{
+				    	  s2Text = s2Text + " " + sCurSymbol; }
+				    }
+				    try{
+				      n = cfLocal.parse( s2Text );
+				      TotalCost.setText( cfLocal.format( n ) );
+						System.out.println("Text Format");
+				    }
+				    catch( ParseException pe ) {
+				    	TotalCost.setText( "" );
+				    	}
+			    
 		}
 	public static void getSum(){
 		
@@ -641,6 +675,7 @@ public class Sales extends MainMDI implements InternalFrameListener {
 				Profit.setText(""+profit);
 				System.out.println("Profit inner is" +profit);
 				
+				
 			}
 			sum=0;
 			cost=0;
@@ -656,6 +691,9 @@ public class Sales extends MainMDI implements InternalFrameListener {
 					JOptionPane.showMessageDialog(null, "No Sales Recorded Today !!");
 					System.out.println("No Record Today");
 					Salestable.setModel(DbUtils.resultSetToTableModel(myRs));
+					TotalSales.setText("0.0");
+					Profit.setText("0.0");
+					TotalCost.setText("0.0");
 				}else{
 				
 					try {
@@ -755,7 +793,7 @@ public class Sales extends MainMDI implements InternalFrameListener {
 						profit = Double.valueOf(df2.format(profit));
 						Profit.setText(""+profit);
 						System.out.println("Profit today is" +profit);
-						
+						textFormat();
 					}
 					sum=0;
 					cost=0;
@@ -790,6 +828,9 @@ public class Sales extends MainMDI implements InternalFrameListener {
 					JOptionPane.showMessageDialog(null, "No Sales Recorded Yesterday!!");
 					System.out.println("No Record Yesterday");
 					Salestable.setModel(DbUtils.resultSetToTableModel(myRs));
+					TotalSales.setText("0.0");
+					Profit.setText("0.0");
+					TotalCost.setText("0.0");
 				}else{
 				
 					try {
@@ -922,6 +963,9 @@ public static void ThisMonthReport(){
 					JOptionPane.showMessageDialog(null, "No Sales Recorded This Month!!");
 					System.out.println("Record This Month");
 					Salestable.setModel(DbUtils.resultSetToTableModel(myRs));
+					TotalSales.setText("0.0");
+					Profit.setText("0.0");
+					TotalCost.setText("0.0");
 				}else{
 				
 					try {
@@ -1021,7 +1065,7 @@ public static void ThisMonthReport(){
 						profit = Double.valueOf(df2.format(profit));
 						Profit.setText(""+profit);
 						System.out.println("Profit get is" +profit);
-						
+						textFormat();
 					}
 					sum=0;
 					cost=0;
@@ -1056,6 +1100,9 @@ public static void LastMonthReport(){
 				JOptionPane.showMessageDialog(null, "No Sales Recorded Last Month!!");
 				System.out.println("No Record Last Month");
 				Salestable.setModel(DbUtils.resultSetToTableModel(myRs));
+				TotalSales.setText("0.0");
+				Profit.setText("0.0");
+				TotalCost.setText("0.0");
 			}else{
 			
 				try {
@@ -1155,7 +1202,7 @@ public static void LastMonthReport(){
 					profit = Double.valueOf(df2.format(profit));
 					Profit.setText(""+profit);
 					System.out.println("Profit get is" +profit);
-					
+					textFormat();
 				}
 				sum=0;
 				cost=0;
@@ -1189,6 +1236,9 @@ public static void LastMonthReport(){
 					JOptionPane.showMessageDialog(null, "No Sales Recorded This Year!!");
 					System.out.println("No Record Annual");
 					Salestable.setModel(DbUtils.resultSetToTableModel(myRs));
+					TotalSales.setText("0.0");
+					Profit.setText("0.0");
+					TotalCost.setText("0.0");
 				}else{
 					try {
 						mystmt = myconn.prepareStatement("select distinct companyName from sales where YEAR(Date) = YEAR(?)");
@@ -1289,7 +1339,7 @@ public static void LastMonthReport(){
 						profit = Double.valueOf(df2.format(profit));
 						Profit.setText(""+profit);
 						System.out.println("Profit get is" +profit);
-						
+						textFormat();
 					}
 					sum=0;
 					cost=0;
@@ -1304,6 +1354,5 @@ public static void LastMonthReport(){
 		        JOptionPane.showMessageDialog(null, e,"Error",0);
 		        e.printStackTrace();
 		    }
-	
 	}
 }
