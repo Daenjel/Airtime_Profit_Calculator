@@ -1,6 +1,7 @@
 package airtime;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Toolkit;
@@ -43,11 +44,13 @@ public class MainMDI implements InternalFrameListener {
 			
 			contentPane = new JFrame();
 			contentPane.setLayout(new FlowLayout());
-			contentPane.setIconImage(Toolkit.getDefaultToolkit().getImage(MainMDI.class.getResource("/images/images24x24.png")));			
+			contentPane.setIconImage(Toolkit.getDefaultToolkit().getImage(MainMDI.class.getResource("/images/aprocon.png")));			
 			contentPane.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			contentPane.setVisible(true);
-			contentPane.setExtendedState(JFrame.MAXIMIZED_BOTH);
+			//contentPane.setExtendedState(JFrame.MAXIMIZED_BOTH);
 			contentPane.setResizable(true);
+			Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+			contentPane.setSize(screenSize.width, screenSize.height);
 			contentPane.setTitle("Airtime Profit Calculator");
 			contentPane.setFont(new Font("Times New Roman", Font.ITALIC, 14));
 			contentPane.setContentPane(desktopPane);

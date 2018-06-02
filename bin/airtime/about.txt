@@ -1,5 +1,5 @@
    
-   ABOUT:
+  ABOUT:
    It is important for any type of business to keep track of stock and profit. Airtime profits are among the difficult aspects to keep track of.
    By developing airtime profit calculator app, it will be easier for business people to have accurate data of their airtime sales. The app
    herein seeks to compute value of daily and periodic airtime purchase so as to help determine period sales, thus computing profits from
@@ -7,74 +7,56 @@
    daily or periodic refills needed from wholesalers. Furthermore it will help to keep track of the fluctuating wholesale prices of the 
    different airtime companys. Therefore profits of close of business daily will be effectively isolated. 
  
-   FUNCTIONALIES:
+  FUNCTIONALIES:
+   			
+   	MENU SETTINGS :-
+   		*******************************************************************************************************************************************
+   		BUTTON Add -> Enables one to save Company Name and Company Profit to the database.
+   			
+   		BUTTON CheckStatus -> It prompts a dialog box displaying a list of Company Names and their Profit.
+   			
+   		BUTTON Update -> Enables one to change a Company's Profit.
+   				
+   		BUTTON Delete -> first you need to select a Company Name on the ComboBox "Edit Company Name" then
+   				      you can be able to permanently remove it from the database. The effect will be felt also
+   				      on Stocks and Sales.
+   								 
+   		BUTTON Cancel -> clears the typed characters on the input options.
+   			
+   	MENU STOCKS :-
+   		******************************************************************************************************************************************
+   		BUTTON Add -> simply adds new stock and displays it on the table.
+   		
+   		BUTTON Edit -> enables one to change the stocks data.
+   		
+   		BUTTON Remove -> enables one to delete a stock data.
+   		
+   		BUTTON Recently -> provides a list of recently added stock.
+   		
+   		BUTTON Cancel -> clears the typed characters on the input options.
+   				
+   	MENU SALES :-
+   		******************************************************************************************************************************************
+   		BUTTON Add -> simply adds new sales record and displays it on the table only if the record is listed on the stock.
+   		
+   		BUTTON Get -> first choose a date by pressing on the DateChooser icon on the far right, then press on "Get"
+   				     to display the sales record for that particular date.
+   		
+   		BUTTON Cancel -> clears the typed characters on the input options.
+   				
+   	MENU ADMIN :-
+   		******************************************************************************************************************************************
+   		BUTTON Lock -> disables all the functionalities.
+   		
+   		BUTTON UnLock -> subdues the Lock Button.
+   		
+   		BUTTON Exit -> shuts down the application.
+   				
+   	MENU HELP :-
+   		
+   		* Provides an over view on all what Airtime Profit Calculator is all about.
+   		BUTTON Cancel -> returns you back to the Sales menu.
     
-		("<html>Airtime Profit Calculator, Airtime Profit Calculator, Airtime Profit Calculator"
-				+ "<br>Airtime Profit Calculator, Airtime Profit Calculator, Airtime Profit Calculator"
-				+ "<br>Airtime Profit Calculator, Airtime Profit Calculator, Airtime Profit Calculator"
-				+"<br>                                                                          "
-				+"<br>                                                                          "
-				+"<br>                                                                          "
-				+"<br>                                                                          "
-				+"<br>                                                                          "
-				+"<br>                                                                          "
-				+"<br>(C) Copyright 2018 by Anthony Wambua, Inc. All Rights Reserved.          *"
-				+"<br>* 										                                "
-				+"<br>*                                                                         "
-				+"<br>* DISCLAIMER: The author  and publisher of this program have used their  *"
-				+"<br>* best efforts in preparing the program. These efforts include the       *"
-				+"<br>* development, research, and testing of the theories and programs        *"
-				+"<br>* to determine their effectiveness. The author and publisher make        *"
-				+"<br>* no warranty of any kind, expressed or implied, with regard to          *"
-				+"<br>* to the documentation contained in these program. The author            *"
-				+"<br>* and publisher shall not be liable in any event for incidental or       *"
-				+"<br>* consequential damages in connection with, or arising out of, the       *"
-				+"<br>* furnishing, performance, or use of these programs.</html>");
- 			
-				
-				("<html>Airtime Profit Calculator, Airtime Profit Calculator, Airtime Profit Calculator"
-				+ "<br>Airtime Profit Calculator, Airtime Profit Calculator, Airtime Profit Calculator"
-				+ "<br>Airtime Profit Calculator, Airtime Profit Calculator, Airtime Profit Calculator"
-				+"<br>                                                                          "
-				+"<br>                                                                          "
-				+"<br>                                                                          "
-				+"<br>                                                                          "
-				+"<br>                                                                          "
-				+"<br>                                                                          "
-				+"<br>(C) Copyright 2018 by Anthony Wambua, Inc. All Rights Reserved.          *"
-				+"<br>* 										                                "
-				+"<br>*                                                                         "
-				+"<br>* DISCLAIMER: The author  and publisher of this program have used their  *"
-				+"<br>* best efforts in preparing the program. These efforts include the       *"
-				+"<br>* development, research, and testing of the theories and programs        *"
-				+"<br>* to determine their effectiveness. The author and publisher make        *"
-				+"<br>* no warranty of any kind, expressed or implied, with regard to          *"
-				+"<br>* to the documentation contained in these program. The author            *"
-				+"<br>* and publisher shall not be liable in any event for incidental or       *"
-				+"<br>* consequential damages in connection with, or arising out of, the       *"
-				+"<br>* furnishing, performance, or use of these programs.</html>");
-				
-				("<html>Airtime Profit Calculator, Airtime Profit Calculator, Airtime Profit Calculator"
-				+ "<br>Airtime Profit Calculator, Airtime Profit Calculator, Airtime Profit Calculator"
-				+ "<br>Airtime Profit Calculator, Airtime Profit Calculator, Airtime Profit Calculator"
-				+"<br>                                                                          "
-				+"<br>                                                                          "
-				+"<br>                                                                          "
-				+"<br>                                                                          "
-				+"<br>                                                                          "
-				+"<br>                                                                          "
-				+"<br>(C) Copyright 2018 by Anthony Wambua, Inc. All Rights Reserved.          *"
-				+"<br>* 										                                "
-				+"<br>*                                                                         "
-				+"<br>* DISCLAIMER: The author  and publisher of this program have used their  *"
-				+"<br>* best efforts in preparing the program. These efforts include the       *"
-				+"<br>* development, research, and testing of the theories and programs        *"
-				+"<br>* to determine their effectiveness. The author and publisher make        *"
-				+"<br>* no warranty of any kind, expressed or implied, with regard to          *"
-				+"<br>* to the documentation contained in these program. The author            *"
-				+"<br>* and publisher shall not be liable in any event for incidental or       *"
-				+"<br>* consequential damages in connection with, or arising out of, the       *"
-				+"<br>* furnishing, performance, or use of these programs.</html>");
   DEVELOPERS:
   
     Anthony Wambua,
@@ -84,7 +66,7 @@
     Skype: anthonywambua
     
     Mbugua Daniel,
-    Software developer.
+    Software developer | Speak Java.
     Phone: +254 733 745 544
     Email: daenjelkirigo@gmail.com
     
