@@ -21,7 +21,7 @@ import javax.swing.UIManager;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameListener;
 	
-public class MainMDI implements InternalFrameListener {
+public class MainMDI extends SplashScreen implements InternalFrameListener {
 
 		public JFrame contentPane;
 		public JMenuBar menuBar;
@@ -41,6 +41,22 @@ public class MainMDI implements InternalFrameListener {
 		public JDesktopPane desktopPaneLock = new JDesktopPane();
 	
 	public MainMDI() {
+		try {
+            //here you can put the selected theme class name in JTattoo
+            UIManager.setLookAndFeel("com.jtattoo.plaf.acryl.AcrylLookAndFeel");
+ 
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(Sales.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(Sales.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(Sales.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(Sales.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
 			
 			contentPane = new JFrame();
 			contentPane.setLayout(new FlowLayout());
@@ -233,22 +249,6 @@ public class MainMDI implements InternalFrameListener {
 			SwingUtilities.invokeLater(new Runnable() {
 				public void run() {
 					//new MainMDI();
-					   try {
-				            //here you can put the selected theme class name in JTattoo
-				            UIManager.setLookAndFeel("com.jtattoo.plaf.acryl.AcrylLookAndFeel");
-				 
-				        } catch (ClassNotFoundException ex) {
-				            java.util.logging.Logger.getLogger(MainMDI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-				            
-				        } catch (InstantiationException ex) {
-				            java.util.logging.Logger.getLogger(MainMDI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-				            
-				        } catch (IllegalAccessException ex) {
-				            java.util.logging.Logger.getLogger(MainMDI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-				            
-				        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-				            java.util.logging.Logger.getLogger(MainMDI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-				        }
 					new Sales();
 					Sales.getSum();
 				}

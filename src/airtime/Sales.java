@@ -68,6 +68,7 @@ public class Sales extends MainMDI implements InternalFrameListener {
 
 	public Sales() {
 		myconn = JConnection.ConnecrDb();	
+	
 		JInternalFrame internalFrameSales = new JInternalFrame("Sales");
 		internalFrameSales.setFrameIcon(new ImageIcon(Sales.class.getResource("/images/ic_add_shopping_cart_black_18dp_1x.png")));
 		internalFrameSales.setBounds(10, 0, 414, 229);
