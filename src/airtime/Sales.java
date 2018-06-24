@@ -89,7 +89,7 @@ public class Sales extends MainMDI implements InternalFrameListener {
 		JButton btnCancel = new JButton("Cancel");
 		btnCancel.setIcon(new ImageIcon(Sales.class.getResource("/images/ic_exit_to_app_black_24dp_1x.png")));
 		btnCancel.setFont(new Font("Segoe UI", Font.ITALIC,12));
-		btnCancel.setBounds(365,374,100,40);
+		btnCancel.setBounds(428,374,100,40);
 		btnCancel.addActionListener(new ActionListener(){
 
 			@Override
@@ -582,6 +582,20 @@ public class Sales extends MainMDI implements InternalFrameListener {
 				        e.printStackTrace();
 				    }	
 				}
+			}
+			
+		});
+		
+		JButton btnEdit = new JButton("Edit");
+		btnEdit.setIcon(new ImageIcon(Sales.class.getResource("/images/ic_edit_black_24dp_1x.png")));
+		btnEdit.setFont(new Font("Segoe UI", Font.ITALIC, 12));
+		btnEdit.setBounds(305, 374, 100, 40);
+		panel.add(btnEdit);
+		btnEdit.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				new AdminAuth();
 			}
 			
 		});

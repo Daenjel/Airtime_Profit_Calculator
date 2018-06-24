@@ -20,6 +20,7 @@ import javax.swing.JComboBox;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.event.InternalFrameListener;
@@ -52,25 +53,31 @@ public class Settings extends MainMDI implements InternalFrameListener {
 		internalFrameCompany.setVisible(true);
 		desktopPane.add(internalFrameCompany);
 		internalFrameCompany.getContentPane().setLayout(null);
+		
+		JPanel panel = new JPanel();
+		panel.setBounds(10, 0, 414, 229);
+		panel.setSize(1340,700);
+		internalFrameCompany.getContentPane().add(panel);
+		panel.setLayout(null);
 				
 		JLabel lblAddCompanyDetails = new JLabel("Add Company Details");
 		lblAddCompanyDetails.setFont(new Font("Times New Roman", Font.ITALIC, 20));
 		lblAddCompanyDetails.setBounds(235, 123, 202, 25);
-		internalFrameCompany.getContentPane().add(lblAddCompanyDetails);
+		panel.add(lblAddCompanyDetails);
 		
 		JLabel lblCompanyName = new JLabel("Company Name:");
 		lblCompanyName.setFont(new Font("Times New Roman", Font.ITALIC, 20));
 		lblCompanyName.setBounds(121, 196, 180, 25);
-		internalFrameCompany.getContentPane().add(lblCompanyName);
+		panel.add(lblCompanyName);
 		
 		JLabel lblCompanyProfit = new JLabel("Company Profit:");
 		lblCompanyProfit.setFont(new Font("Times New Roman", Font.ITALIC, 20));
 		lblCompanyProfit.setBounds(121, 252, 202, 25);
-		internalFrameCompany.getContentPane().add(lblCompanyProfit);
+		panel.add(lblCompanyProfit);
 		
 		txtFieldCompanyName = new JTextField();
 		txtFieldCompanyName.setBounds(311, 196, 245, 25);
-		internalFrameCompany.getContentPane().add(txtFieldCompanyName);
+		panel.add(txtFieldCompanyName);
 		txtFieldCompanyName.setColumns(10);
 		
 		txtFldCompanyProfit = new JTextField();
@@ -86,13 +93,13 @@ public class Settings extends MainMDI implements InternalFrameListener {
 		});
 		txtFldCompanyProfit.setColumns(10);
 		txtFldCompanyProfit.setBounds(311, 252, 245, 25);
-		internalFrameCompany.getContentPane().add(txtFldCompanyProfit);
+		panel.add(txtFldCompanyProfit);
 				
 		comboBoxEdtCompany = new JComboBox<String>();
 		comboBoxEdtCompany.setBounds(937, 193, 245, 25);
 		comboBoxEdtCompany.addItem("-Select Company-");
 		comboBoxEdtCompany.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-		internalFrameCompany.getContentPane().add(comboBoxEdtCompany);
+		panel.add(comboBoxEdtCompany);
 				try
 				{				
 					mystmt = myconn.prepareStatement("select CompanyName from company");
@@ -115,13 +122,13 @@ public class Settings extends MainMDI implements InternalFrameListener {
 		JLabel lblEdtCompanyName = new JLabel("Company Name:");
 		lblEdtCompanyName.setFont(new Font("Times New Roman", Font.ITALIC, 20));
 		lblEdtCompanyName.setBounds(747, 193, 180, 25);
-		internalFrameCompany.getContentPane().add(lblEdtCompanyName);
+		panel.add(lblEdtCompanyName);
 		
 		JButton btnEditCompany = new JButton("Update");
 		btnEditCompany.setIcon(new ImageIcon(Settings.class.getResource("/images/ic_system_update_alt_black_24dp_1x.png")));
 		btnEditCompany.setFont(new Font("Segoe UI", Font.ITALIC, 12));
 		btnEditCompany.setBounds(944, 367, 105, 33);
-		internalFrameCompany.getContentPane().add(btnEditCompany);
+		panel.add(btnEditCompany);
 		btnEditCompany.addActionListener(new ActionListener(){
 
 			@Override
@@ -162,7 +169,7 @@ public class Settings extends MainMDI implements InternalFrameListener {
 		btnDeleteCompany.setIcon(new ImageIcon(Settings.class.getResource("/images/ic_delete_forever_black_24dp_1x.png")));
 		btnDeleteCompany.setFont(new Font("Segoe UI", Font.ITALIC, 12));
 		btnDeleteCompany.setBounds(1092, 367, 105, 33);
-		internalFrameCompany.getContentPane().add(btnDeleteCompany);
+		panel.add(btnDeleteCompany);
 		btnDeleteCompany.addActionListener(new ActionListener(){
 
 			@Override
@@ -202,8 +209,8 @@ public class Settings extends MainMDI implements InternalFrameListener {
 		JButton btnAddCompany = new JButton("Add");
 		btnAddCompany.setIcon(new ImageIcon(Settings.class.getResource("/images/ic_create_new_folder_black_24dp_1x.png")));
 		btnAddCompany.setFont(new Font("Segoe UI", Font.ITALIC, 12));
-		btnAddCompany.setBounds(235, 367, 90, 33);
-		internalFrameCompany.getContentPane().add(btnAddCompany);
+		btnAddCompany.setBounds(287, 326, 90, 33);
+		panel.add(btnAddCompany);
 		btnAddCompany.addActionListener(new ActionListener(){
 
 			@Override
@@ -256,17 +263,17 @@ public class Settings extends MainMDI implements InternalFrameListener {
 		JLabel lblEditCompanyDetails = new JLabel("Edit Company Details");
 		lblEditCompanyDetails.setFont(new Font("Times New Roman", Font.ITALIC, 20));
 		lblEditCompanyDetails.setBounds(858, 123, 202, 25);
-		internalFrameCompany.getContentPane().add(lblEditCompanyDetails);
+		panel.add(lblEditCompanyDetails);
 		
 		JLabel lblSettingCompanyDetails = new JLabel("Setting Up Company Details");
 		lblSettingCompanyDetails.setFont(new Font("Times New Roman", Font.ITALIC, 20));
 		lblSettingCompanyDetails.setBounds(527, 51, 245, 25);
-		internalFrameCompany.getContentPane().add(lblSettingCompanyDetails);
+		panel.add(lblSettingCompanyDetails);
 		
 		JLabel lblEdtProfit = new JLabel("Edit Profit:");
 		lblEdtProfit.setFont(new Font("Times New Roman", Font.ITALIC, 20));
 		lblEdtProfit.setBounds(747, 252, 202, 25);
-		internalFrameCompany.getContentPane().add(lblEdtProfit);
+		panel.add(lblEdtProfit);
 		
 		txtFldEdtProfit = new JTextField();
 		txtFldEdtProfit.addKeyListener(new KeyAdapter() {
@@ -281,11 +288,11 @@ public class Settings extends MainMDI implements InternalFrameListener {
 		});
 		txtFldEdtProfit.setColumns(10);
 		txtFldEdtProfit.setBounds(937, 252, 245, 25);
-		internalFrameCompany.getContentPane().add(txtFldEdtProfit);
+		panel.add(txtFldEdtProfit);
 		
 		JButton btnCancel = new JButton("Cancel");
 		btnCancel.setIcon(new ImageIcon(Settings.class.getResource("/images/ic_exit_to_app_black_24dp_1x.png")));
-		btnCancel.setBounds(376, 367, 105, 33);
+		btnCancel.setBounds(428, 326, 105, 33);
 		btnCancel.setFont(new Font("Segoe UI", Font.ITALIC,12));
 		btnCancel.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
@@ -294,13 +301,13 @@ public class Settings extends MainMDI implements InternalFrameListener {
 			}
 			
 		});
-		internalFrameCompany.getContentPane().add(btnCancel);
+		panel.add(btnCancel);
 		
 		JButton btnCheckStatus = new JButton("Check Status");
 		btnCheckStatus.setIcon(new ImageIcon(Settings.class.getResource("/images/ic_receipt_black_24dp_1x.png")));
 		btnCheckStatus.setFont(new Font("Segoe UI", Font.ITALIC, 12));
 		btnCheckStatus.setBounds(629, 367, 129, 33);
-		internalFrameCompany.getContentPane().add(btnCheckStatus);
+		panel.add(btnCheckStatus);
 		btnCheckStatus.addActionListener(new ActionListener(){
 
 			@Override
@@ -317,7 +324,66 @@ public class Settings extends MainMDI implements InternalFrameListener {
 		lblcCopyright.setForeground(Color.DARK_GRAY);
 		lblcCopyright.setFont(new Font("Times New Roman", Font.ITALIC, 16));
 		lblcCopyright.setBounds(436, 626, 420, 33);
-		internalFrameCompany.add(lblcCopyright);
+		panel.add(lblcCopyright);
+		
+		JPanel panel1 = new JPanel();
+		panel1.setBackground(Color.LIGHT_GRAY);
+		panel1.setBounds(38, 425, 459, 183);
+		panel.add(panel1);
+		panel1.setLayout(null);
+		
+		JTextField txtWSalerID = new JTextField();
+		txtWSalerID.setColumns(10);
+		txtWSalerID.setBounds(209, 38, 186, 25);
+		panel1.add(txtWSalerID);
+		
+		JLabel lblWholsalerId = new JLabel("WholeSaler ID:");
+		lblWholsalerId.setFont(new Font("Times New Roman", Font.ITALIC, 20));
+		lblWholsalerId.setBounds(52, 38, 129, 24);
+		panel1.add(lblWholsalerId);
+		
+		JLabel lblDelWSaler = new JLabel("WholeSaler ID:");
+		lblDelWSaler.setFont(new Font("Times New Roman", Font.ITALIC, 20));
+		lblDelWSaler.setBounds(52, 73, 129, 24);
+		lblDelWSaler.setVisible(false);
+		panel1.add(lblDelWSaler);
+		
+		JComboBox<String> cmbWSaler = new JComboBox<String>();
+		cmbWSaler.setFont(new Font("Times New Roman", Font.ITALIC, 20));
+		cmbWSaler.setBounds(209, 74, 186, 25);
+		cmbWSaler.addItem("-WholeSaler ID-");
+		cmbWSaler.setVisible(false);
+		panel1.add(cmbWSaler);
+		
+		JButton btnAddWSaler = new JButton("Add");
+		btnAddWSaler.setIcon(new ImageIcon(Settings.class.getResource("/images/ic_create_new_folder_black_24dp_1x.png")));
+		btnAddWSaler.setFont(new Font("Segoe UI", Font.ITALIC, 12));
+		btnAddWSaler.setBounds(73, 125, 90, 33);
+		panel1.add(btnAddWSaler);
+		
+		JButton btnStatusWSaler = new JButton("Check Status");
+		btnStatusWSaler.setIcon(new ImageIcon(Settings.class.getResource("/images/ic_receipt_black_24dp_1x.png")));
+		btnStatusWSaler.setFont(new Font("Segoe UI", Font.ITALIC, 12));
+		btnStatusWSaler.setBounds(184, 125, 129, 33);
+		panel1.add(btnStatusWSaler);
+		
+		JButton btnDelWSaler = new JButton("Delete");
+		btnDelWSaler.setIcon(new ImageIcon(Settings.class.getResource("/images/ic_delete_forever_black_24dp_1x.png")));
+		btnDelWSaler.setFont(new Font("Segoe UI", Font.ITALIC, 12));
+		btnDelWSaler.setBounds(328, 125, 105, 33);
+		panel1.add(btnDelWSaler);
+		btnDelWSaler.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				lblWholsalerId.setVisible(false);
+				txtWSalerID.setVisible(false);
+				lblDelWSaler.setVisible(true);
+				cmbWSaler.setVisible(true);
+			}
+			
+		});
+				
 		
 	}
 	protected void  addToComboEdit(){

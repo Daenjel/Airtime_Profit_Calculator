@@ -45,7 +45,7 @@ import javax.swing.SwingConstants;
 public class Stocks extends MainMDI implements InternalFrameListener {
 	private static JTable table_1;
 	private JTextField textField;
-	static JLabel TotalCost;
+	static JLabel lblTotalSales;
 	static double sum = 0;
 	static DecimalFormat df2 = new DecimalFormat(".##");
 	private JComboBox<Object> cmbCompanyName;
@@ -54,6 +54,7 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 	static ArrayList<String> deno;
 	private JButton btnCurrentStock;
 	static Connection myconn = null;
+	private JTextField txtWSalerID;
 	public static void main(String[] args){
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -78,14 +79,14 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 		panel.setLayout(null);
 		
 		JLabel lblStock = new JLabel("Stocks");
-		lblStock.setFont(new Font("Times New Roman", Font.ITALIC, 22));
 		lblStock.setBounds(642, 22, 83, 40);
+		lblStock.setFont(new Font("Times New Roman", Font.ITALIC, 22));
 		panel.add(lblStock);
 		
 		JButton btnCancel = new JButton("Cancel");
+		btnCancel.setBounds(611, 573, 100, 40);
 		btnCancel.setIcon(new ImageIcon(Stocks.class.getResource("/images/ic_exit_to_app_black_24dp_1x.png")));
 		btnCancel.setFont(new Font("Segoe UI", Font.ITALIC,12));
-		btnCancel.setBounds(611,573,100,40);
 		btnCancel.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -115,9 +116,9 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 		CurrentStock();
 		
 		JButton btnPrint = new JButton("Print Stock");
+		btnPrint.setBounds(897, 508, 121, 40);
 		btnPrint.setIcon(new ImageIcon(Stocks.class.getResource("/images/ic_print_black_24dp_1x.png")));
 		btnPrint.setFont(new Font("Segoe UI", Font.ITALIC, 12));
-		btnPrint.setBounds(897, 508, 121, 40);
 		panel.add(btnPrint);
 		btnPrint.addActionListener(new ActionListener(){
 
@@ -136,9 +137,9 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 		});
 		
 		JButton btnAdd = new JButton("Add");
+		btnAdd.setBounds(240, 430, 90, 40);
 		btnAdd.setIcon(new ImageIcon(Stocks.class.getResource("/images/ic_library_add_black_24dp_1x.png")));
 		btnAdd.setFont(new Font("Segoe UI", Font.ITALIC, 12));
-		btnAdd.setBounds(240, 371, 90, 40);
 		panel.add(btnAdd);
 		btnAdd.addActionListener(new ActionListener(){
 
@@ -191,10 +192,6 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 						   textField.getText().toString();
 					    }
 					check.close();
-				
-					cmbCompanyName.setSelectedItem("-Select Company-");
-					cmbDeno.setSelectedItem("-Select Denomination-");
-					textField.setText(null);
 				}catch (Exception e){
 					JOptionPane.showMessageDialog(null,e);
 					e.printStackTrace();
@@ -209,34 +206,34 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 		
 		
 		JLabel lblAddNewStock = new JLabel("Add New Stock");
-		lblAddNewStock.setFont(new Font("Times New Roman", Font.ITALIC, 22));
 		lblAddNewStock.setBounds(255, 89, 219, 40);
+		lblAddNewStock.setFont(new Font("Times New Roman", Font.ITALIC, 22));
 		panel.add(lblAddNewStock);
 		
 		JLabel lblRequestNewStock = new JLabel("Current Stock");
-		lblRequestNewStock.setFont(new Font("Times New Roman", Font.ITALIC, 22));
 		lblRequestNewStock.setBounds(856, 89, 144, 40);
+		lblRequestNewStock.setFont(new Font("Times New Roman", Font.ITALIC, 22));
 		panel.add(lblRequestNewStock);
 		
 		JLabel lblCompanyName = new JLabel("Company Name:");
+		lblCompanyName.setBounds(156, 220, 171, 30);
 		lblCompanyName.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-		lblCompanyName.setBounds(156, 161, 171, 30);
 		panel.add(lblCompanyName);
 		
 		JLabel lblDenominations = new JLabel("Denominations :");
+		lblDenominations.setBounds(156, 283, 171, 30);
 		lblDenominations.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-		lblDenominations.setBounds(156, 224, 171, 30);
 		panel.add(lblDenominations);
 		
 		JLabel lblUnits = new JLabel("Units:");
+		lblUnits.setBounds(210, 357, 69, 30);
 		lblUnits.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-		lblUnits.setBounds(210, 298, 69, 30);
 		panel.add(lblUnits);
 		
 		cmbCompanyName = new JComboBox<Object>();
+		cmbCompanyName.setBounds(337, 225, 230, 25);
 		cmbCompanyName.setFont(new Font("Times New Roman", Font.ITALIC, 20));
 		cmbCompanyName.addItem("-Select Company-");
-		cmbCompanyName.setBounds(337, 166, 230, 25);
 		panel.add(cmbCompanyName);
 		try {
 			Statement mystmt= myconn.createStatement();							
@@ -254,11 +251,12 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 		
 		String [] deno = {"-Select Denomination-","10","20","50","100","250","500","1000"};
 		cmbDeno = new JComboBox<Object>(deno);
+		cmbDeno.setBounds(337, 288, 230, 25);
 		cmbDeno.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-		cmbDeno.setBounds(337, 229, 230, 25);
 		panel.add(cmbDeno);
 		
 		textField = new JTextField();
+		textField.setBounds(336, 357, 231, 30);
 		textField.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyTyped(KeyEvent evt) {
@@ -269,14 +267,13 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 				JOptionPane.showMessageDialog(null, "Cannot Accept Letters");}
 			}
 		});
-		textField.setBounds(336, 298, 231, 30);
 		panel.add(textField);
 		textField.setColumns(10);
 		
 		JButton btnEdit = new JButton("Edit");
+		btnEdit.setBounds(370, 430, 83, 40);
 		btnEdit.setIcon(new ImageIcon(Stocks.class.getResource("/images/ic_edit_black_24dp_1x.png")));
 		btnEdit.setFont(new Font("Segoe UI", Font.ITALIC, 12));
-		btnEdit.setBounds(370, 371, 83, 40);
 		panel.add(btnEdit);
 		btnEdit.addActionListener(new ActionListener(){
 
@@ -290,9 +287,9 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 					JOptionPane.showMessageDialog(null,"Number of Units are not declared");
 				}else{
 					try{						
-						PreparedStatement mystmt = myconn.prepareStatement("update stocks set Denominations =?, Units =? where CompanyName =?");
-						mystmt.setString(1,cmbDeno.getSelectedItem().toString());
-						mystmt.setString(2,textField.getText().toString());
+						PreparedStatement mystmt = myconn.prepareStatement("update stocks set  Units =? where Denominations =? and CompanyName =?");
+						mystmt.setString(1,textField.getText().toString());
+						mystmt.setString(2,cmbDeno.getSelectedItem().toString());
 						mystmt.setString(3,cmbCompanyName.getSelectedItem().toString());
 											
 						mystmt.execute();
@@ -315,6 +312,7 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 		});
 
 		JButton btnRemove = new JButton("Remove");
+		btnRemove.setBounds(484, 430, 100, 40);
 		btnRemove.setIcon(new ImageIcon(Stocks.class.getResource("/images/ic_remove_shopping_cart_black_18dp_1x.png")));
 		btnRemove.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -359,65 +357,104 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 		});
 		
 		btnRemove.setFont(new Font("Segoe UI", Font.ITALIC, 12));
-		btnRemove.setBounds(484, 371, 100, 40);
 		panel.add(btnRemove);
 		
-		TotalCost = new JLabel("0.0");
-		TotalCost.setHorizontalAlignment(SwingConstants.RIGHT);
-		TotalCost.setForeground(Color.BLACK);
-		TotalCost.setFont(new Font("Times New Roman", Font.CENTER_BASELINE, 20));
-		TotalCost.setBounds(1142, 444, 108, 34);
-		panel.add(TotalCost);
+		lblTotalSales = new JLabel("0.0");
+		lblTotalSales.setBounds(1160, 444, 90, 30);
+		lblTotalSales.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblTotalSales.setForeground(Color.BLACK);
+		lblTotalSales.setFont(new Font("Times New Roman", Font.CENTER_BASELINE, 20));
+		panel.add(lblTotalSales);
 		
-		JButton btnRecentStock = new JButton("Recent Stock");
-		btnRecentStock.addActionListener(new ActionListener() {
+		JButton btnRefillStock = new JButton("Refill Stock");
+		btnRefillStock.setBounds(1121, 99, 129, 30);
+		btnRefillStock.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				lblRequestNewStock.setText("Recent Stock");
+				lblRequestNewStock.setText("Refill Stock");
 				try{				
 					PreparedStatement mystmt = myconn.prepareStatement("select Date,CompanyName,Denominations,Units from stocks order by date desc");
 					ResultSet myRs = mystmt.executeQuery();
 					table_1.setModel(DbUtils.resultSetToTableModel(myRs));
-					System.out.println("Displays Recent Stocks");
+					System.out.println("Displays Refill Stocks");
 				}catch (Exception e){
 					e.printStackTrace();
 				}
-				btnRecentStock.setVisible(false);
+				btnRefillStock.setVisible(false);
 				btnCurrentStock.setVisible(true);
 			}
 		});
-		btnRecentStock.setIcon(new ImageIcon(Stocks.class.getResource("/images/ic_storage_black_18dp_1x.png")));
-		btnRecentStock.setFont(new Font("Segoe UI", Font.ITALIC, 12));
-		btnRecentStock.setBounds(1121, 99, 129, 30);
-		panel.add(btnRecentStock);
+		btnRefillStock.setIcon(new ImageIcon(Stocks.class.getResource("/images/ic_storage_black_18dp_1x.png")));
+		btnRefillStock.setFont(new Font("Segoe UI", Font.ITALIC, 12));
+		panel.add(btnRefillStock);
 		
 		btnCurrentStock = new JButton("Current Stock");
+		btnCurrentStock.setBounds(1121, 99, 129, 30);
 		btnCurrentStock.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				lblRequestNewStock.setText("Current Stock");
 				CurrentStock();
 				System.out.println("Displays Current Stocks");
 				btnCurrentStock.setVisible(false);
-				btnRecentStock.setVisible(true);
+				btnRefillStock.setVisible(true);
 			}
 		});
 		btnCurrentStock.setIcon(new ImageIcon(Stocks.class.getResource("/images/ic_storage_black_18dp_1x.png")));
 		btnCurrentStock.setFont(new Font("Segoe UI", Font.ITALIC, 12));
-		btnCurrentStock.setBounds(1121, 99, 129, 30);
 		panel.add(btnCurrentStock);
 		
-		JLabel lblTotalCost = new JLabel("Total Cost:");
-		lblTotalCost.setFont(new Font("Times New Roman", Font.ITALIC, 22));
-		lblTotalCost.setBounds(1024, 441, 108, 40);
-		panel.add(lblTotalCost);
+		JLabel Label_10 = new JLabel("Total Sales:");
+		Label_10.setBounds(1060, 440, 90, 30);
+		Label_10.setFont(new Font("Times New Roman", Font.ITALIC, 18));
+		panel.add(Label_10);
 		
 		JLabel lblcCopyright = new JLabel();
+		lblcCopyright.setBounds(436, 626, 420, 33);
 		lblcCopyright.setVerticalAlignment(SwingConstants.CENTER);
 		lblcCopyright.setText("(C) Copyright 2018 by Anthony Wambua, Daniel Mbugua Inc.");
 		lblcCopyright.setHorizontalAlignment(SwingConstants.CENTER);
 		lblcCopyright.setForeground(Color.DARK_GRAY);
 		lblcCopyright.setFont(new Font("Times New Roman", Font.ITALIC, 16));
-		lblcCopyright.setBounds(436, 626, 420, 33);
 		panel.add(lblcCopyright);
+		
+		JLabel label = new JLabel("Total Cost:");
+		label.setBounds(666, 440, 90, 30);
+		label.setFont(new Font("Times New Roman", Font.ITALIC, 18));
+		panel.add(label);
+		
+		JLabel lblTotalCost = new JLabel("0.0");
+		lblTotalCost.setBounds(755, 440, 68, 34);
+		lblTotalCost.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblTotalCost.setForeground(Color.BLACK);
+		lblTotalCost.setFont(new Font("Times New Roman", Font.BOLD, 20));
+		panel.add(lblTotalCost);
+		
+		JLabel lblProft = new JLabel("Profit:");
+		lblProft.setBounds(874, 440, 69, 30);
+		lblProft.setFont(new Font("Times New Roman", Font.ITALIC, 18));
+		panel.add(lblProft);
+		
+		JLabel lblProfit = new JLabel("0.0");
+		lblProfit.setBounds(953, 442, 77, 28);
+		lblProfit.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblProfit.setForeground(Color.BLACK);
+		lblProfit.setFont(new Font("Times New Roman", Font.BOLD, 20));
+		panel.add(lblProfit);
+		
+		txtWSalerID = new JTextField();
+		txtWSalerID.setColumns(10);
+		txtWSalerID.setBounds(336, 169, 231, 30);
+		panel.add(txtWSalerID);
+		
+		JLabel lblWholsalerId = new JLabel("WholeSaler ID:");
+		lblWholsalerId.setFont(new Font("Times New Roman", Font.ITALIC, 20));
+		lblWholsalerId.setBounds(156, 169, 171, 30);
+		panel.add(lblWholsalerId);
+		
+		JComboBox<Object> cmbWholSaler = new JComboBox<Object>();
+		cmbWholSaler.setFont(new Font("Times New Roman", Font.ITALIC, 20));
+		cmbWholSaler.setBounds(1077, 37, 171, 25);
+		cmbWholSaler.addItem("-WholeSaler ID-");
+		panel.add(cmbWholSaler);
 	}
 
 	public static void CurrentStock(){
@@ -492,7 +529,7 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 		for(int j=0;j<deno.size();j++){
 			
 			sum = sum+Double.parseDouble(table_1.getValueAt(j, companys.size()+1).toString());
-			TotalCost.setText(""+sum);
+			lblTotalSales.setText(""+sum);
 			System.out.println("Sum inner is" +sum);
 			
 			boolean bool = true;
@@ -509,7 +546,7 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 			      sCurSymbol = dfs.getCurrencySymbol();      
 			    }
 			Number n = null;
-			String sText = TotalCost.getText();    
+			String sText = lblTotalSales.getText();    
 			ndx = sText.indexOf(sCurSymbol);
 			if( ndx == -1 ){ 
 			      if( bool ){
@@ -519,10 +556,10 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 			    }
 			    try{
 			      n = cfLocal.parse( sText );
-			      TotalCost.setText( cfLocal.format( n ) );
+			      lblTotalSales.setText( cfLocal.format( n ) );
 			    }
 			    catch( ParseException pe ) {
-			    	TotalCost.setText( "" ); }
+			    	lblTotalSales.setText( "" ); }
 			    
 			}
 		
