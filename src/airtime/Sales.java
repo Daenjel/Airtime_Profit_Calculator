@@ -29,6 +29,7 @@ import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -595,8 +596,21 @@ public class Sales extends MainMDI implements InternalFrameListener {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				new AdminAuth();
-			}
+				JPasswordField pf = new JPasswordField();
+				int response = JOptionPane.showConfirmDialog(null, pf,"Require Administrator Priviledges!!",
+						JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+				 
+				if (response == JOptionPane.YES_OPTION) {
+						
+				    	  String password = new String(pf.getPassword());
+				    	  System.err.println("You entered: " + password);
+				    	  if(password.equals("4321")){
+								 System.out.println("Not Deleted");
+				    	  }else{
+						 System.out.println("Deleted");
+				    	  }
+				    }
+				}
 			
 		});
 		cbxChseSales.addActionListener(new ActionListener(){

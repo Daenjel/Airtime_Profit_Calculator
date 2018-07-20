@@ -6,6 +6,8 @@ import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -35,26 +37,26 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
 import javax.swing.event.InternalFrameListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
 import net.proteanit.sql.DbUtils;
-import javax.swing.SwingConstants;
 
 public class Stocks extends MainMDI implements InternalFrameListener {
 	private static JTable table_1;
 	private JTextField textField;
-	static JLabel lblTotalSales;
-	static double sum = 0;
+	static JLabel lblTotalSales,lblTotalCost,lblProfit;
+	static double sum,cost,profit = 0;
 	static DecimalFormat df2 = new DecimalFormat(".##");
 	private JComboBox<Object> cmbCompanyName;
 	private JComboBox<Object> cmbDeno;
 	static ArrayList<String> companys;
 	static ArrayList<String> deno;
 	private JButton btnCurrentStock;
+	JComboBox<Object> cmbWSalerID;
 	static Connection myconn = null;
-	private JTextField txtWSalerID;
 	public static void main(String[] args){
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -150,12 +152,16 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 					
 					else if(cmbDeno.getSelectedItem().equals("-Select Denomination-")){
 						JOptionPane.showMessageDialog(null, "Enter Denomination");}
-					
+
+					else if(cmbWSalerID.getSelectedItem().equals("-Select WholeSalerID-")){
+						JOptionPane.showMessageDialog(null, "Enter WholeSalerID");}
 					else if(textField.getText().equals("")){
 						JOptionPane.showMessageDialog(null, "Enter Number of Units");}
 					else if(textField.getText().equals("0")){
 						JOptionPane.showMessageDialog(null, "Units cannot be equals to Zero");}
 					else {
+						int MaxStock = 30;
+
 				try{					
 					Date curDate = new Date();
 					
@@ -163,6 +169,9 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 
 					String DateToStr = format.format(curDate);
 					System.out.println(DateToStr);
+					String Refill = textField.getText().toString();
+					int refiller = Integer.parseInt(Refill);
+					int setfiller = MaxStock - refiller;
 					PreparedStatement check = myconn.prepareStatement("SELECT Units FROM stocks WHERE CompanyName =? and Denominations =?");
 					check.setString(1,cmbCompanyName.getSelectedItem().toString());
 					check.setString(2,cmbDeno.getSelectedItem().toString());
@@ -170,31 +179,38 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 					   boolean recordAdded = false;
 					    if(!myRs.first()){            
 					       /// Do your insertion of new records
-					    	PreparedStatement mystmt = myconn.prepareStatement("insert into stocks (CompanyName,Denominations,Units,Date) values (?,?,?,?)");
+					    	PreparedStatement mystmt = myconn.prepareStatement("insert into stocks (CompanyName,Denominations,Units,Date,WholeSalerID,Refill) values (?,?,?,?,?,?)");
 							mystmt.setString(1,cmbCompanyName.getSelectedItem().toString());
 							mystmt.setString(2,cmbDeno.getSelectedItem().toString());
 							mystmt.setString(3,textField.getText().toString());
 							mystmt.setString(4,DateToStr.toString());
-							
+							mystmt.setString(5, cmbWSalerID.getSelectedItem().toString());
+							mystmt.setDouble(6, setfiller);
 							mystmt.execute();
 							JOptionPane.showMessageDialog(null,"Stock Saved");
 							CurrentStock();
 							System.out.println("Stocks Saved");
 							mystmt.close();
+							cmbWSalerID.setSelectedItem("-Select WholeSalerID-");
+							cmbCompanyName.setSelectedItem("-Select Company-");
+							cmbDeno.setSelectedItem("-Select Denomination-");
+							textField.setText(null);
 					         recordAdded = true;
 					    }
 					    else if( recordAdded ){
 					      JOptionPane.showMessageDialog(null, "Record added");
 					    }else{
 					       JOptionPane.showMessageDialog(null, "Record already exists Press EDIT to update");
+					       cmbWSalerID.getSelectedItem().toString();
 					   	   cmbCompanyName.getSelectedItem().toString();
 						   cmbDeno.getSelectedItem().toString();
 						   textField.getText().toString();
 					    }
 					check.close();
 				}catch (Exception e){
-					JOptionPane.showMessageDialog(null,e);
+					JOptionPane.showMessageDialog(null,"Maximum Stock Value Unit is: "+MaxStock);
 					e.printStackTrace();
+					cmbWSalerID.setSelectedItem("-Select WholeSalerID-");
 					cmbCompanyName.setSelectedItem("-Select Company-");
 					cmbDeno.setSelectedItem("-Select Denomination-");
 					textField.setText(null);
@@ -204,14 +220,14 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 			}
 		});
 		
-		
 		JLabel lblAddNewStock = new JLabel("Add New Stock");
 		lblAddNewStock.setBounds(255, 89, 219, 40);
 		lblAddNewStock.setFont(new Font("Times New Roman", Font.ITALIC, 22));
 		panel.add(lblAddNewStock);
 		
 		JLabel lblRequestNewStock = new JLabel("Current Stock");
-		lblRequestNewStock.setBounds(856, 89, 144, 40);
+		lblRequestNewStock.setHorizontalAlignment(SwingConstants.TRAILING);
+		lblRequestNewStock.setBounds(708, 89, 272, 40);
 		lblRequestNewStock.setFont(new Font("Times New Roman", Font.ITALIC, 22));
 		panel.add(lblRequestNewStock);
 		
@@ -281,27 +297,36 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 			public void actionPerformed(ActionEvent arg0) {
 				if (cmbCompanyName.getSelectedItem().equals("-Select Company-")){
 					JOptionPane.showMessageDialog(null,"Company Name is not declared");
+				}else if (cmbWSalerID.getSelectedItem().equals("-Select WholeSalerID-")){
+					JOptionPane.showMessageDialog(null,"WholeSalerID is not declared");
 				}else if (cmbDeno.getSelectedItem().equals("-Select Denomination-")){
 					JOptionPane.showMessageDialog(null,"Company Denomination is not declared");
 				}else if (textField.getText().equals("")){
 					JOptionPane.showMessageDialog(null,"Number of Units are not declared");
 				}else{
-					try{						
-						PreparedStatement mystmt = myconn.prepareStatement("update stocks set  Units =? where Denominations =? and CompanyName =?");
+					int MaxStock = 30;
+					try{
+						String Refill = textField.getText().toString();
+						int refiller = Integer.parseInt(Refill);
+						int setfiller = MaxStock - refiller;
+						PreparedStatement mystmt = myconn.prepareStatement("update stocks set  Units =?,Refill =? where Denominations =? and CompanyName =?");
 						mystmt.setString(1,textField.getText().toString());
-						mystmt.setString(2,cmbDeno.getSelectedItem().toString());
-						mystmt.setString(3,cmbCompanyName.getSelectedItem().toString());
+						mystmt.setDouble(2, setfiller);
+						mystmt.setString(3,cmbDeno.getSelectedItem().toString());
+						mystmt.setString(4,cmbCompanyName.getSelectedItem().toString());
 											
 						mystmt.execute();
 						JOptionPane.showMessageDialog(null, cmbCompanyName.getSelectedItem().toString()+ " denomination "+cmbDeno.getSelectedItem().toString()+ " has changed to  " + textField.getText().toString());
 						mystmt.close();
 						System.out.println("Edited");
 						CurrentStock();
+						cmbWSalerID.setSelectedItem("-Select WholeSalerID-");
 						cmbCompanyName.setSelectedItem("-Select Company-");
 						cmbDeno.setSelectedItem("-Select Denomination-");
 						textField.setText(null);
 					}catch(Exception e) {
-						JOptionPane.showMessageDialog(null, e);
+						JOptionPane.showMessageDialog(null,"Maximum Stock Value Unit is:  "+MaxStock);
+						cmbWSalerID.setSelectedItem("-Select WholeSalerID-");
 						cmbCompanyName.setSelectedItem("-Select Company-");
 						cmbDeno.setSelectedItem("-Select Denomination-");
 						textField.setText(null);
@@ -332,7 +357,7 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 				     
 				
 				try{					
-					PreparedStatement mystmt = myconn.prepareStatement("delete from airtime.stocks where CompanyName = ? and Denominations=?");
+					PreparedStatement mystmt = myconn.prepareStatement("delete from stocks where CompanyName = ? and Denominations=?");
 					mystmt.setString(1,cmbCompanyName.getSelectedItem().toString());
 					mystmt.setString(2,cmbDeno.getSelectedItem().toString());
 					
@@ -371,14 +396,7 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 		btnRefillStock.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				lblRequestNewStock.setText("Refill Stock");
-				try{				
-					PreparedStatement mystmt = myconn.prepareStatement("select Date,CompanyName,Denominations,Units from stocks order by date desc");
-					ResultSet myRs = mystmt.executeQuery();
-					table_1.setModel(DbUtils.resultSetToTableModel(myRs));
-					System.out.println("Displays Refill Stocks");
-				}catch (Exception e){
-					e.printStackTrace();
-				}
+				RefillStock();
 				btnRefillStock.setVisible(false);
 				btnCurrentStock.setVisible(true);
 			}
@@ -392,7 +410,7 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 		btnCurrentStock.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				lblRequestNewStock.setText("Current Stock");
-				CurrentStock();
+				CurrentStockButton();
 				System.out.println("Displays Current Stocks");
 				btnCurrentStock.setVisible(false);
 				btnRefillStock.setVisible(true);
@@ -421,8 +439,8 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 		label.setFont(new Font("Times New Roman", Font.ITALIC, 18));
 		panel.add(label);
 		
-		JLabel lblTotalCost = new JLabel("0.0");
-		lblTotalCost.setBounds(755, 440, 68, 34);
+		lblTotalCost = new JLabel("0.0");
+		lblTotalCost.setBounds(755, 440, 101, 34);
 		lblTotalCost.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblTotalCost.setForeground(Color.BLACK);
 		lblTotalCost.setFont(new Font("Times New Roman", Font.BOLD, 20));
@@ -433,17 +451,31 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 		lblProft.setFont(new Font("Times New Roman", Font.ITALIC, 18));
 		panel.add(lblProft);
 		
-		JLabel lblProfit = new JLabel("0.0");
+		lblProfit = new JLabel("0.0");
 		lblProfit.setBounds(953, 442, 77, 28);
 		lblProfit.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblProfit.setForeground(Color.BLACK);
 		lblProfit.setFont(new Font("Times New Roman", Font.BOLD, 20));
 		panel.add(lblProfit);
 		
-		txtWSalerID = new JTextField();
-		txtWSalerID.setColumns(10);
-		txtWSalerID.setBounds(336, 169, 231, 30);
-		panel.add(txtWSalerID);
+		cmbWSalerID = new JComboBox<Object>();
+		cmbWSalerID.setFont(new Font("Times New Roman", Font.ITALIC, 20));
+		cmbWSalerID.setBounds(336, 169, 231, 30);
+		cmbWSalerID.addItem("-Select WholeSalerID-");
+		panel.add(cmbWSalerID);
+		try{				
+			PreparedStatement mystmt = myconn.prepareStatement("select WholeSalerID from wholesale");						
+			ResultSet myRs = mystmt.executeQuery();
+			
+			  while(myRs.next())
+			  {
+				  cmbWSalerID.addItem(myRs.getString("WholeSalerID"));
+			  }		
+			  mystmt.close();			
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
 		
 		JLabel lblWholsalerId = new JLabel("WholeSaler ID:");
 		lblWholsalerId.setFont(new Font("Times New Roman", Font.ITALIC, 20));
@@ -452,11 +484,252 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 		
 		JComboBox<Object> cmbWholSaler = new JComboBox<Object>();
 		cmbWholSaler.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-		cmbWholSaler.setBounds(1077, 37, 171, 25);
-		cmbWholSaler.addItem("-WholeSaler ID-");
+		cmbWholSaler.setBounds(1039, 37, 209, 25);
+		cmbWholSaler.addItem("-Select WholeSalerID-");
 		panel.add(cmbWholSaler);
-	}
+		try{				
+			PreparedStatement mystmt = myconn.prepareStatement("select distinct WholeSalerID from stocks");						
+			ResultSet myRs = mystmt.executeQuery();
+			
+			  while(myRs.next())
+			  {
+				  cmbWholSaler.addItem(myRs.getString("WholeSalerID"));
+			  }		
+			  mystmt.close();			
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
+		cmbWholSaler.addItemListener(new ItemListener(){
 
+			@Override
+			public void itemStateChanged(ItemEvent event) {
+				JComboBox<?> cmbWholSaler = (JComboBox<?>)event.getSource();
+				
+				Object item = event.getItem();
+				
+				if(cmbWholSaler.getSelectedItem().equals("-Select WholeSalerID-")){
+					JOptionPane.showMessageDialog(null, "Select WholeSalerID");
+				}else if (event.getStateChange() == ItemEvent.SELECTED) {
+							 
+						    try {				
+								PreparedStatement mystmt = myconn.prepareStatement("select *from stocks where WholeSalerID = (?)");
+								mystmt.setString(1, item.toString());
+								ResultSet myRs = mystmt.executeQuery();
+								if(!myRs.first()){
+									JOptionPane.showMessageDialog(null, "No Stocks Recorded for WholeSalerID "+item.toString());
+									System.out.println("No Record for WholeSalerID");
+									table_1.setModel(DbUtils.resultSetToTableModel(myRs));
+									lblTotalSales.setText("0.0");
+									lblProfit.setText("0.0");
+									lblTotalCost.setText("0.0");
+								}else{
+									lblRequestNewStock.setText("WholeSalerID "+item.toString());
+
+									try {
+										mystmt = myconn.prepareStatement("select distinct companyName from stocks where WholeSalerID = (?)");
+										mystmt.setString(1,item.toString());
+										myRs = mystmt.executeQuery();
+										
+										DefaultTableModel model = new DefaultTableModel();
+										table_1.setModel(model);
+										table_1.setShowVerticalLines(true);
+										table_1.setCellSelectionEnabled(true);
+										table_1.setColumnSelectionAllowed(true);
+										companys = new ArrayList<>();
+										model.addColumn(" ");
+										while(myRs.next()){
+											companys.add(myRs.getString("CompanyName"));
+										
+										model.addColumn(myRs.getString("CompanyName"));
+										}
+										model.addColumn("Grand Totals");
+										
+										PreparedStatement mystmt1 = myconn.prepareStatement("select distinct Denominations from stocks  where WholeSalerID = (?) order by Denominations desc");
+										mystmt1.setString(1,item.toString());
+										ResultSet myRs1 = mystmt1.executeQuery();
+										ArrayList<String> deno = new ArrayList<>();
+										while(myRs1.next()){
+											deno.add(myRs1.getString("Denominations"));
+											
+											model.addRow(new Object[]{myRs1.getString("Denominations")});
+									}
+										model.addRow(new Object[]{"Total Sales"});
+										model.addRow(new Object[]{"Profit"});
+										model.addRow(new Object[]{"Cost Price"});
+										String val ="";
+										
+										int i,j;
+									for(i=0; i<deno.size();i++){
+										double totalUnits = 0;
+										for(j=0; j<companys.size();j++){
+											PreparedStatement mystmt2 = myconn.prepareStatement("select sum(Units) AS Units from stocks where WholeSalerID = (?) and CompanyName ='"+companys.get(j)+"' and Denominations = "+deno.get(i));
+											mystmt2.setString(1,item.toString());
+											ResultSet myRs2 = mystmt2.executeQuery();
+											TableColumn column = table_1.getColumnModel().getColumn(0);
+									        column.setPreferredWidth(110);
+											
+											while(myRs2.next()){
+												val=myRs2.getString("Units");
+												if(val!= null){
+													val=myRs2.getString("Units");	
+												}else {val="0";}
+												
+												}
+											model.setValueAt(val,i, j+1);
+											totalUnits = totalUnits+ Double.parseDouble(val);
+											model.setValueAt(totalUnits *Double.parseDouble(deno.get(i)),i, companys.size()+1);
+										}
+									
+									}
+									for(j=0;j<companys.size();j++){
+										for(i=0;i<deno.size();i++){
+											sum = sum+(Double.parseDouble(model.getValueAt(i, j+1).toString())*Double.parseDouble(deno.get(i)));
+											model.setValueAt(sum,deno.size(),j+1);
+											
+											PreparedStatement pro = myconn.prepareStatement("select distinct stocks.CompanyName,company.CompanyProfit from stocks,company where stocks.CompanyName=? and company.CompanyName=stocks.CompanyName");
+											pro.setString(1,companys.get(j));
+											ResultSet myPro = pro.executeQuery();
+											if(!myPro.next()){
+												System.out.println("No column sales");
+											}else{
+											double cost =myPro.getInt("CompanyProfit");
+											cost = cost*(Double.parseDouble(model.getValueAt(deno.size(),j+1).toString())/100);
+											model.setValueAt(Double.valueOf(df2.format(cost)),deno.size()+2,j+1);
+											cost = Double.valueOf(df2.format(cost));
+											System.out.println("Sum of cost "+j+ "-> " +cost);
+											
+											double profit = sum-cost;
+											model.setValueAt(Double.valueOf(df2.format(profit)),deno.size()+1,j+1);
+											profit = Double.valueOf(df2.format(profit));
+											System.out.println("Sum of Profit "+j+ "-> " +profit);}
+										}
+										System.out.println("Sum of col "+j+ "-> " +sum);
+										sum=0;
+									}
+									System.out.println("Record For Today");
+									for(int s=0;s<companys.size();s++){
+										
+										sum = sum+Double.parseDouble(table_1.getValueAt(deno.size(),s+1).toString());
+										lblTotalSales.setText(""+sum);
+										System.out.println("Sum today is" +sum);
+										
+										cost =cost+(Double.parseDouble(table_1.getValueAt(deno.size()+2,s+1).toString()));
+										cost = Double.valueOf(df2.format(cost));
+										System.out.println("Cost today is" +cost);
+										lblTotalCost.setText(""+cost);
+										
+										profit = sum-cost;
+										profit = Double.valueOf(df2.format(profit));
+										lblProfit.setText(""+profit);
+										System.out.println("Profit today is" +profit);
+										textFormat();
+									}
+									sum=0;
+									cost=0;
+									profit =0;
+									} catch (SQLException e) {
+										JOptionPane.showMessageDialog(null, e);
+										e.printStackTrace();
+									}
+								}
+						    } catch (Exception e) {
+						        JOptionPane.showMessageDialog(null,e, "Error",0);
+						        e.printStackTrace();
+						    }	    
+					
+				 }
+			}
+			
+		});
+	}
+	public static void textFormat(){
+		boolean bool = true;
+		int ndx = 0;
+    
+		NumberFormat cfLocal = NumberFormat.getCurrencyInstance();
+
+		String sCurSymbol = "";
+
+		DecimalFormatSymbols dfs = null;
+
+		if( cfLocal instanceof DecimalFormat ){ // determine if symbol is prefix or suffix
+		      dfs = ((DecimalFormat)cfLocal).getDecimalFormatSymbols();
+		      sCurSymbol = dfs.getCurrencySymbol();     
+		    }
+		Number n = null;
+		String sText = lblTotalSales.getText();  
+		ndx = sText.indexOf(sCurSymbol);
+		if( ndx == -1 ){ 
+		      if( bool ){
+		    	  sText = sCurSymbol + sText; }
+		      else{
+		    	  sText = sText + " " + sCurSymbol; }
+		    }
+		    try{
+		      n = cfLocal.parse( sText );
+		      lblTotalSales.setText( cfLocal.format( n ) );
+				System.out.println("Text Format");
+		    }
+		    catch( ParseException pe ) {
+		    	lblTotalSales.setText( "" );
+		    	}
+			String s1Text = lblProfit.getText();  
+			ndx = s1Text.indexOf(sCurSymbol);
+			if( ndx == -1 ){ 
+			      if( bool ){
+			    	  s1Text = sCurSymbol + s1Text; }
+			      else{
+			    	  s1Text = s1Text + " " + sCurSymbol; }
+			    }
+			    try{
+			      n = cfLocal.parse( s1Text );
+			      lblProfit.setText( cfLocal.format( n ) );
+					System.out.println("Text Format");
+			    }
+			    catch( ParseException pe ) {
+			    	lblProfit.setText( "" );
+			    	}
+				String s2Text = lblTotalCost.getText();  
+				ndx = s2Text.indexOf(sCurSymbol);
+				if( ndx == -1 ){ 
+				      if( bool ){
+				    	  s2Text = sCurSymbol + s2Text; }
+				      else{
+				    	  s2Text = s2Text + " " + sCurSymbol; }
+				    }
+				    try{
+				      n = cfLocal.parse( s2Text );
+				      lblTotalCost.setText( cfLocal.format( n ) );
+						System.out.println("Text Format");
+				    }
+				    catch( ParseException pe ) {
+				    	lblTotalCost.setText( "" );
+				    	}
+	}
+	public static void getStock(){
+		
+		for(int j=0;j<deno.size();j++){
+			
+			sum = sum+Double.parseDouble(table_1.getValueAt(j, companys.size()+1).toString());
+			lblTotalSales.setText(""+sum);
+			System.out.println("Sum inner is" +sum);
+			
+			cost =cost+(Double.parseDouble(table_1.getValueAt(deno.size(),j+1).toString()));
+			cost = Double.valueOf(df2.format(cost));
+			System.out.println("Cost is" +cost);
+			lblTotalCost.setText(""+cost);
+			
+			profit = sum-cost;
+			profit = Double.valueOf(df2.format(profit));
+			lblProfit.setText(""+profit);
+			System.out.println("Profit inner is" +profit);
+			textFormat();
+		}
+		 sum=0;
+		 cost =0;
+		 profit=0;
+	}	    
 	public static void CurrentStock(){
 		try {
 			PreparedStatement mystmt = myconn.prepareStatement("select distinct companyName from stocks");
@@ -522,47 +795,183 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 			JOptionPane.showMessageDialog(null, e);
 			e.printStackTrace();
 		}
-		System.out.println("Displays Stocks");
+		System.out.println("Displays Stocks");	
 	}
-	public static double getStock(){
-		
+	public static void CurrentStockButton(){
+		try {
+			PreparedStatement mystmt = myconn.prepareStatement("select distinct companyName from stocks");
+			
+			ResultSet myRs = mystmt.executeQuery();
+			
+			DefaultTableModel model = new DefaultTableModel();
+			table_1.setModel(model);
+			table_1.setFont(new Font("Times New Roman", Font.BOLD, 16));
+			table_1.setShowVerticalLines(true);
+			table_1.setCellSelectionEnabled(true);
+			table_1.setColumnSelectionAllowed(true);
+			companys = new ArrayList<>();
+			model.addColumn(" ");
+			while(myRs.next()){
+				companys.add(myRs.getString("CompanyName"));
+			
+			model.addColumn(myRs.getString("CompanyName"));
+			}
+			model.addColumn("Total Stocks");
+			
+			PreparedStatement mystmt1 = myconn.prepareStatement("select distinct Denominations from stocks order by Denominations desc");
+			
+			ResultSet myRs1 = mystmt1.executeQuery();
+			deno = new ArrayList<>();
+			while(myRs1.next()){
+				deno.add(myRs1.getString("Denominations"));
+				
+				model.addRow(new Object[]{myRs1.getString("Denominations")});
+		}	model.addRow(new Object[]{("Total Stk:")});			
+			String val ="";
+			
+			int i,j;
+		for(i=0; i<deno.size();i++){
+			double totalUnits = 0;
+			for(j=0; j<companys.size();j++){
+				PreparedStatement mystmt2 = myconn.prepareStatement("select sum(Units) AS Units from stocks where CompanyName ='"+companys.get(j)+"' and Denominations = "+deno.get(i));
+				ResultSet myRs2 = mystmt2.executeQuery();
+				TableColumn column = table_1.getColumnModel().getColumn(0);
+		        column.setPreferredWidth(100);
+				while(myRs2.next()){
+					val=myRs2.getString("Units");
+					if(val!= null){
+						val=myRs2.getString("Units");	
+					}else {val="0";}
+					
+					}
+				model.setValueAt(val,i, j+1);
+				totalUnits = totalUnits+ Double.parseDouble(val);
+				model.setValueAt(totalUnits *Double.parseDouble(deno.get(i)),i, companys.size()+1);
+			}
+			System.out.println(i);
+		}
+		for(j=0;j<companys.size();j++){
+			for(i=0;i<deno.size();i++){
+				sum = sum+(Double.parseDouble(model.getValueAt(i, j+1).toString())*Double.parseDouble(deno.get(i)));
+				model.setValueAt(sum,deno.size(),j+1);
+				}
+			System.out.println("Sum of col "+j+ "-> " +sum);
+			sum=0;
+		}
+		} catch (SQLException e) {
+			JOptionPane.showMessageDialog(null, e);
+			e.printStackTrace();
+		}
+		System.out.println("Displays Stocks");
+		for(int j=0;j<deno.size();j++){
+			sum = sum+Double.parseDouble(table_1.getValueAt(j, companys.size()+1).toString());
+			lblTotalSales.setText(""+sum);
+			System.out.println("Sum inner is" +sum);
+
+			cost =cost+(Double.parseDouble(table_1.getValueAt(deno.size(),j+1).toString()));
+			cost = Double.valueOf(df2.format(cost));
+			System.out.println("Cost get is" +cost);
+			lblTotalCost.setText(""+cost);
+			
+			profit = sum-cost;
+			profit = Double.valueOf(df2.format(profit));
+			lblProfit.setText(""+profit);
+			System.out.println("Profit get is" +profit);
+			textFormat();
+			}
+		sum=0;
+		profit=0;
+		cost=0;
+	}
+
+	public static void RefillStock(){
+		try {
+			PreparedStatement mystmt = myconn.prepareStatement("select distinct companyName from stocks");
+			
+			ResultSet myRs = mystmt.executeQuery();
+			
+			DefaultTableModel model = new DefaultTableModel();
+			table_1.setModel(model);
+			table_1.setFont(new Font("Times New Roman", Font.BOLD, 16));
+			table_1.setShowVerticalLines(true);
+			table_1.setCellSelectionEnabled(true);
+			table_1.setColumnSelectionAllowed(true);
+			companys = new ArrayList<>();
+			model.addColumn(" ");
+			while(myRs.next()){
+				companys.add(myRs.getString("CompanyName"));
+			
+			model.addColumn(myRs.getString("CompanyName"));
+			}
+			model.addColumn("Total Stocks");
+			
+			PreparedStatement mystmt1 = myconn.prepareStatement("select distinct Denominations from stocks order by Denominations desc");
+			
+			ResultSet myRs1 = mystmt1.executeQuery();
+			deno = new ArrayList<>();
+			while(myRs1.next()){
+				deno.add(myRs1.getString("Denominations"));
+				
+				model.addRow(new Object[]{myRs1.getString("Denominations")});
+		}	model.addRow(new Object[]{("Total Stk:")});			
+			String val ="";
+			
+			int i,j;
+		for(i=0; i<deno.size();i++){
+			double totalUnits = 0;
+			for(j=0; j<companys.size();j++){
+				PreparedStatement mystmt2 = myconn.prepareStatement("select sum(Refill) AS Refill from stocks where CompanyName ='"+companys.get(j)+"' and Denominations = "+deno.get(i));
+				ResultSet myRs2 = mystmt2.executeQuery();
+				TableColumn column = table_1.getColumnModel().getColumn(0);
+		        column.setPreferredWidth(100);
+				while(myRs2.next()){
+					val=myRs2.getString("Refill");
+					if(val!= null){
+						val=myRs2.getString("Refill");	
+					}else {val="0";}
+					
+					}
+				model.setValueAt(val,i, j+1);
+				totalUnits = totalUnits+ Double.parseDouble(val);
+				model.setValueAt(totalUnits *Double.parseDouble(deno.get(i)),i, companys.size()+1);
+			}
+			System.out.println(i);
+		}
+		for(j=0;j<companys.size();j++){
+			for(i=0;i<deno.size();i++){
+				sum = sum+(Double.parseDouble(model.getValueAt(i, j+1).toString())*Double.parseDouble(deno.get(i)));
+				model.setValueAt(sum,deno.size(),j+1);
+				}
+			System.out.println("Sum of col "+j+ "-> " +sum);
+			sum=0;
+			
+		}
+		} catch (SQLException e) {
+			JOptionPane.showMessageDialog(null, e);
+			e.printStackTrace();
+		}
+		System.out.println("Displays Refill Stocks");
 		for(int j=0;j<deno.size();j++){
 			
 			sum = sum+Double.parseDouble(table_1.getValueAt(j, companys.size()+1).toString());
 			lblTotalSales.setText(""+sum);
 			System.out.println("Sum inner is" +sum);
 			
-			boolean bool = true;
-			int ndx = 0;
-
-			NumberFormat cfLocal = NumberFormat.getCurrencyInstance();
-
-			String sCurSymbol = " ";
-
-			DecimalFormatSymbols dfs = null;
-
-			if( cfLocal instanceof DecimalFormat ){ // determine if symbol is prefix or suffix
-			      dfs = ((DecimalFormat)cfLocal).getDecimalFormatSymbols();
-			      sCurSymbol = dfs.getCurrencySymbol();      
-			    }
-			Number n = null;
-			String sText = lblTotalSales.getText();    
-			ndx = sText.indexOf(sCurSymbol);
-			if( ndx == -1 ){ 
-			      if( bool ){
-			    	  sText = sCurSymbol + sText; }
-			      else{
-			    	  sText = sText + " " + sCurSymbol; }
-			    }
-			    try{
-			      n = cfLocal.parse( sText );
-			      lblTotalSales.setText( cfLocal.format( n ) );
-			    }
-			    catch( ParseException pe ) {
-			    	lblTotalSales.setText( "" ); }
+			cost =cost+(Double.parseDouble(table_1.getValueAt(deno.size(),j+1).toString()));
+			cost = Double.valueOf(df2.format(cost));
+			System.out.println("Cost get is" +cost);
+			lblTotalCost.setText(""+cost);
+			
+			profit = sum-cost;
+			profit = Double.valueOf(df2.format(profit));
+			lblProfit.setText(""+profit);
+			System.out.println("Profit get is" +profit);
+			textFormat();
 			    
 			}
-		
-		return sum=0;
+		sum=0;
+		profit=0;
+		cost=0;
 	}
+	
 }

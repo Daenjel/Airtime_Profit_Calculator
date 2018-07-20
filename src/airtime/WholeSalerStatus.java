@@ -12,16 +12,16 @@ import javax.swing.JTable;
 
 import net.proteanit.sql.DbUtils;
 
-public class CheckStatus extends JFrame {
+public class WholeSalerStatus extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private JTable table;
 	Connection myconn = null;
 	public static void main(String[] args) {
-		new CheckStatus();
+		new WholeSalerStatus();
 	}
 
-	public CheckStatus() {
+	public WholeSalerStatus() {
 		myconn = JConnection.ConnecrDb();
 		JFrame frame = new JFrame();
 				
@@ -31,7 +31,7 @@ public class CheckStatus extends JFrame {
 	    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		optionPane.setOptionType(JOptionPane.CLOSED_OPTION);
 		
-	    JDialog dialog = optionPane.createDialog(frame, "Company Status");
+	    JDialog dialog = optionPane.createDialog(frame, "WholeSaler Status");
 	    dialog.setVisible(true);
 	    dialog.setSize(50,50);
 		setUndecorated(true);
@@ -47,7 +47,8 @@ public class CheckStatus extends JFrame {
 		optionPane.add(table);
 		scrollPane.setViewportView(table);
 		try{
-			PreparedStatement mystmt = myconn.prepareStatement("select *from company");
+			
+			PreparedStatement mystmt = myconn.prepareStatement("select * from wholesale");
 					
 			ResultSet myRs = mystmt.executeQuery();
 			
@@ -56,7 +57,7 @@ public class CheckStatus extends JFrame {
 			myRs.close();
 			mystmt.close();
 			myconn.close();
-			System.out.println("Displays Company Status");
+			System.out.println("Displays WholeSaler Status");
 			
 		}
 		catch(Exception e) {

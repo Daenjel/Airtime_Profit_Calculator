@@ -11,6 +11,7 @@ import java.awt.event.KeyEvent;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -32,7 +33,8 @@ public class Settings extends MainMDI implements InternalFrameListener {
 	private static Connection myconn = null;
 	static PreparedStatement mystmt;
 	private ResultSet myRs;
-	JComboBox<String> comboBoxEdtCompany;
+	JButton btnAddCompany;
+	JComboBox<String> comboBoxEdtCompany,cmbWSaler;
 	
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -76,6 +78,14 @@ public class Settings extends MainMDI implements InternalFrameListener {
 		panel.add(lblCompanyProfit);
 		
 		txtFieldCompanyName = new JTextField();
+		txtFieldCompanyName.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent evt) {
+				if(evt.getKeyCode() == KeyEvent.VK_ENTER){
+					txtFldCompanyProfit.requestFocus();
+				}
+			}
+		});
 		txtFieldCompanyName.setBounds(311, 196, 245, 25);
 		panel.add(txtFieldCompanyName);
 		txtFieldCompanyName.setColumns(10);
@@ -89,6 +99,9 @@ public class Settings extends MainMDI implements InternalFrameListener {
 					Toolkit.getDefaultToolkit().beep();
 					evt.consume();
 				JOptionPane.showMessageDialog(null, "Cannot Accept Letters");}
+				else if(evt.getKeyCode() == KeyEvent.VK_ENTER){
+					btnAddCompany.requestFocus();
+				}
 			}
 		});
 		txtFldCompanyProfit.setColumns(10);
@@ -206,7 +219,7 @@ public class Settings extends MainMDI implements InternalFrameListener {
 			
 		});
 		
-		JButton btnAddCompany = new JButton("Add");
+		btnAddCompany = new JButton("Add");
 		btnAddCompany.setIcon(new ImageIcon(Settings.class.getResource("/images/ic_create_new_folder_black_24dp_1x.png")));
 		btnAddCompany.setFont(new Font("Segoe UI", Font.ITALIC, 12));
 		btnAddCompany.setBounds(287, 326, 90, 33);
@@ -348,25 +361,76 @@ public class Settings extends MainMDI implements InternalFrameListener {
 		lblDelWSaler.setVisible(false);
 		panel1.add(lblDelWSaler);
 		
-		JComboBox<String> cmbWSaler = new JComboBox<String>();
+		cmbWSaler = new JComboBox<String>();
 		cmbWSaler.setFont(new Font("Times New Roman", Font.ITALIC, 20));
 		cmbWSaler.setBounds(209, 74, 186, 25);
-		cmbWSaler.addItem("-WholeSaler ID-");
+		cmbWSaler.addItem("-Select WholeSalerID-");
 		cmbWSaler.setVisible(false);
 		panel1.add(cmbWSaler);
-		
+		try
+		{				
+			mystmt = myconn.prepareStatement("select WholeSalerID from wholesale");
+			//Statement mystmt= myconn.createStatement();							
+			myRs = mystmt.executeQuery();
+			
+			  while(myRs.next())
+			  {
+				
+				  cmbWSaler.addItem(myRs.getString("WholeSalerID"));
+			  }		
+			  mystmt.close();
+			  System.out.println("Displays WholeSalerID Name on cmbWholSaler");
+			
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
 		JButton btnAddWSaler = new JButton("Add");
 		btnAddWSaler.setIcon(new ImageIcon(Settings.class.getResource("/images/ic_create_new_folder_black_24dp_1x.png")));
 		btnAddWSaler.setFont(new Font("Segoe UI", Font.ITALIC, 12));
 		btnAddWSaler.setBounds(73, 125, 90, 33);
 		panel1.add(btnAddWSaler);
+		btnAddWSaler.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				String insert = "insert into wholesale(WholeSalerID,Date) values (?,?)";
+				
+				Date curdate = new Date();
+				SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd");
+				
+				String DateToday = format.format(curdate);
+				if(txtWSalerID.getText().equals("")){
+					JOptionPane.showMessageDialog(null, "Enter WholeSalerID on the TextArea");
+				}else{
+				try {
+					mystmt = myconn.prepareStatement(insert);
+					mystmt.setString(1, txtWSalerID.getText().toString());
+					mystmt.setString(2, DateToday.toString());
+					mystmt.execute();
+					mystmt.close();
+					txtWSalerID.setText(null);
+					JOptionPane.showMessageDialog(null, "WholeSaler ID Saved");
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+			}
+		});
 		
 		JButton btnStatusWSaler = new JButton("Check Status");
 		btnStatusWSaler.setIcon(new ImageIcon(Settings.class.getResource("/images/ic_receipt_black_24dp_1x.png")));
 		btnStatusWSaler.setFont(new Font("Segoe UI", Font.ITALIC, 12));
 		btnStatusWSaler.setBounds(184, 125, 129, 33);
 		panel1.add(btnStatusWSaler);
-		
+		btnStatusWSaler.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				new WholeSalerStatus();
+			}
+			
+		});
 		JButton btnDelWSaler = new JButton("Delete");
 		btnDelWSaler.setIcon(new ImageIcon(Settings.class.getResource("/images/ic_delete_forever_black_24dp_1x.png")));
 		btnDelWSaler.setFont(new Font("Segoe UI", Font.ITALIC, 12));
@@ -380,6 +444,38 @@ public class Settings extends MainMDI implements InternalFrameListener {
 				txtWSalerID.setVisible(false);
 				lblDelWSaler.setVisible(true);
 				cmbWSaler.setVisible(true);
+				if (cmbWSaler.getSelectedItem().equals("-Select Company-")){
+					JOptionPane.showMessageDialog(null,"WholeSalerID is not declared");}
+				int response = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete  " + cmbWSaler.getSelectedItem().toString() + "  from the database"," Delete",
+						JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE);
+				 
+				if (response == JOptionPane.NO_OPTION) {
+					 System.out.println("Not Deleted");
+				      
+				    } else if (response == JOptionPane.YES_OPTION) {
+				     
+				
+				try{					
+					mystmt = myconn.prepareStatement("delete from wholesale where WholeSalerID =?");
+					mystmt.setString(1,cmbWSaler.getSelectedItem().toString());
+										
+					mystmt.execute();
+					JOptionPane.showMessageDialog(null, "WholeSalerID  " + cmbWSaler.getSelectedItem().toString() +"  has been deleted");
+
+					lblWholsalerId.setVisible(true);
+					txtWSalerID.setVisible(true);
+					lblDelWSaler.setVisible(false);
+					cmbWSaler.setVisible(false);
+					mystmt.close();
+					System.out.println("Deleted");
+					cmbWSaler.removeAllItems();
+					cmbWSaler.addItem("-Select WholeSalerID-");
+					addToComboWlSale();
+				}catch(Exception e) {
+					JOptionPane.showMessageDialog(null, e);
+					e.printStackTrace();
+				}
+			}
 			}
 			
 		});
@@ -396,12 +492,27 @@ public class Settings extends MainMDI implements InternalFrameListener {
 		  {			
 		  	comboBoxEdtCompany.addItem(myRs.getString("CompanyName"));
 		  }		
-		  mystmt.close();
-		  System.out.println("Displays Added Company Name on ComboBoxEdtCompany");	
+		  mystmt.close();	
 	}
 	catch(Exception e) {
 		e.printStackTrace();
 	}
   }		
+	protected void  addToComboWlSale(){
+		try
+		{		
+			mystmt = myconn.prepareStatement("select WholeSalerID from wholesale");							
+			myRs = mystmt.executeQuery();
+			
+			  while(myRs.next())
+			  {			
+				  cmbWSaler.addItem(myRs.getString("WholeSalerID"));
+			  }		
+			  mystmt.close();	
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
+	  }		
 }
 
