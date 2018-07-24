@@ -5,6 +5,8 @@ import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.sql.Connection;
@@ -44,6 +46,7 @@ import net.proteanit.sql.DbUtils;
 
 public class Sales extends MainMDI implements InternalFrameListener {
 	private JTextField txtFldEnterUnits;
+	JButton btnAdd;
 	private static JTable Salestable;
 	JDateChooser dateChooser;
 	static JLabel TotalSales,TotalCost,Profit;
@@ -124,7 +127,17 @@ public class Sales extends MainMDI implements InternalFrameListener {
 				catch(Exception e) {
 					e.printStackTrace();
 				}
-		
+		cbxChseCompany.addItemListener(new ItemListener(){
+
+			@Override
+			public void itemStateChanged(ItemEvent event) {
+				if(event.getStateChange()==ItemEvent.SELECTED){
+					denomination.requestFocus();
+				}
+			}
+			
+		});
+	
 		txtFldEnterUnits = new JTextField();
 		txtFldEnterUnits.addKeyListener(new KeyAdapter() {
 			@Override
@@ -134,6 +147,9 @@ public class Sales extends MainMDI implements InternalFrameListener {
 					Toolkit.getDefaultToolkit().beep();
 				   	evt.consume();
 				JOptionPane.showMessageDialog(null, "Cannot Accept Letters");}
+				else if(evt.getKeyCode() == KeyEvent.VK_ENTER){
+					btnAdd.requestFocus();
+				}
 			}
 		});
 		txtFldEnterUnits.setBounds(316, 271, 180, 28);
@@ -157,13 +173,22 @@ public class Sales extends MainMDI implements InternalFrameListener {
 		denomination.setSize(230, 30);
 		denomination.setFont(new Font("Times New Roman", Font.ITALIC,18));
 		panel.add(denomination);
+		denomination.addKeyListener(new KeyAdapter(){
+			@Override
+			public void keyTyped(KeyEvent evt) {
+				if(evt.getKeyCode() == KeyEvent.VK_ENTER){
+					txtFldEnterUnits.requestFocus();
+				}
+			}
+			
+		});
 		
 		JLabel lblUnitsSold = new JLabel("Units Sold:");
 		lblUnitsSold.setFont(new Font("Times New Roman", Font.ITALIC, 20));
 		lblUnitsSold.setBounds(109, 262, 180, 40);
 		panel.add(lblUnitsSold);
 		
-		JButton btnAdd = new JButton("Add");
+		btnAdd = new JButton("Add");
 		btnAdd.setIcon(new ImageIcon(Sales.class.getResource("/images/ic_library_add_black_24dp_1x.png")));
 		btnAdd.setFont(new Font("Segoe UI", Font.ITALIC, 12));
 		btnAdd.setBounds(181, 374, 100, 40);
@@ -235,12 +260,13 @@ public class Sales extends MainMDI implements InternalFrameListener {
 						updater.setString(3,denomination.getSelectedItem().toString() );
 						updater.execute();
 						System.out.println("Record Updated");
-						}
-					} 
+
 						TodaysReport();
 						cbxChseCompany.setSelectedItem("-Select Company-");
 						denomination.setSelectedItem("-Select Denomination-");
 						txtFldEnterUnits.setText(null);
+						}
+					} 
 					}
 					catch(Exception e){
 						 JOptionPane.showMessageDialog(null,e,"Duplicate Entry Alert",1);
@@ -605,9 +631,9 @@ public class Sales extends MainMDI implements InternalFrameListener {
 				    	  String password = new String(pf.getPassword());
 				    	  System.err.println("You entered: " + password);
 				    	  if(password.equals("4321")){
-								 System.out.println("Not Deleted");
+								 System.out.println("Deleted");
 				    	  }else{
-						 System.out.println("Deleted");
+						 System.out.println("Not Deleted");
 				    	  }
 				    }
 				}

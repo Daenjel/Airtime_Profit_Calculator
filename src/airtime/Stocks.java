@@ -56,6 +56,7 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 	static ArrayList<String> deno;
 	private JButton btnCurrentStock;
 	JComboBox<Object> cmbWSalerID;
+	static JComboBox<Object> cmbWholSaler;
 	static Connection myconn = null;
 	public static void main(String[] args){
 		EventQueue.invokeLater(new Runnable() {
@@ -188,7 +189,9 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 							mystmt.setDouble(6, setfiller);
 							mystmt.execute();
 							JOptionPane.showMessageDialog(null,"Stock Saved");
-							CurrentStock();
+							CurrentStockButton();
+							//cmbWholSaler.removeAllItems();
+							//addToComboWlSale();
 							System.out.println("Stocks Saved");
 							mystmt.close();
 							cmbWSalerID.setSelectedItem("-Select WholeSalerID-");
@@ -210,10 +213,6 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 				}catch (Exception e){
 					JOptionPane.showMessageDialog(null,"Maximum Stock Value Unit is: "+MaxStock);
 					e.printStackTrace();
-					cmbWSalerID.setSelectedItem("-Select WholeSalerID-");
-					cmbCompanyName.setSelectedItem("-Select Company-");
-					cmbDeno.setSelectedItem("-Select Denomination-");
-					textField.setText(null);
 				}
 				
 			}
@@ -319,7 +318,7 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 						JOptionPane.showMessageDialog(null, cmbCompanyName.getSelectedItem().toString()+ " denomination "+cmbDeno.getSelectedItem().toString()+ " has changed to  " + textField.getText().toString());
 						mystmt.close();
 						System.out.println("Edited");
-						CurrentStock();
+						CurrentStockButton();
 						cmbWSalerID.setSelectedItem("-Select WholeSalerID-");
 						cmbCompanyName.setSelectedItem("-Select Company-");
 						cmbDeno.setSelectedItem("-Select Denomination-");
@@ -342,12 +341,12 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 		btnRemove.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				if (cmbCompanyName.getSelectedItem().equals("-Select Company-")){
-					JOptionPane.showMessageDialog(null,"Company Name is not declared");
+					JOptionPane.showMessageDialog(null,"Company Name not declared");
 			}else if (cmbDeno.getSelectedItem().equals("-Select Denomination-")){
-				JOptionPane.showMessageDialog(null,"Company Denomination is not declared");
-			}else if(textField.getText().equals(" ")){
-				JOptionPane.showMessageDialog(null,"Number of Units are not declared");}
-				int response = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete  " + cmbCompanyName.getSelectedItem().toString() + " with Demonimation "+cmbDeno.getSelectedItem().toString()+ "  from Stock"," Delete",
+				JOptionPane.showMessageDialog(null,"Company Denomination not declared");
+			}else if(cmbWSalerID.getSelectedItem().equals("-Select WholeSalerID-")){
+				JOptionPane.showMessageDialog(null,"WholeSalerID not declared");}
+				int response = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete  " + cmbCompanyName.getSelectedItem().toString() + " with Demonimation "+cmbDeno.getSelectedItem().toString()+ "  from Stock WholeSalerID  "+ cmbWSalerID.getSelectedItem().toString()," Delete",
 						JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE);
 				 
 				if (response == JOptionPane.NO_OPTION) {
@@ -357,19 +356,20 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 				     
 				
 				try{					
-					PreparedStatement mystmt = myconn.prepareStatement("delete from stocks where CompanyName = ? and Denominations=?");
+					PreparedStatement mystmt = myconn.prepareStatement("delete from stocks where CompanyName = ? and Denominations=? and WholeSalerID=?");
 					mystmt.setString(1,cmbCompanyName.getSelectedItem().toString());
 					mystmt.setString(2,cmbDeno.getSelectedItem().toString());
-					
+					mystmt.setString(3, cmbWSalerID.getSelectedItem().toString());
 										
 					mystmt.execute();
 					JOptionPane.showMessageDialog(null, "Company Name  " + cmbCompanyName.getSelectedItem().toString() +"  has been deleted");
 					
 					mystmt.close();
 					System.out.println("Deleted");
-					CurrentStock();
+					CurrentStockButton();
 					cmbCompanyName.setSelectedItem("-Select Company-");
 					cmbDeno.setSelectedItem("-Select Denomination-");
+					cmbWSalerID.setSelectedItem("-Select WholeSalerID-");
 					textField.setText(null);
 				
 				}catch(Exception e) {
@@ -385,7 +385,7 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 		panel.add(btnRemove);
 		
 		lblTotalSales = new JLabel("0.0");
-		lblTotalSales.setBounds(1160, 444, 90, 30);
+		lblTotalSales.setBounds(1150, 444, 100, 30);
 		lblTotalSales.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblTotalSales.setForeground(Color.BLACK);
 		lblTotalSales.setFont(new Font("Times New Roman", Font.CENTER_BASELINE, 20));
@@ -452,7 +452,7 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 		panel.add(lblProft);
 		
 		lblProfit = new JLabel("0.0");
-		lblProfit.setBounds(953, 442, 77, 28);
+		lblProfit.setBounds(930, 442, 120, 28);
 		lblProfit.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblProfit.setForeground(Color.BLACK);
 		lblProfit.setFont(new Font("Times New Roman", Font.BOLD, 20));
@@ -482,24 +482,12 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 		lblWholsalerId.setBounds(156, 169, 171, 30);
 		panel.add(lblWholsalerId);
 		
-		JComboBox<Object> cmbWholSaler = new JComboBox<Object>();
+		cmbWholSaler = new JComboBox<Object>();
 		cmbWholSaler.setFont(new Font("Times New Roman", Font.ITALIC, 20));
 		cmbWholSaler.setBounds(1039, 37, 209, 25);
 		cmbWholSaler.addItem("-Select WholeSalerID-");
 		panel.add(cmbWholSaler);
-		try{				
-			PreparedStatement mystmt = myconn.prepareStatement("select distinct WholeSalerID from stocks");						
-			ResultSet myRs = mystmt.executeQuery();
-			
-			  while(myRs.next())
-			  {
-				  cmbWholSaler.addItem(myRs.getString("WholeSalerID"));
-			  }		
-			  mystmt.close();			
-		}
-		catch(Exception e) {
-			e.printStackTrace();
-		}
+		addToComboWlSale();
 		cmbWholSaler.addItemListener(new ItemListener(){
 
 			@Override
@@ -510,7 +498,8 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 				
 				if(cmbWholSaler.getSelectedItem().equals("-Select WholeSalerID-")){
 					JOptionPane.showMessageDialog(null, "Select WholeSalerID");
-				}else if (event.getStateChange() == ItemEvent.SELECTED) {
+				}else
+					if (event.getStateChange() == ItemEvent.SELECTED) {
 							 
 						    try {				
 								PreparedStatement mystmt = myconn.prepareStatement("select *from stocks where WholeSalerID = (?)");
@@ -519,6 +508,7 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 								if(!myRs.first()){
 									JOptionPane.showMessageDialog(null, "No Stocks Recorded for WholeSalerID "+item.toString());
 									System.out.println("No Record for WholeSalerID");
+									lblRequestNewStock.setText("WholeSalerID "+item.toString());
 									table_1.setModel(DbUtils.resultSetToTableModel(myRs));
 									lblTotalSales.setText("0.0");
 									lblProfit.setText("0.0");
@@ -637,7 +627,6 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 						        JOptionPane.showMessageDialog(null,e, "Error",0);
 						        e.printStackTrace();
 						    }	    
-					
 				 }
 			}
 			
@@ -973,5 +962,20 @@ public class Stocks extends MainMDI implements InternalFrameListener {
 		profit=0;
 		cost=0;
 	}
-	
+	protected static void  addToComboWlSale(){
+		try
+		{		
+			PreparedStatement mystmt = myconn.prepareStatement("select distinct WholeSalerID from wholesale");							
+			ResultSet myRs = mystmt.executeQuery();
+			
+			  while(myRs.next())
+			  {			
+				  cmbWholSaler.addItem(myRs.getString("WholeSalerID"));
+			  }		
+			  mystmt.close();	
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
+	  }	
 }
